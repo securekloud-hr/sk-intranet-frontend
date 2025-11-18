@@ -69,7 +69,7 @@ const InternalJobs = () => {
       <Card>
         <CardHeader>
           <CardTitle>Select Job</CardTitle>
-          <CardDescription>Choose a job to filter</CardDescription>
+          <CardDescription>Choose a job to  filter</CardDescription>
         </CardHeader>
         <CardContent>
           <select
