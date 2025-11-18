@@ -1,0 +1,36 @@
+[
+  {
+    "id": "1033",
+    "name": "Mukund",
+    "role": "employee",
+    "department": "Engineering",
+    "skills": [
+      "React",
+      "Node.js",
+      "UI/UX"
+    ],
+    "profilePic": "/employee-images/1033.png"
+  },
+  {
+    "id": "1024",
+    "name": "Deva",
+     "role": "employee",
+    "department": "HR",
+    "skills": [
+      "Recruitment",
+      "Payroll"
+    ],
+    "profilePic": "/employee-images/1024.png"
+  },
+  {
+    "id": "1015",
+    "name": "vasudha ",
+     "role": "admin",
+    "department": "Finance",
+    "skills": [
+      "Budgeting",
+      "Forecasting"
+    ],
+    "profilePic": "/employee-images/1015.png"
+  }
+]
