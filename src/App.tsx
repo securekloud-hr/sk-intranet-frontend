@@ -30,6 +30,7 @@ import MyCourses from "./Pages/MyCourses";
 const queryClient = new QueryClient();
 
 export default function App() {
+  console.log("App rendered");
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
