@@ -203,7 +203,7 @@ const Holidays = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Holiday Policy Highlights</CardTitle>
+          <CardTitle>Holiday Policy Highlights ...</CardTitle>
           <CardDescription>Key points from our company holiday policy</CardDescription>
         </CardHeader>
         <CardContent>
