@@ -14,9 +14,6 @@
  *  - In prod → "" (frontend will call /api/..., Nginx handles the rest)
  */
 
-const API_BASE_URL = import.meta.env.PROD
-  ? "" // ✅ Production: use relative /api calls (proxied by Nginx)
-  // : "http://3.108.233.2:8000"; // ✅ Development: local backend
-  : "http://localhost:8000"; // ✅ Development: local backend
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export default API_BASE_URL;

@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
  * - If you proxy /api to backend via Nginx in prod, set API = "" (same origin).
  * - For local dev with backend on 8000, use: "http://localhost:8000".
  */
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_URL
 
 type Question = {
   _id: string;

@@ -68,8 +68,8 @@ const InternalJobs = () => {
       {/* List Box Filter */}
       <Card>
         <CardHeader>
-          <CardTitle>Select Job</CardTitle>
-          <CardDescription>Choose a job to  filter</CardDescription>
+          <CardTitle>Select  Job</CardTitle>
+          <CardDescription>Choose a job to filter</CardDescription>
         </CardHeader>
         <CardContent>
           <select

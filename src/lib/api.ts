@@ -1,7 +1,10 @@
 // src/lib/api.ts
-import { msalInstance, loginRequest } from "@/Pages/auth";
+// import { msalInstance, loginRequest } from "@/Pages/auth";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { loginRequest, msalInstance } from "@/auth";
+
+
+const API_BASE = import.meta.env.VITE_API_URL
 
 // Acquire ID token from MSAL
 export async function getIdToken(): Promise<string> {
