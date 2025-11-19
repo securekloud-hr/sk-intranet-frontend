@@ -191,7 +191,7 @@ const JobCard = ({ job }: JobCardProps) => {
           </ul>
         </div>
         <div className="flex flex-wrap gap-4 pt-2">
-          <Button>View Job Details</Button>
+        
           <Button variant="outline">Apply Now</Button>
         </div>
       </CardContent>
