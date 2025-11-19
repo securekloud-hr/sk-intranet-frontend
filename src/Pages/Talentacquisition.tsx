@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
+
 import {
   Card,
   CardContent,
@@ -11,6 +12,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { UserPlus, Award, Building } from "lucide-react";
 import API from "@/config";
+
+type UserLike = {
+  name?: string;
+  email?: string;
+  role?: "admin" | "user";
+  fullName?: string;
+  type?: string;
+};
 
 enum Priority {
   High = "high",
@@ -101,6 +110,20 @@ const TalentAcquisition = () => {
   });
   const [resume, setResume] = useState<File | null>(null);
 
+  // 🔐 Read user from localStorage and determine role
+  const cachedUser = useMemo<UserLike | null>(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (raw && raw !== "undefined") return JSON.parse(raw);
+    } catch (err) {
+      console.error("Failed to parse user from localStorage", err);
+    }
+    return null;
+  }, []);
+
+  const role = cachedUser?.role || "user";
+  const isAdmin = role === "admin";
+
   useEffect(() => {
     fetch(`${API}/api/jobs`)
       .then((res) => res.json())
@@ -122,9 +145,7 @@ const TalentAcquisition = () => {
       body: formData,
     });
 
-    const res = await fetch(`${API}/api/jobs`
-
-    );
+    const res = await fetch(`${API}/api/jobs`);
     const data = await res.json();
     setOpportunities(data);
   };
@@ -208,7 +229,8 @@ const TalentAcquisition = () => {
             <li>Refer qualified candidates for open positions at SecureKloud.</li>
             <li>If your referral is hired and completes 90 days, you earn a bonus.</li>
             <li>
-              Bonus amounts vary by position, with high-priority roles offering higher incentives.
+              Bonus amounts vary by position, with high-priority roles offering higher
+              incentives.
             </li>
             <li>
               Submit referrals through the form below or email recruiting@securekloud.com.
@@ -311,19 +333,23 @@ const TalentAcquisition = () => {
         </CardContent>
       </Card>
 
-      {/* Upload Excel */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Referral Opportunities</CardTitle>
-          <CardDescription>Upload an Excel sheet to update jobs list</CardDescription>
-        </CardHeader>
-        <CardContent className="flex gap-4">
-          <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
-          <Button onClick={handleUpload} disabled={!file}>
-            Upload & Update
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Upload Excel – only for Admin */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload Referral Opportunities</CardTitle>
+            <CardDescription>
+              Upload an Excel sheet to update jobs list
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-4">
+            <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
+            <Button onClick={handleUpload} disabled={!file}>
+              Upload & Update
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Jobs List */}
       <div>
@@ -386,7 +412,9 @@ const TalentAcquisition = () => {
       <Card>
         <CardHeader>
           <CardTitle>Talent Acquisition Resources</CardTitle>
-          <CardDescription>Tools to help you refer the best candidates</CardDescription>
+          <CardDescription>
+            Tools to help you refer the best candidates
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <p>Access detailed job descriptions for all open positions.</p>

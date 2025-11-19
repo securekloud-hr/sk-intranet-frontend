@@ -217,6 +217,23 @@ const uniqueDepartments = Array.from(
       .filter(Boolean)
   )
 ).sort();
+// 👇 add near other useState hooks
+
+
+// 👇 add in the same useEffect where you load user / data, or create a new one:
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem("user");
+    if (raw && raw !== "undefined") {
+      const parsed = JSON.parse(raw);
+      // role comes from MongoDB user document: "admin" | "user"
+      setIsAdmin(parsed.role === "admin");
+    }
+  } catch (e) {
+    console.error("Failed to read user from localStorage", e);
+  }
+}, []);
+
 
 
 
@@ -4198,6 +4215,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
           ? "You are viewing full employee details (Admin access)."
           : "You are viewing limited employee details. Sensitive information is hidden."}
       </DialogDescription>
+    
     </DialogHeader>
 
     {loadingEmployees ? (
@@ -4231,27 +4249,29 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
             </select>
           </div>
 
-          {/* 🩸 Blood Group Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">
-              Blood Group
-            </label>
-            <select
-              value={selectedBloodGroup}
-              onChange={(e) => setSelectedBloodGroup(e.target.value)}
-              className="border p-2 rounded"
-            >
-              <option value="">All</option>
-              <option value="A+Ve">A+Ve</option>
-              <option value="A-Ve">A-Ve</option>
-              <option value="B+Ve">B+Ve</option>
-              <option value="B-Ve">B-Ve</option>
-              <option value="O+Ve">O+Ve</option>
-              <option value="O-Ve">O-Ve</option>
-              <option value="AB+Ve">AB+Ve</option>
-              <option value="AB-Ve">AB-Ve</option>
-            </select>
-          </div>
+          {/* 🩸 Blood Group Filter – only for Admin */}
+          {isAdmin && (
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">
+                Blood Group
+              </label>
+              <select
+                value={selectedBloodGroup}
+                onChange={(e) => setSelectedBloodGroup(e.target.value)}
+                className="border p-2 rounded"
+              >
+                <option value="">All</option>
+                <option value="A+Ve">A+Ve</option>
+                <option value="A-Ve">A-Ve</option>
+                <option value="B+Ve">B+Ve</option>
+                <option value="B-Ve">B-Ve</option>
+                <option value="O+Ve">O+Ve</option>
+                <option value="O-Ve">O-Ve</option>
+                <option value="AB+Ve">AB+Ve</option>
+                <option value="AB-Ve">AB-Ve</option>
+              </select>
+            </div>
+          )}
 
           {/* 🧠 Skills Filter */}
           <div className="flex-1 flex flex-col">
@@ -4293,7 +4313,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               emp.Department === selectedDepartment ||
               emp.department === selectedDepartment;
 
+            // 🔒 For non-admins, ignore blood-group filter completely
             const matchBlood =
+              !isAdmin ||
               !selectedBloodGroup ||
               emp.BloodGroup === selectedBloodGroup;
 

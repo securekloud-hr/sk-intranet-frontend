@@ -1,78 +1,87 @@
-﻿import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, User, Users, Upload, RefreshCw } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import * as XLSX from 'xlsx';
+﻿import React, { useState, useEffect } from "react";
+import { ChevronDown, ChevronUp, User, Users, Upload, RefreshCw } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import * as XLSX from "xlsx";
 import API from "@/config";
 
 // Enhanced role detection matching the org chart structure
-const detectRoleHierarchy = (roleText: string, department: string): { level: string, title: string } => {
+const detectRoleHierarchy = (
+  roleText: string,
+  department: string
+): { level: string; title: string } => {
   let role = roleText.toLowerCase().trim();
 
   // normalize "TEAM MEMBER - ..." style
-  role = role.replace(/team\s*member\s*-/i, '').replace(/team\s*member/i, '').trim();
+  role = role.replace(/team\s*member\s*-/i, "").replace(/team\s*member/i, "").trim();
 
   // CEO and C-level
-  if (role === 'ceo' || role === 'ceo office' || role.startsWith('ceo ') || role === 'ceo & chairman') {
-    return { level: 'CEO', title: roleText };
+  if (
+    role === "ceo" ||
+    role === "ceo office" ||
+    role.startsWith("ceo ") ||
+    role === "ceo & chairman"
+  ) {
+    return { level: "CEO", title: roleText };
   }
-  if (role.includes('director&operations') || role.includes('director operations')) {
-    return { level: 'DIRECTOR & OPERATIONS', title: 'Director&operations' };
+  if (role.includes("director&operations") || role.includes("director operations")) {
+    return { level: "DIRECTOR & OPERATIONS", title: "Director&operations" };
   }
-  if (role.includes('cdo') || role.includes('people & culture')) {
-    return { level: 'CDO / Head-People & Culture', title: 'CDO/people & culture' };
+  if (role.includes("cdo") || role.includes("people & culture")) {
+    return { level: "CDO / Head-People & Culture", title: "CDO/people & culture" };
   }
-  if (role === 'cfo') {
-    return { level: 'CFO', title: 'CFO' };
+  if (role === "cfo") {
+    return { level: "CFO", title: "CFO" };
   }
-  if (role.includes('cro') || role.includes('wtd')) {
-    return { level: 'CRO/WTD', title: 'CRO/WTD' };
+  if (role.includes("cro") || role.includes("wtd")) {
+    return { level: "CRO/WTD", title: "CRO/WTD" };
   }
-  if (role.includes('director') && role.includes('delivery')) {
-    return { level: 'DEPT_DIRECTOR', title: 'Director-Delivery-CMS' };
+  if (role.includes("director") && role.includes("delivery")) {
+    return { level: "DEPT_DIRECTOR", title: "Director-Delivery-CMS" };
   }
-  if (role.includes('senior manager') || role.includes('sr manager')) {
-    return { level: 'SENIOR_MANAGER', title: roleText };
+  if (role.includes("senior manager") || role.includes("sr manager")) {
+    return { level: "SENIOR_MANAGER", title: roleText };
   }
-  if (role.includes('vp ')) {
-    return { level: 'VP', title: roleText };
+  if (role.includes("vp ")) {
+    return { level: "VP", title: roleText };
   }
-  if (role.includes('finance manager') && !role.includes('team member')) {
-    return { level: 'Finance Manager', title: roleText };
+  if (role.includes("finance manager") && !role.includes("team member")) {
+    return { level: "Finance Manager", title: roleText };
   }
-  if (role.includes('company secretary') || role === 'cs') {
-    return { level: 'Company Secretary', title: 'Company Secretary' };
+  if (role.includes("company secretary") || role === "cs") {
+    return { level: "Company Secretary", title: "Company Secretary" };
   }
 
   // role map
   const roleMap: Record<string, { level: string; title: string }> = {
-    "hr": { level: "HR", title: "HR" },
-    "finance": { level: "FINANCE", title: "Finance" },
-    "bda": { level: "BDA", title: "Business Development Associate" },
+    hr: { level: "HR", title: "HR" },
+    finance: { level: "FINANCE", title: "Finance" },
+    bda: { level: "BDA", title: "Business Development Associate" },
     "it admin": { level: "IT_ADMIN", title: "Associate Manager - I.T. Opertions" },
-    "iam": { level: "IAM", title: "Head of IAM" },
-    "sales": { level: "SALES", title: "Sales" },
-    "marketing": { level: "MARKETING", title: "Marketing" },
-    "ta": { level: "TA", title: "Talent Acquisition" },
-    "admin": { level: "ADMIN", title: "Admin" },
-    "t a": { level: "TA", title: "Talent Acquisition" }
+    iam: { level: "IAM", title: "Head of IAM" },
+    sales: { level: "SALES", title: "Sales" },
+    marketing: { level: "MARKETING", title: "Marketing" },
+    ta: { level: "TA", title: "Talent Acquisition" },
+    admin: { level: "ADMIN", title: "Admin" },
+    "t a": { level: "TA", title: "Talent Acquisition" },
   };
 
   if (roleMap[role]) {
     return roleMap[role];
   }
 
-  return { level: 'TEAM_MEMBER', title: roleText };
+  return { level: "TEAM_MEMBER", title: roleText };
 };
 
 const normalizeExcelData = (excelData: any[]): any[] => {
   return excelData.map((row) => {
     const lowerRow: any = {};
-    Object.keys(row).forEach(key => {
+    Object.keys(row).forEach((key) => {
       lowerRow[key.trim().toLowerCase()] = row[key];
     });
 
     const rawRole = (lowerRow["role"] || "").toString().trim();
-    const department = (lowerRow["department"] || "").toString()
+    const department = (lowerRow["department"] || "")
+      .toString()
       .replace(/[^a-zA-Z0-9 ]/g, "")
       .trim();
 
@@ -81,13 +90,13 @@ const normalizeExcelData = (excelData: any[]): any[] => {
     return {
       id: lowerRow["emp id"]?.toString().trim() || `temp-${Math.random()}`,
       name: lowerRow["associate name"]?.toString().trim(),
-     title: rawRole,            
+      title: rawRole, // Always show Excel role
       email: lowerRow["email"]?.toString().trim(),
       phone: lowerRow["phone no"]?.toString().trim(),
       department,
       subTeam: lowerRow["sub team"]?.toString().trim() || "General",
       role: hierarchy.level,
-      hierarchyTitle: hierarchy.title, 
+      hierarchyTitle: hierarchy.title,
       reportingManager: lowerRow["reporting manager"]?.toString().trim() || "",
     };
   });
@@ -99,7 +108,7 @@ interface Person {
   title: string;
   email: string;
   phone: string;
-  children?: Person[];  // NEW: Support for nested reports
+  children?: Person[];
 }
 
 interface Team {
@@ -130,34 +139,34 @@ interface OrgStructure {
   branches: ExecutiveBranch[];
 }
 
-const OrgChart = () => {
-
+const OrgChart: React.FC = () => {
   const [orgData, setOrgData] = useState<OrgStructure | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [uploadStatus, setUploadStatus] = useState<string>("");
   const [expandedBranches, setExpandedBranches] = useState<Set<string>>(new Set());
   const [expandedDepartments, setExpandedDepartments] = useState<Set<string>>(new Set());
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
 
+  // 🔐 Admin visibility (same logic as sidebar)
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const getDefaultOrgData = (): OrgStructure => ({
     ceo: {
-      id: 'ceo',
-      name: 'Suresh V',
-      title: 'CEO',
-      email: '',
-      phone: ''
+      id: "ceo",
+      name: "Suresh V",
+      title: "CEO",
+      email: "",
+      phone: "",
     },
     seniorEA: {
-      id: 'senior-ea',
-      name: 'Hemamalini K',
-      title: 'Senior EA',
-      email: '',
-      phone: ''
+      id: "senior-ea",
+      name: "Hemamalini K",
+      title: "Senior EA",
+      email: "",
+      phone: "",
     },
-    branches: []
+    branches: [],
   });
-    // 🔐 Admin visibility (same logic as sidebar)
-  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     try {
@@ -174,44 +183,54 @@ const OrgChart = () => {
     }
   }, []);
 
+  // Helper function to validate org structure
+  const validateOrgStructure = (data: any): OrgStructure => {
+    const defaultData = getDefaultOrgData();
+    return {
+      ceo: data.ceo || defaultData.ceo,
+      seniorEA: data.seniorEA || defaultData.seniorEA,
+      branches: Array.isArray(data.branches) ? data.branches : defaultData.branches,
+    };
+  };
+
+  const loadOrgData = async () => {
+    try {
+      setIsLoading(true);
+      setUploadStatus("Loading organization data...");
+
+      // 🔹 Fetch saved organization data from backend
+      const response = await fetch(`${API}/api/org/structure`);
+
+      if (response.ok) {
+        const data = await response.json();
+        const validatedData = validateOrgStructure(data);
+        setOrgData(validatedData);
+        setUploadStatus(""); // no banner in UI
+      } else if (response.status === 404) {
+        // No stored org data yet → show default
+        const defaultData = getDefaultOrgData();
+        setOrgData(defaultData);
+        setUploadStatus("No saved org data found. Please upload an Excel file.");
+      } else {
+        // Server error
+        const defaultData = getDefaultOrgData();
+        setOrgData(defaultData);
+        setUploadStatus(`Server error (${response.status}). Showing default data.`);
+      }
+    } catch (error) {
+      console.error("Failed to load org structure:", error);
+      const defaultData = getDefaultOrgData();
+      setOrgData(defaultData);
+      setUploadStatus("Connection error – showing default data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadOrgData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-const loadOrgData = async () => {
-  try {
-    setIsLoading(true);
-    setUploadStatus("Loading organization data...");
-
-    // 🔹 Fetch saved organization data from backend
-    const response = await fetch(`${API}/api/org/structure`);
-
-    if (response.ok) {
-      const data = await response.json();
-      const validatedData = validateOrgStructure(data);
-      setOrgData(validatedData);
-      setUploadStatus("Loaded organization structure from server");
-    } else if (response.status === 404) {
-      // No stored org data yet → show default
-      const defaultData = getDefaultOrgData();
-      setOrgData(defaultData);
-      setUploadStatus("No saved org data found. Please upload an Excel file.");
-    } else {
-      // Server error
-      const defaultData = getDefaultOrgData();
-      setOrgData(defaultData);
-      setUploadStatus(`Server error (${response.status}). Showing default data.`);
-    }
-  } catch (error) {
-    console.error("Failed to load org structure:", error);
-    const defaultData = getDefaultOrgData();
-    setOrgData(defaultData);
-    setUploadStatus("Connection error – showing default data.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -219,76 +238,77 @@ const loadOrgData = async () => {
 
     try {
       setIsLoading(true);
-      setUploadStatus('Reading Excel file...');
+      setUploadStatus("Reading Excel file...");
 
       const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const excelData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
 
       if (!excelData || excelData.length === 0) {
-        throw new Error('Excel file is empty or invalid');
+        throw new Error("Excel file is empty or invalid");
       }
 
-      setUploadStatus('Processing organizational hierarchy...');
+      setUploadStatus("Processing organizational hierarchy...");
       const normalizedData = normalizeExcelData(excelData);
 
-      setUploadStatus('Saving to database...');
+      setUploadStatus("Saving to database...");
       const response = await fetch(`${API}/api/org/structure`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeData: normalizedData }),
       });
 
       if (response.ok) {
         const transformedData = await response.json();
-        if (transformedData && typeof transformedData === 'object') {
+        if (transformedData && typeof transformedData === "object") {
           const validatedData = validateOrgStructure(transformedData);
           setOrgData(validatedData);
-          setUploadStatus(`Successfully processed ${excelData.length} employees!`);
         } else {
-          throw new Error('Invalid response from server');
+          throw new Error("Invalid response from server");
         }
 
         // Reset expansions
         setExpandedBranches(new Set());
         setExpandedDepartments(new Set());
         setExpandedTeams(new Set());
+
+        // ✅ SUCCESS POPUP
+        window.alert(
+          `Organization structure uploaded successfully.\nProcessed ${excelData.length} employees.`
+        );
       } else {
         const errorText = await response.text();
         throw new Error(`Failed to save: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      console.error('Error processing file:', error);
-      setUploadStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Error processing file:", error);
+
+      // ❌ ERROR POPUP
+      window.alert(
+        `Error while uploading organization structure:\n${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setIsLoading(false);
-      event.target.value = '';
+      setUploadStatus(""); // clear status so nothing shows on page
+      event.target.value = "";
     }
   };
 
-  // Helper function to validate org structure
-  const validateOrgStructure = (data: any): OrgStructure => {
-    const defaultData = getDefaultOrgData();
-    return {
-      ceo: data.ceo || defaultData.ceo,
-      seniorEA: data.seniorEA || defaultData.seniorEA,
-      branches: Array.isArray(data.branches) ? data.branches : defaultData.branches
-    };
-  };
-
-  const toggleExpansion = (type: 'branch' | 'department' | 'team', id: string) => {
+  const toggleExpansion = (type: "branch" | "department" | "team", id: string) => {
     const setters = {
       branch: setExpandedBranches,
       department: setExpandedDepartments,
-      team: setExpandedTeams
+      team: setExpandedTeams,
     };
 
     const current = {
       branch: expandedBranches,
       department: expandedDepartments,
-      team: expandedTeams
+      team: expandedTeams,
     };
 
     const newSet = new Set(current[type]);
@@ -303,17 +323,21 @@ const loadOrgData = async () => {
   const expandAll = () => {
     if (!orgData || !orgData.branches) return;
 
-    setExpandedBranches(new Set(orgData.branches.map(b => b.id)));
-    setExpandedDepartments(new Set(
-      orgData.branches.flatMap(b =>
-        (b.departments || []).map(d => d.id)
+    setExpandedBranches(new Set(orgData.branches.map((b) => b.id)));
+    setExpandedDepartments(
+      new Set(
+        orgData.branches.flatMap((b) => (b.departments || []).map((d) => d.id))
       )
-    ));
-    setExpandedTeams(new Set(
-      orgData.branches.flatMap(b =>
-        (b.departments || []).flatMap(d => (d.subTeams || []).map(t => t.id))
+    );
+    setExpandedTeams(
+      new Set(
+        orgData.branches.flatMap((b) =>
+          (b.departments || []).flatMap((d) =>
+            (d.subTeams || []).map((t) => t.id)
+          )
+        )
       )
-    ));
+    );
   };
 
   const collapseAll = () => {
@@ -323,31 +347,36 @@ const loadOrgData = async () => {
   };
 
   // Early return for loading state
-  if (isLoading) {
+  if (isLoading && !orgData) {
     return (
       <div className="max-w-7xl mx-auto flex items-center justify-center py-20">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading organization structure...</p>
-          {uploadStatus && <p className="text-sm text-gray-500 mt-2">{uploadStatus}</p>}
+          {uploadStatus && (
+            <p className="text-sm text-gray-500 mt-2">{uploadStatus}</p>
+          )}
         </div>
       </div>
     );
   }
 
-  // Early return if no data (should never happen now)
+  // Early return if no data
   if (!orgData) {
     return (
       <div className="max-w-7xl mx-auto text-center py-20">
         <p className="text-gray-600">No organization data available</p>
-        <button onClick={loadOrgData} className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <button
+          onClick={loadOrgData}
+          className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
           Retry Loading
         </button>
       </div>
     );
   }
 
-    // Ensure branches is always an array
+  // Ensure branches is always an array
   const branches = Array.isArray(orgData.branches) ? orgData.branches : [];
 
   return (
@@ -382,8 +411,6 @@ const loadOrgData = async () => {
           )}
 
           {/* Visible for everyone */}
-        
-
           <button
             onClick={expandAll}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -398,20 +425,6 @@ const loadOrgData = async () => {
             Collapse All
           </button>
         </div>
-
-        {uploadStatus && (
-          <div
-            className={`p-3 rounded-lg ${
-              uploadStatus.includes("Error")
-                ? "bg-red-100 text-red-700"
-                : uploadStatus.includes("Successfully")
-                ? "bg-green-100 text-green-700"
-                : "bg-blue-100 text-blue-700"
-            }`}
-          >
-            {uploadStatus}
-          </div>
-        )}
       </div>
 
       {/* CEO Level */}
@@ -528,7 +541,6 @@ const loadOrgData = async () => {
   );
 };
 
-
 interface DepartmentCardProps {
   department: DepartmentSection;
   isExpanded: boolean;
@@ -541,8 +553,6 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
   department,
   isExpanded,
   onToggle,
-  expandedTeams,
-  onTeamToggle
 }) => {
   if (!department) return null;
 
@@ -551,35 +561,42 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border">
       {/* Department Head - Blue level */}
-      <div className="bg-blue-600 text-white p-3 cursor-pointer hover:bg-blue-700 transition-colors" onClick={onToggle}>
+      <div
+        className="bg-blue-600 text-white p-3 cursor-pointer hover:bg-blue-700 transition-colors"
+        onClick={onToggle}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <User className="w-4 h-4" />
             <div>
-          
-<h5 className="font-bold text-sm">
-  {department.head?.name && department.head.name !== "TBD"
-    ? department.head.name
-    : department.name}
-</h5>
-<p className="text-xs opacity-90">
-  {department.head?.title && department.head.name !== "TBD"
-    ? department.head.title
-    : `Department of ${department.name}`}
-</p>
-
-
-
+              <h5 className="font-bold text-sm">
+                {department.head?.name && department.head.name !== "TBD"
+                  ? department.head.name
+                  : department.name}
+              </h5>
+              <p className="text-xs opacity-90">
+                {department.head?.title && department.head.name !== "TBD"
+                  ? department.head.title
+                  : `Department of ${department.name}`}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-xs">
-              {subTeams.reduce((count, t) => count + (t.members?.length || 0), 0)} members
+              {subTeams.reduce(
+                (count, t) => count + (t.members?.length || 0),
+                0
+              )}{" "}
+              members
             </span>
 
             {subTeams.length > 0 && (
               <div>
-                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </div>
             )}
           </div>
@@ -589,12 +606,14 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
       {/* Members directly under department (skip sub-team level) */}
       {isExpanded && (
         <div className="p-3 space-y-2 bg-gray-50">
-          {subTeams.flatMap(team => team.members).map((member) => (
+          {subTeams.flatMap((team) => team.members).map((member) => (
             <MemberCard key={member.id} member={member} color="bg-purple-600" />
           ))}
 
-          {subTeams.flatMap(team => team.members).length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-2">No members found</p>
+          {subTeams.flatMap((team) => team.members).length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-2">
+              No members found
+            </p>
           )}
         </div>
       )}
@@ -615,16 +634,27 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, isExpanded, onToggle }) => {
 
   return (
     <div className="bg-white rounded border shadow-sm">
-      <div className={`${team.color || 'bg-purple-600'} text-white p-2 cursor-pointer hover:opacity-90 transition-opacity`} onClick={onToggle}>
+      <div
+        className={`${
+          team.color || "bg-purple-600"
+        } text-white p-2 cursor-pointer hover:opacity-90 transition-opacity`}
+        onClick={onToggle}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Users className="w-3 h-3" />
-            <span className="text-sm font-medium">{team.name || 'Team'}</span>
+            <span className="text-sm font-medium">{team.name || "Team"}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-xs">{members.length} members</span>
             {members.length > 0 && (
-              <div>{isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}</div>
+              <div>
+                {isExpanded ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -633,7 +663,11 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, isExpanded, onToggle }) => {
       {isExpanded && members.length > 0 && (
         <div className="p-2 space-y-1 max-h-48 overflow-y-auto bg-gray-50">
           {members.map((member) => (
-            <MemberCard key={member.id} member={member} color={team.color || 'bg-purple-600'} />
+            <MemberCard
+              key={member.id}
+              member={member}
+              color={team.color || "bg-purple-600"}
+            />
           ))}
         </div>
       )}
@@ -641,7 +675,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, isExpanded, onToggle }) => {
   );
 };
 
-// NEW: Recursive MemberCard for nested rendering
+// Recursive MemberCard for nested rendering
 interface MemberCardProps {
   member: Person;
   color: string;
@@ -659,31 +693,47 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, color, depth = 0 }) => 
         className="flex items-center space-x-2 p-2 bg-white rounded text-sm shadow-sm hover:bg-gray-100 transition cursor-pointer"
         onClick={() => hasChildren && setIsExpanded(!isExpanded)}
       >
-        <div className={`w-6 h-6 ${color} rounded-full flex items-center justify-center flex-shrink-0`}>
+        <div
+          className={`w-6 h-6 ${color} rounded-full flex items-center justify-center flex-shrink-0`}
+        >
           <User className="w-3 h-3 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-gray-800 truncate">{member.name || 'Unknown'}</p>
-         <p className="text-xs text-gray-600 truncate">
-  {member.title}   {/* Always show Excel role */}
-</p>
-
+          <p className="font-medium text-gray-800 truncate">
+            {member.name || "Unknown"}
+          </p>
+          <p className="text-xs text-gray-600 truncate">
+            {member.title} {/* Always show Excel role */}
+          </p>
 
           {hasChildren && (
-            <p className="text-xs text-gray-500 truncate">{memberCount} members</p>
+            <p className="text-xs text-gray-500 truncate">
+              {memberCount} members
+            </p>
           )}
           {member.email && (
             <p className="text-xs text-gray-500 truncate">{member.email}</p>
           )}
         </div>
         {hasChildren && (
-          <div>{isExpanded ? <ChevronUp className="w-3 h-3 text-gray-600" /> : <ChevronDown className="w-3 h-3 text-gray-600" />}</div>
+          <div>
+            {isExpanded ? (
+              <ChevronUp className="w-3 h-3 text-gray-600" />
+            ) : (
+              <ChevronDown className="w-3 h-3 text-gray-600" />
+            )}
+          </div>
         )}
       </div>
       {isExpanded && hasChildren && (
         <div className="space-y-1">
-          {member.children.map((child) => (
-            <MemberCard key={child.id} member={child} color={color} depth={depth + 1} />
+          {member.children!.map((child) => (
+            <MemberCard
+              key={child.id}
+              member={child}
+              color={color}
+              depth={depth + 1}
+            />
           ))}
         </div>
       )}

@@ -215,7 +215,7 @@ const Holidays = () => {
           <div className="mt-4 p-4 bg-securekloud-50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <CalendarIcon className="h-5 w-5 text-securekloud-700" />
-              <h3 className="font-medium">Time Off Requests< ;/h3>
+              <h3 className="font-medium">Time Off Requests</h3>
             </div>
             <p className="text-sm text-muted-foreground">
               For additional time off requests, please submit your request through the HR Portal.
