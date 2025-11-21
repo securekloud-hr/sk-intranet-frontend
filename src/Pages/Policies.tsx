@@ -73,9 +73,11 @@ const Policies: React.FC = () => {
 
   // Category order (for tabs)
   const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
-  const [draggedCategoryIndex, setDraggedCategoryIndex] = useState<number | null>(null);
+  const [draggedCategoryIndex, setDraggedCategoryIndex] = useState<number | null>(
+    null
+  );
 
-  // Add category
+  // Add category (state kept but no button now)
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
@@ -458,13 +460,7 @@ const Policies: React.FC = () => {
             </p>
           </div>
 
-          {isAdmin && (
-            <div className="flex justify-end">
-              <Button size="sm" onClick={() => setShowCategoryModal(true)}>
-                + Add Category
-              </Button>
-            </div>
-          )}
+          {/* Add Category button removed here */}
 
           <p className="text-center text-gray-500">
             No policies available yet.
@@ -501,7 +497,7 @@ const Policies: React.FC = () => {
           />
         </div>
 
-        {/* Tabs + Add Category + Trash */}
+        {/* Tabs + Trash (no Add Category button) */}
         <Tabs defaultValue={defaultTabValue} className="w-full">
           <div className="flex items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-3">
@@ -520,22 +516,13 @@ const Policies: React.FC = () => {
                     onDrop={(e) => handleCategoryDrop(index, e)}
                     // This onDragStart is only for deleting category by trash
                     onMouseDownCapture={(e) => {
-                      // If admin wants to drag to trash, we still need payload
-                      // but we don't want to break tab reorder.
                       if (!isAdmin) return;
-                      // Right-click or middle-click won't start drag; fine.
                     }}
                   >
                     {key}
                   </TabsTrigger>
                 ))}
               </TabsList>
-
-              {isAdmin && (
-                <Button size="sm" onClick={() => setShowCategoryModal(true)}>
-                  + Add Category
-                </Button>
-              )}
             </div>
 
             {/* Trash drop zone */}
@@ -692,7 +679,7 @@ const Policies: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Add Category dialog */}
+        {/* Add Category dialog (still present but no button opens it) */}
         <Dialog open={showCategoryModal} onOpenChange={setShowCategoryModal}>
           <DialogContent className="max-w-md">
             <DialogHeader>
