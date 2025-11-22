@@ -16,6 +16,7 @@ import API from "@/config";
 type UserLike = {
   name?: string;
   email?: string;
+  mail?: string; // for AAD "mail"
   role?: "admin" | "user";
   fullName?: string;
   type?: string;
@@ -65,14 +66,18 @@ const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
             </div>
 
             {opportunities.length === 0 && (
-              <p className="text-muted-foreground">No job opportunities available.</p>
+              <p className="text-muted-foreground">
+                No job opportunities available.
+              </p>
             )}
 
             {opportunities.map((job) => (
               <div key={job.id} className="mb-6 border-b pb-4">
                 <h4 className="font-semibold text-lg">{job.title}</h4>
                 {job.department && (
-                  <p className="text-sm text-muted-foreground">{job.department}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {job.department}
+                  </p>
                 )}
                 <p className="mt-2">{job.description}</p>
                 <div className="mt-2">
@@ -100,7 +105,7 @@ const TalentAcquisition = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  // ✅ referral form state
+  // ✅ referral form state (candidate details)
   const [referral, setReferral] = useState({
     candidateName: "",
     email: "",
@@ -169,11 +174,41 @@ const TalentAcquisition = () => {
     if (e.target.files) setResume(e.target.files[0]);
   };
 
+  // 🔹 Submit referral – includes logged-in user info (with mail fallback)
   const submitReferral = async () => {
+    if (!cachedUser) {
+      alert("Please login before submitting a referral.");
+      return;
+    }
+
+    const referrerName =
+      cachedUser.fullName || cachedUser.name || "Employee";
+
+    // 👈 IMPORTANT: fall back to mail if email is missing
+    const referrerEmail =
+      cachedUser.email || cachedUser.mail || "";
+
+    console.log("Referral referrer:", referrerName, referrerEmail, cachedUser);
+
+    if (!referrerEmail) {
+      alert("Your profile does not have an email address.");
+      return;
+    }
+
     const data = new FormData();
-    Object.keys(referral).forEach((key) => {
-      data.append(key, (referral as any)[key]);
-    });
+
+    // 💥 BACKEND EXPECTS THESE FIELD NAMES:
+    // candidateName, candidateEmail, phone, position, notes
+    data.append("candidateName", referral.candidateName);
+    data.append("candidateEmail", referral.email);
+    data.append("phone", referral.phone);
+    data.append("position", referral.position);
+    data.append("notes", referral.notes);
+
+    // referrer details
+    data.append("referrerName", referrerName);
+    data.append("referrerEmail", referrerEmail);
+
     if (resume) data.append("resume", resume);
 
     const res = await fetch(`${API}/api/referral`, {
@@ -182,7 +217,9 @@ const TalentAcquisition = () => {
     });
 
     if (res.ok) {
-      alert("Referral submitted successfully!");
+      alert(
+        "Referral submitted successfully! TA and you will receive a confirmation email."
+      );
       setReferral({
         candidateName: "",
         email: "",
@@ -192,7 +229,8 @@ const TalentAcquisition = () => {
       });
       setResume(null);
     } else {
-      alert("Error submitting referral.");
+      const err = await res.json().catch(() => null);
+      alert("Error submitting referral." + (err?.error ? ` ${err.error}` : ""));
     }
   };
 

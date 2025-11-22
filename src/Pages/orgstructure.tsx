@@ -380,12 +380,10 @@ const OrgChart: React.FC = () => {
   const branches = Array.isArray(orgData.branches) ? orgData.branches : [];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 py-6 px-4">
-      {/* Upload Controls */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          Organization Structure
-        </h2>
+       <div className="max-w-7xl mx-auto space-y-8 py-4 px-4">
+    
+      <div className="bg-white rounded-lg shadow-md p-3">
+
 
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
           {/* 🔐 Upload Excel – only for admins */}
@@ -411,23 +409,25 @@ const OrgChart: React.FC = () => {
           )}
 
           {/* Visible for everyone */}
-          <button
-            onClick={expandAll}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            Expand All
+          <button onClick={expandAll}>
+          <img
+        src="../Public/expand.png"
+        alt="upload"
+        className="w-10 h-10"
+      />
           </button>
 
-          <button
-            onClick={collapseAll}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
-          >
-            Collapse All
+          <button onClick={collapseAll}>
+          <img
+        src="../Public/collapse.png"
+        alt="upload"
+        className="w-10 h-10"
+      />
           </button>
         </div>
       </div>
 
-      {/* CEO Level */}
+      {/* CEO Level */}{/*}
       <div className="flex justify-center">
         <Card className="p-6 bg-blue-600 text-white shadow-xl rounded-lg">
           <div className="flex flex-col items-center space-y-3">
@@ -442,7 +442,7 @@ const OrgChart: React.FC = () => {
             </div>
           </div>
         </Card>
-      </div>
+      </div>*/}
 
       {/* Senior EA - positioned to the right */}
       <div className="flex justify-end pr-16">
