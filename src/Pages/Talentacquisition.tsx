@@ -535,5 +535,5 @@ const ReferralCard = ({ opportunity }: ReferralCardProps) => {
     </Card>
   );
 };
-
+//
 export default TalentAcquisition;
