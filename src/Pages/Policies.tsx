@@ -559,7 +559,7 @@ const Policies: React.FC = () => {
                     return (
                       <Card
                         key={`${policy.name}-${index}`}
-                        className="p-2 text-xs space-y-0.5 shadow-sm border rounded-md h-full flex flex-col"
+                        className="p-4 text-base space-y-2 shadow-sm border rounded-md h-full flex flex-col"
                         draggable={isAdmin}
                         onDragStart={(e) =>
                           startDragPolicyToTrash(e, key, policy.name)

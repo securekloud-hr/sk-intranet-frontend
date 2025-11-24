@@ -12,11 +12,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, HelpCircle, Globe, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Mail, HelpCircle, Globe } from "lucide-react";
 import API from "@/config";
 
 const FAQs = () => {
@@ -24,8 +24,14 @@ const FAQs = () => {
   const [isTicketDialogOpen, setIsTicketDialogOpen] = useState(false);
   const [isPayrollDialogOpen, setIsPayrollDialogOpen] = useState(false);
 
+  // 🔹 Subject + body for each type
+  const [emailSubject, setEmailSubject] = useState("");
   const [emailQuery, setEmailQuery] = useState("");
+
+  const [ticketSubject, setTicketSubject] = useState("");
   const [ticketQuery, setTicketQuery] = useState("");
+
+  const [payrollSubject, setPayrollSubject] = useState("");
   const [payrollQuery, setPayrollQuery] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,8 +49,9 @@ const FAQs = () => {
     }
   };
 
-  // 🔹 Send support email to backend
+  // 🔹 Common function to call backend
   const sendSupportEmail = async (
+    subject: string,
     message: string,
     type: "query" | "ticket" | "payroll"
   ) => {
@@ -59,6 +66,7 @@ const FAQs = () => {
       body: JSON.stringify({
         name,
         email,
+        subject,
         message,
         type,
       }),
@@ -71,13 +79,18 @@ const FAQs = () => {
 
   // 🔹 HR submit
   const handleEmailSubmit = async () => {
-    if (!emailQuery.trim()) return;
+    if (!emailSubject.trim() || !emailQuery.trim()) return;
     setIsSubmitting(true);
 
     try {
-      const result = await sendSupportEmail(emailQuery, "query");
+      const result = await sendSupportEmail(
+        emailSubject.trim(),
+        emailQuery.trim(),
+        "query"
+      );
       if (result.success) {
-        alert("✅ HR Query sent successfully!");
+        alert("✅ HR query sent successfully!");
+        setEmailSubject("");
         setEmailQuery("");
         setIsEmailDialogOpen(false);
       }
@@ -90,13 +103,18 @@ const FAQs = () => {
 
   // 🔹 IT Ticket submit
   const handleTicketSubmit = async () => {
-    if (!ticketQuery.trim()) return;
+    if (!ticketSubject.trim() || !ticketQuery.trim()) return;
     setIsTicketSubmitting(true);
 
     try {
-      const result = await sendSupportEmail(ticketQuery, "ticket");
+      const result = await sendSupportEmail(
+        ticketSubject.trim(),
+        ticketQuery.trim(),
+        "ticket"
+      );
       if (result.success) {
         alert("🎫 Ticket sent successfully!");
+        setTicketSubject("");
         setTicketQuery("");
         setIsTicketDialogOpen(false);
       }
@@ -109,13 +127,18 @@ const FAQs = () => {
 
   // 🔹 Payroll submit
   const handlePayrollSubmit = async () => {
-    if (!payrollQuery.trim()) return;
+    if (!payrollSubject.trim() || !payrollQuery.trim()) return;
     setIsPayrollSubmitting(true);
 
     try {
-      const result = await sendSupportEmail(payrollQuery, "payroll");
+      const result = await sendSupportEmail(
+        payrollSubject.trim(),
+        payrollQuery.trim(),
+        "payroll"
+      );
       if (result.success) {
         alert("💰 Payroll query sent successfully!");
+        setPayrollSubject("");
         setPayrollQuery("");
         setIsPayrollDialogOpen(false);
       }
@@ -135,9 +158,11 @@ const FAQs = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            
             {/* ========================== HR Email ========================== */}
-            <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+            <Dialog
+              open={isEmailDialogOpen}
+              onOpenChange={setIsEmailDialogOpen}
+            >
               <div className="border rounded-lg p-4 text-center">
                 <Mail className="h-8 w-8 mx-auto mb-2 text-securekloud-600" />
                 <h3 className="font-medium mb-2">HR Email Support</h3>
@@ -156,18 +181,32 @@ const FAQs = () => {
 
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Submit a Query</DialogTitle>
+                  <DialogTitle>Submit an HR Query</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <Label>Your Query</Label>
-                  <Textarea
-                    value={emailQuery}
-                    onChange={(e) => setEmailQuery(e.target.value)}
-                    className="min-h-[100px]"
-                  />
+                  <div className="space-y-2">
+                    <Label>Subject</Label>
+                    <Input
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      placeholder="Subject"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Your Query</Label>
+                    <Textarea
+                      value={emailQuery}
+                      onChange={(e) => setEmailQuery(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                  </div>
                   <Button
                     className="w-full"
-                    disabled={!emailQuery.trim() || isSubmitting}
+                    disabled={
+                      !emailSubject.trim() ||
+                      !emailQuery.trim() ||
+                      isSubmitting
+                    }
                     onClick={handleEmailSubmit}
                   >
                     {isSubmitting ? "Submitting..." : "Submit"}
@@ -199,18 +238,32 @@ const FAQs = () => {
 
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create a Ticket</DialogTitle>
+                  <DialogTitle>Create an IT Ticket</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <Label>Description</Label>
-                  <Textarea
-                    value={ticketQuery}
-                    onChange={(e) => setTicketQuery(e.target.value)}
-                    className="min-h-[120px]"
-                  />
+                  <div className="space-y-2">
+                    <Label>Subject</Label>
+                    <Input
+                      value={ticketSubject}
+                      onChange={(e) => setTicketSubject(e.target.value)}
+                      placeholder="Subject"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={ticketQuery}
+                      onChange={(e) => setTicketQuery(e.target.value)}
+                      className="min-h-[120px]"
+                    />
+                  </div>
                   <Button
                     className="w-full"
-                    disabled={!ticketQuery.trim() || isTicketSubmitting}
+                    disabled={
+                      !ticketSubject.trim() ||
+                      !ticketQuery.trim() ||
+                      isTicketSubmitting
+                    }
                     onClick={handleTicketSubmit}
                   >
                     {isTicketSubmitting ? "Creating..." : "Submit Ticket"}
@@ -245,15 +298,29 @@ const FAQs = () => {
                   <DialogTitle>Payroll Request</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <Label>Your Request</Label>
-                  <Textarea
-                    value={payrollQuery}
-                    onChange={(e) => setPayrollQuery(e.target.value)}
-                    className="min-h-[120px]"
-                  />
+                  <div className="space-y-2">
+                    <Label>Subject</Label>
+                    <Input
+                      value={payrollSubject}
+                      onChange={(e) => setPayrollSubject(e.target.value)}
+                      placeholder="Subject"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Your Request</Label>
+                    <Textarea
+                      value={payrollQuery}
+                      onChange={(e) => setPayrollQuery(e.target.value)}
+                      className="min-h-[120px]"
+                    />
+                  </div>
                   <Button
                     className="w-full"
-                    disabled={!payrollQuery.trim() || isPayrollSubmitting}
+                    disabled={
+                      !payrollSubject.trim() ||
+                      !payrollQuery.trim() ||
+                      isPayrollSubmitting
+                    }
                     onClick={handlePayrollSubmit}
                   >
                     {isPayrollSubmitting ? "Submitting..." : "Submit"}
@@ -261,7 +328,6 @@ const FAQs = () => {
                 </div>
               </DialogContent>
             </Dialog>
-
           </div>
         </CardContent>
       </Card>

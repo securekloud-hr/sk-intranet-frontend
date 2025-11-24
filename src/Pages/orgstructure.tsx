@@ -409,21 +409,22 @@ const OrgChart: React.FC = () => {
           )}
 
           {/* Visible for everyone */}
-          <button onClick={expandAll}>
-          <img
-        src="../Public/expand.png"
-        alt="upload"
-        className="w-10 h-10"
-      />
-          </button>
+         <button onClick={expandAll}>
+  <img
+    src="/expand.png"
+    alt="Expand"
+    className="w-10 h-10"
+  />
+</button>
 
-          <button onClick={collapseAll}>
-          <img
-        src="../Public/collapse.png"
-        alt="upload"
-        className="w-10 h-10"
-      />
-          </button>
+<button onClick={collapseAll}>
+  <img
+    src="/collapse.png"
+    alt="Collapse"
+    className="w-10 h-10"
+  />
+</button>
+
         </div>
       </div>
 
