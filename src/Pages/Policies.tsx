@@ -588,14 +588,17 @@ const Policies: React.FC = () => {
                             </button>
 
                             {/* Download */}
-                            <a
-                              href={`${API}${policy.fileUrl}`}
-                              download
-                              className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
-                              title="Download"
-                            >
-                              <FiDownload className="w-4 h-4" />
-                            </a>
+                            {/* Download – call backend download API */}
+<a
+  href={`${API}/api/policies/download/${encodeURIComponent(
+    key
+  )}/${encodeURIComponent(policy.name)}`}
+  className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
+  title="Download"
+>
+  <FiDownload className="w-4 h-4" />
+</a>
+
 
                             {/* Upload new version (admin only) */}
                             {isAdmin && (
