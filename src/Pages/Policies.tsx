@@ -557,88 +557,76 @@ const Policies: React.FC = () => {
                   {filtered.map((policy, index) => {
                     const uploadKey = `${key}::${policy.name}`;
                     return (
-                      <Card
-                        key={`${policy.name}-${index}`}
-                        className="p-4 text-base space-y-2 shadow-sm border rounded-md h-full flex flex-col"
-                        draggable={isAdmin}
-                        onDragStart={(e) =>
-                          startDragPolicyToTrash(e, key, policy.name)
-                        }
-                      >
-                        <CardHeader className="pb-2 flex-grow">
-                          <CardTitle className="text-sm font-semibold break-words">
-                            {policy.name}
-                          </CardTitle>
-                          <CardDescription>
-                            Last updated: {policy.updated}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex-shrink-0 pt-0">
-                          <div className="flex flex-wrap justify-center gap-2">
-                            {/* View */}
-                            <button
-                              onClick={() => {
-                                setDocToView(`${API}${policy.fileUrl}`);
-                                setShowDocModal(true);
-                              }}
-                              className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
-                              title="View"
-                            >
-                              <FiEye className="w-4 h-4" />
-                            </button>
-
-                            {/* Download */}
-                            {/* Download – call backend download API */}
-<a
-  href={`${API}/api/policies/download/${encodeURIComponent(
-    key
-  )}/${encodeURIComponent(policy.name)}`}
-  className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
-  title="Download"
+                    <Card
+  key={`${policy.name}-${index}`}
+  className="p-2 text-xs space-y-0.5 shadow-sm border rounded-md h-full flex flex-col"
+  draggable={isAdmin}
+  onDragStart={(e) => startDragPolicyToTrash(e, key, policy.name)}
 >
-  <FiDownload className="w-4 h-4" />
-</a>
+  <CardHeader className="pb-2 flex-grow">
+    {/* 👇 no custom classes, same as HR Forms */}
+    <CardTitle>{policy.name}</CardTitle>
+    <CardDescription>Last updated: {policy.updated}</CardDescription>
+  </CardHeader>
 
 
-                            {/* Upload new version (admin only) */}
-                            {isAdmin && (
-                              <>
-                                <input
-                                  type="file"
-                                  accept="application/pdf"
-                                  className="hidden"
-                                  id={`upload-${key}-${index}`}
-                                  onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      await handleUploadPolicyFile(
-                                        key,
-                                        policy.name,
-                                        file
-                                      );
-                                      // allow re-selecting the same file later
-                                      e.target.value = "";
-                                    }
-                                  }}
-                                />
-                                {/* label styled as button */}
-                                <label
-                                  htmlFor={`upload-${key}-${index}`}
-                                  className={`text-sm px-2 py-1 rounded-md flex items-center cursor-pointer ${
-                                    uploadingPolicyKey === uploadKey
-                                      ? "bg-green-200 text-green-900"
-                                      : "bg-green-100 text-green-800 hover:bg-green-200"
-                                  }`}
-                                >
-                                  {uploadingPolicyKey === uploadKey
-                                    ? "Uploading..."
-                                    : "Upload"}
-                                </label>
-                              </>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+  <CardContent className="flex-shrink-0 pt-0">
+    <div className="flex justify-center space-x-2">
+      {/* VIEW */}
+      <button
+        onClick={() => {
+          setDocToView(`${API}${policy.fileUrl}`);
+          setShowDocModal(true);
+        }}
+        className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
+        title="View"
+      >
+        <FiEye className="w-4 h-4" />
+      </button>
+
+      {/* DOWNLOAD */}
+      <a
+        href={`${API}/api/policies/download/${encodeURIComponent(
+          key
+        )}/${encodeURIComponent(policy.name)}`}
+        className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
+        title="Download"
+      >
+        <FiDownload className="w-4 h-4" />
+      </a>
+
+      {/* UPLOAD (admin only) */}
+      {isAdmin && (
+        <>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            id={`upload-${key}-${index}`}
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                await handleUploadPolicyFile(key, policy.name, file);
+                e.target.value = "";
+              }
+            }}
+          />
+          <label
+            htmlFor={`upload-${key}-${index}`}
+            className={`text-sm px-2 py-1 rounded-md flex items-center ${
+              uploadingPolicyKey === `${key}::${policy.name}`
+                ? "bg-green-200 text-green-800"
+                : "bg-green-100 text-green-800"
+            }`}
+          >
+            Upload
+          </label>
+        </>
+      )}
+    </div>
+  </CardContent>
+</Card>
+
                     );
                   })}
 

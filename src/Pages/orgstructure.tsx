@@ -381,88 +381,106 @@ const OrgChart: React.FC = () => {
 
   return (
        <div className="max-w-7xl mx-auto space-y-8 py-4 px-4">
-    
-      <div className="bg-white rounded-lg shadow-md p-3">
+        {/* Top-right actions: Upload / Expand / Collapse */}
+    <div className="w-full flex justify-end items-center gap-4 mb-6">
+
+      {/* 🔐 Upload Excel – only for admins */}
+      {isAdmin && (
+        <>
+          <label
+            htmlFor="excel-upload"
+            className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer flex items-center space-x-2 text-sm"
+          >
+            <Upload className="w-4 h-4" />
+            <span>{isLoading ? "Processing..." : "Upload Excel File"}</span>
+          </label>
+
+          <input
+            id="excel-upload"
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            className="hidden"
+            disabled={isLoading}
+          />
+        </>
+      )}
+
+      {/* Expand all */}
+      <button
+        onClick={expandAll}
+        className="p-2 rounded-lg bg-gray-800 hover:bg-gray-900 shadow"
+        aria-label="Expand all"
+      >
+        <img src="/expand.png" alt="Expand" className="w-6 h-6" />
+      </button>
+
+      {/* Collapse all */}
+      <button
+        onClick={collapseAll}
+        className="p-2 rounded-lg bg-gray-800 hover:bg-gray-900 shadow"
+        aria-label="Collapse all"
+      >
+        <img src="/collapse.png" alt="Collapse" className="w-6 h-6" />
+      </button>
+    </div>
 
 
-        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-          {/* 🔐 Upload Excel – only for admins */}
-          {isAdmin && (
-            <>
-              <label
-                htmlFor="excel-upload"
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer flex items-center space-x-2"
-              >
-                <Upload className="w-5 h-5" />
-                <span>{isLoading ? "Processing..." : "Upload Excel File"}</span>
-              </label>
+           {/* CEO + Senior EA with connecting lines */}
+           {/* CEO + Senior EA with connector lines */}
+      {/* ========= CEO (Centered at Top) ========= */}
+<div className="flex justify-center mt-2 mb-2">
+  <Card className="p-6 bg-blue-600 text-white shadow-xl rounded-lg">
+    <div className="flex flex-col items-center space-y-3">
+      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+        <User className="w-8 h-8 text-blue-600" />
+      </div>
+      <div className="text-center">
+        <h3 className="text-xl font-bold">
+          {orgData.ceo?.name || "CEO"}
+        </h3>
+        <p className="text-white opacity-90">
+          {orgData.ceo?.title || "Chief Executive Officer"}
+        </p>
+      </div>
+    </div>
+  </Card>
+</div>
 
-              <input
-                id="excel-upload"
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={isLoading}
-              />
-            </>
-          )}
+{/* ========= LINES + SENIOR EA (aligned) ========= */}
+<div className="relative w-full max-w-5xl mx-auto h-[150px] mt-0 mb-10">
 
-          {/* Visible for everyone */}
-         <button onClick={expandAll}>
-  <img
-    src="/expand.png"
-    alt="Expand"
-    className="w-10 h-10"
-  />
-</button>
+  {/* vertical line from CEO down to baseline */}
+  <div className="absolute left-1/2 top-0 w-[3px] h-full bg-black -translate-x-1/2" />
 
-<button onClick={collapseAll}>
-  <img
-    src="/collapse.png"
-    alt="Collapse"
-    className="w-10 h-10"
-  />
-</button>
+  {/* horizontal line to Senior EA (middle of vertical) */}
+  <div className="absolute left-1/2 top-1/2 w-[170px] h-[3px] bg-black -translate-y-1/2" />
 
+  {/* long baseline for directors */}
+  <div className="absolute left-[5%] right-[5%] bottom-0 h-[3px] bg-black" />
+
+  {/* Senior EA card EXACTLY centered on end of horizontal line */}
+  <div className="absolute top-1/2 left-[calc(50%+170px)] -translate-y-1/2">
+    <Card className="p-3 bg-teal-600 text-white shadow-lg rounded-lg">
+      <div className="flex flex-col items-center space-y-1">
+        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <User className="w-5 h-5 text-teal-600" />
+        </div>
+        <div className="text-center">
+          <h4 className="font-semibold text-sm">
+            {orgData.seniorEA?.name || "Senior EA"}
+          </h4>
+          <p className="text-xs text-white opacity-90">
+            {orgData.seniorEA?.title || "Senior Executive Assistant"}
+          </p>
         </div>
       </div>
+    </Card>
+  </div>
+</div>
 
-      {/* CEO Level */}{/*}
-      <div className="flex justify-center">
-        <Card className="p-6 bg-blue-600 text-white shadow-xl rounded-lg">
-          <div className="flex flex-col items-center space-y-3">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-              <User className="w-8 h-8 text-blue-600" />
-            </div>
-            <div className="text-center">
-              <h3 className="text-xl font-bold">{orgData.ceo?.name || "CEO"}</h3>
-              <p className="text-white opacity-90">
-                {orgData.ceo?.title || "Chief Executive Officer"}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>*/}
+      {/* Executive Branches - Orange level */}
 
-      {/* Senior EA - positioned to the right */}
-      <div className="flex justify-end pr-16">
-        <Card className="p-4 bg-teal-600 text-white shadow-lg rounded-lg">
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <User className="w-6 h-6 text-teal-600" />
-            </div>
-            <div className="text-center">
-              <h4 className="font-bold">
-                {orgData.seniorEA?.name || "Senior EA"}
-              </h4>
-              <p className="text-xs text-white opacity-90">
-                {orgData.seniorEA?.title || "Senior Executive Assistant"}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
 
       {/* Executive Branches - Orange level */}
       <div className="flex flex-row flex-wrap gap-4 mt-8">
