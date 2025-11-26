@@ -432,7 +432,7 @@ const OrgChart: React.FC = () => {
 <div className="flex justify-center mt-2 mb-2">
   <Card className="p-6 bg-blue-600 text-white shadow-xl rounded-lg">
     <div className="flex flex-col items-center space-y-3">
-      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+      <div className="w-16 h-8 bg-white rounded-full flex items-center justify-center">
         <User className="w-8 h-8 text-blue-600" />
       </div>
       <div className="text-center">
