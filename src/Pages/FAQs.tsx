@@ -101,6 +101,7 @@ const FAQs = () => {
     }
   };
 
+  
   // 🔹 IT Ticket submit
   const handleTicketSubmit = async () => {
     if (!ticketSubject.trim() || !ticketQuery.trim()) return;
