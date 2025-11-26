@@ -282,7 +282,7 @@ const FAQs = () => {
                 <Globe className="h-8 w-8 mx-auto mb-2 text-securekloud-600" />
                 <h3 className="font-medium mb-2">Payroll Helpdesk</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Manage payroll-related requests.
+                  Raise payroll-related queries.
                 </p>
                 <Button
                   variant="outline"
