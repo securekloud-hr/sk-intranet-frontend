@@ -73,9 +73,8 @@ const Policies: React.FC = () => {
 
   // Category order (for tabs)
   const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
-  const [draggedCategoryIndex, setDraggedCategoryIndex] = useState<number | null>(
-    null
-  );
+  const [draggedCategoryIndex, setDraggedCategoryIndex] =
+    useState<number | null>(null);
 
   // Add category (state kept but no button now)
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -102,35 +101,12 @@ const Policies: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // ---------- Helper: sync categoryOrder with categories + localStorage ----------
+  // ---------- Helper: sync categoryOrder with categories (NO localStorage) ----------
   const syncCategoryOrder = (allCategories: { [key: string]: Policy[] }) => {
-    const keys = Object.keys(allCategories).filter((key) =>
-      Array.isArray(allCategories[key])
-    );
-
-    let saved: string[] = [];
-    try {
-      const raw = localStorage.getItem("policyCategoryOrder");
-      if (raw) saved = JSON.parse(raw);
-    } catch (e) {
-      console.error("Error reading category order from localStorage", e);
-    }
-
-    // 1) keep only categories that still exist
-    let order = saved.filter((k) => keys.includes(k));
-    // 2) append any new categories at the end
-    const remaining = keys.filter((k) => !order.includes(k));
-    order = [...order, ...remaining];
-
-    // if nothing saved, just use current keys
-    if (!order.length) order = keys;
-
-    setCategoryOrder(order);
-    try {
-      localStorage.setItem("policyCategoryOrder", JSON.stringify(order));
-    } catch (e) {
-      console.error("Error saving category order to localStorage", e);
-    }
+    const keys = Object.keys(allCategories);
+    // backend already returns categories in correct order,
+    // just keep that order as-is
+    setCategoryOrder(keys);
   };
 
   // ---------- Effects ----------
@@ -308,11 +284,14 @@ const Policies: React.FC = () => {
       const order = [...prev];
       const [moved] = order.splice(fromIndex, 1);
       order.splice(toIndex, 0, moved);
-      try {
-        localStorage.setItem("policyCategoryOrder", JSON.stringify(order));
-      } catch (e) {
-        console.error("Error saving category order to localStorage", e);
-      }
+
+      // 🔥 SAVE to backend so EVERYONE sees new order
+      fetch(`${API}/api/policies/reorder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order }),
+      }).catch((err) => console.error("Order save failed:", err));
+
       return order;
     });
   };
@@ -460,8 +439,6 @@ const Policies: React.FC = () => {
             </p>
           </div>
 
-          {/* Add Category button removed here */}
-
           <p className="text-center text-gray-500">
             No policies available yet.
           </p>
@@ -514,10 +491,6 @@ const Policies: React.FC = () => {
                       e.dataTransfer.dropEffect = "move";
                     }}
                     onDrop={(e) => handleCategoryDrop(index, e)}
-                    // This onDragStart is only for deleting category by trash
-                    onMouseDownCapture={(e) => {
-                      if (!isAdmin) return;
-                    }}
                   >
                     {key}
                   </TabsTrigger>
@@ -554,81 +527,84 @@ const Policies: React.FC = () => {
             return (
               <TabsContent key={key} value={tabValue}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {filtered.map((policy, index) => {
-                    const uploadKey = `${key}::${policy.name}`;
-                    return (
+                  {filtered.map((policy, index) => (
                     <Card
-  key={`${policy.name}-${index}`}
-  className="p-2 text-xs space-y-0.5 shadow-sm border rounded-md h-full flex flex-col"
-  draggable={isAdmin}
-  onDragStart={(e) => startDragPolicyToTrash(e, key, policy.name)}
->
-  <CardHeader className="pb-2 flex-grow">
-    {/* 👇 no custom classes, same as HR Forms */}
-    <CardTitle>{policy.name}</CardTitle>
-    <CardDescription>Last updated: {policy.updated}</CardDescription>
-  </CardHeader>
+                      key={`${policy.name}-${index}`}
+                      className="p-2 text-xs space-y-0.5 shadow-sm border rounded-md h-full flex flex-col"
+                      draggable={isAdmin}
+                      onDragStart={(e) =>
+                        startDragPolicyToTrash(e, key, policy.name)
+                      }
+                    >
+                      <CardHeader className="pb-2 flex-grow">
+                        <CardTitle>{policy.name}</CardTitle>
+                        <CardDescription>
+                          Last updated: {policy.updated}
+                        </CardDescription>
+                      </CardHeader>
 
+                      <CardContent className="flex-shrink-0 pt-0">
+                        <div className="flex justify-center space-x-2">
+                          {/* VIEW */}
+                          <button
+                            onClick={() => {
+                              setDocToView(`${API}${policy.fileUrl}`);
+                              setShowDocModal(true);
+                            }}
+                            className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
+                            title="View"
+                          >
+                            <FiEye className="w-4 h-4" />
+                          </button>
 
-  <CardContent className="flex-shrink-0 pt-0">
-    <div className="flex justify-center space-x-2">
-      {/* VIEW */}
-      <button
-        onClick={() => {
-          setDocToView(`${API}${policy.fileUrl}`);
-          setShowDocModal(true);
-        }}
-        className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
-        title="View"
-      >
-        <FiEye className="w-4 h-4" />
-      </button>
+                          {/* DOWNLOAD */}
+                          <a
+                            href={`${API}/api/policies/download/${encodeURIComponent(
+                              key
+                            )}/${encodeURIComponent(policy.name)}`}
+                            className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
+                            title="Download"
+                          >
+                            <FiDownload className="w-4 h-4" />
+                          </a>
 
-      {/* DOWNLOAD */}
-      <a
-        href={`${API}/api/policies/download/${encodeURIComponent(
-          key
-        )}/${encodeURIComponent(policy.name)}`}
-        className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
-        title="Download"
-      >
-        <FiDownload className="w-4 h-4" />
-      </a>
-
-      {/* UPLOAD (admin only) */}
-      {isAdmin && (
-        <>
-          <input
-            type="file"
-            accept="application/pdf"
-            className="hidden"
-            id={`upload-${key}-${index}`}
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                await handleUploadPolicyFile(key, policy.name, file);
-                e.target.value = "";
-              }
-            }}
-          />
-          <label
-            htmlFor={`upload-${key}-${index}`}
-            className={`text-sm px-2 py-1 rounded-md flex items-center ${
-              uploadingPolicyKey === `${key}::${policy.name}`
-                ? "bg-green-200 text-green-800"
-                : "bg-green-100 text-green-800"
-            }`}
-          >
-            Upload
-          </label>
-        </>
-      )}
-    </div>
-  </CardContent>
-</Card>
-
-                    );
-                  })}
+                          {/* UPLOAD (admin only) */}
+                          {isAdmin && (
+                            <>
+                              <input
+                                type="file"
+                                accept="application/pdf"
+                                className="hidden"
+                                id={`upload-${key}-${index}`}
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    await handleUploadPolicyFile(
+                                      key,
+                                      policy.name,
+                                      file
+                                    );
+                                    e.target.value = "";
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`upload-${key}-${index}`}
+                                className={`text-sm px-2 py-1 rounded-md flex items-center ${
+                                  uploadingPolicyKey ===
+                                  `${key}::${policy.name}`
+                                    ? "bg-green-200 text-green-800"
+                                    : "bg-green-100 text-green-800"
+                                }`}
+                              >
+                                Upload
+                              </label>
+                            </>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
 
                   {/* Add Policy card (admin only) */}
                   {isAdmin && (

@@ -245,7 +245,7 @@ await fetch(`${API}/api/sendCourseNotification`, {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader><CardTitle>Skills</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Primary Skills</CardTitle></CardHeader>
           <CardContent>
             <ul className="list-disc list-inside mb-3">
               {skills.map((s, i) => <li key={i}>{s}</li>)}
@@ -254,7 +254,17 @@ await fetch(`${API}/api/sendCourseNotification`, {
           </CardContent>
         </Card>
 
+       
         <Card>
+          <CardHeader><CardTitle>secondary skills</CardTitle></CardHeader>
+          <CardContent>
+            <ul className="list-disc list-inside mb-3">
+              {courses.map((c, i) => <li key={i}>{c.title} - {c.instructor}</li>)}
+            </ul>
+            <Button className="w-full bg-purple-600 text-white" onClick={() => setOpenCourse(true)}>+ Add Course</Button>
+          </CardContent>
+        </Card>
+         <Card>
           <CardHeader><CardTitle>Certifications</CardTitle></CardHeader>
           <CardContent>
             <ul className="list-disc list-inside mb-3">
@@ -264,15 +274,6 @@ await fetch(`${API}/api/sendCourseNotification`, {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader><CardTitle>Courses</CardTitle></CardHeader>
-          <CardContent>
-            <ul className="list-disc list-inside mb-3">
-              {courses.map((c, i) => <li key={i}>{c.title} - {c.instructor}</li>)}
-            </ul>
-            <Button className="w-full bg-purple-600 text-white" onClick={() => setOpenCourse(true)}>+ Add Course</Button>
-          </CardContent>
-        </Card>
       </div>
 
       <Dialog open={openSkill} onOpenChange={setOpenSkill}>

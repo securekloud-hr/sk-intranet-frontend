@@ -217,9 +217,19 @@ const Holidays = () => {
               <CalendarIcon className="h-5 w-5 text-securekloud-700" />
               <h3 className="font-medium">Time Off Requests</h3>
             </div>
-            <p className="text-sm text-muted-foreground">
-              For additional time off requests, please submit your request through the HR Portal.
-            </p>
+          <p className="text-sm text-muted-foreground">
+  For additional time off requests, please submit your request through the{" "}
+  <a
+    href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 underline font-medium hover:text-blue-800 cursor-pointer"
+  >
+    HR Portal
+  </a>.
+</p>
+
+
           </div>
         </CardContent>
       </Card>

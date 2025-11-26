@@ -175,7 +175,7 @@ const FAQs = () => {
                   className="w-full"
                   onClick={() => setIsEmailDialogOpen(true)}
                 >
-                  Email Support
+                  Create Ticket
                 </Button>
               </div>
 
@@ -289,7 +289,7 @@ const FAQs = () => {
                   className="w-full"
                   onClick={() => setIsPayrollDialogOpen(true)}
                 >
-                  View Payroll
+                  Create Ticket
                 </Button>
               </div>
 
