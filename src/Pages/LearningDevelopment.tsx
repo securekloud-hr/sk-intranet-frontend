@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 
 import {
   Card,
@@ -13,16 +13,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -32,334 +23,295 @@ import {
 } from "@/components/ui/select";
 import API from "@/config";
 
-interface Course {
+// ===================== Certification Provider List =====================
+const providersMap: Record<string, string[]> = {
+  AWS: ["AWS Certified Cloud Practitioner","AWS Certified Solutions Architect","AWS Certified Developer"],
+  "Microsoft Azure": ["Azure Fundamentals","Azure Administrator","Azure Developer"],
+  "Google Cloud": ["Associate Cloud Engineer","Professional Cloud Architect","Professional Data Engineer"],
+  Python: ["PCEP - Entry-Level Python","PCAP - Associate Python Programmer"],
+  Udemy: ["100 Days Python Bootcamp","Ultimate AWS Solutions Architect"],
+  Coursera: ["Google IT Support","IBM Data Science"],
+};
+
+// ===================== Employee Structure =====================
+interface EmployeeSkills {
   id: string;
-  title: string;
-  category: "technical" | "professional" | "compliance" | "leadership";
-  description: string;
-  duration: string;
-  instructor: string;
-  enrolled?: boolean;
-  progress?: number;
+  EmpID: string;
+  name: string;
+  email: string;
+  department: string;
+  primarySkills: string[];
+  secondarySkills: string[];
+  certifications: string[]; // mapped from SpecialSkill
 }
 
-const baseCourses: Course[] = [
-  {
-    id: "1",
-    title: "Cloud Security Fundamentals",
-    category: "technical",
-    description: "Learn the basics of securing cloud environments and applications.",
-    duration: "4 hours",
-    instructor: "David Chen",
-    enrolled: true,
-    progress: 75,
-  },
-  {
-    id: "2",
-    title: "Effective Communication Skills",
-    category: "professional",
-    description: "Improve your communication skills.",
-    duration: "3 hours",
-    instructor: "James Wilson",
-    enrolled: true,
-    progress: 30,
-  },
-];
+const LearningDevelopment: React.FC = () => {
 
-const LearningDevelopment = () => {
-  const [skills, setSkills] = useState<string[]>([]);
-  const [certifications, setCertifications] = useState<{ title: string; provider: string }[]>([]);
-  const [courses, setCourses] = useState<Course[]>([...baseCourses]);
+  const [employee, setEmployee] = useState<EmployeeSkills | null>(null);
 
-  const [newSkill, setNewSkill] = useState("");
-  const [newCert, setNewCert] = useState({ title: "", provider: "" });
-  const [newCourse, setNewCourse] = useState({ title: "", instructor: "", duration: "", category: "technical" as const });
-  const [searchTerm, setSearchTerm] = useState("");
+  const [primarySkills, setPrimarySkills] = useState<string[]>([]);
+  const [secondarySkills, setSecondarySkills] = useState<string[]>([]);
+  const [certifications, setCertifications] = useState<string[]>([]);
 
-  const [openSkill, setOpenSkill] = useState(false);
-  const [openManualCert, setOpenManualCert] = useState(false);
-  const [openCourse, setOpenCourse] = useState(false);
+  const [newPrimary, setNewPrimary] = useState("");
+  const [newSecondary, setNewSecondary] = useState("");
 
-  const [skillError, setSkillError] = useState("");
-  const [certError, setCertError] = useState("");
-  const [courseError, setCourseError] = useState("");
-
+  const [openPrimary, setOpenPrimary] = useState(false);
+  const [openSecondary, setOpenSecondary] = useState(false);
   const [isCertDialogVisible, setIsCertDialogVisible] = useState(false);
+
   const [selectedProvider, setSelectedProvider] = useState("");
   const [selectedCertificate, setSelectedCertificate] = useState("");
 
-  const providers = {
-    "AWS": ["AWS Certified Cloud Practitioner", "AWS Certified Solutions Architect", "AWS Certified Developer"],
-    "Microsoft Azure": ["Azure Fundamentals", "Azure Administrator", "Azure Developer"],
-    "Google Cloud": ["Associate Cloud Engineer", "Professional Cloud Architect", "Professional Data Engineer"],
-    "Python": ["PCEP - Certified Entry-Level Python Programmer", "PCAP - Certified Associate in Python Programming"],
-    "Udemy": ["100 Days of Code: The Complete Python Pro Bootcamp", "Ultimate AWS Certified Solutions Architect Associate"],
-    "Coursera": ["Google IT Support Professional Certificate", "IBM Data Science Professional Certificate"]
-  };
+  const [primaryError, setPrimaryError] = useState("");
+  const [secondaryError, setSecondaryError] = useState("");
+  const [certError, setCertError] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [skillsResp, certsResp, coursesResp] = await Promise.all([
-          fetch(`${API}/api/skills/mukund`),
-          fetch(`${API}/api/certificates/mukund`),
-          fetch(`${API}/api/courses/mukund`),
-          fetch(`${API}/api/courses/mukund`),
-        ]);
-        const [skillsData, certsData, coursesData] = await Promise.all([
-          skillsResp.json(),
-          certsResp.json(),
-          coursesResp.json(),
-        ]);
-        if (skillsResp.ok) setSkills(skillsData.map((s: any) => s.skillName));
-        if (certsResp.ok) setCertifications(certsData.map((c: any) => ({ title: c.title, provider: c.provider })));
-        if (coursesResp.ok) setCourses(coursesData);
-      } catch (err) {
-        console.error("Fetch Error:", err);
-      }
-    };
-    fetchData();
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+
+  // ===================== GET LOGGED USER NAME =====================
+  const currentUser = useMemo(() => {
+    try {
+      const r = localStorage.getItem("user");
+      return r && r !== "undefined" ? JSON.parse(r) : null;
+    } catch { return null; }
   }, []);
 
-  const enrolledCourses = courses.filter((c) => c.enrolled);
-  const filterCourses = (category: string) =>
-    courses.filter(
-      (course) =>
-        (category === "all" || course.category === category) &&
-        course.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const userName: string | undefined =
+    currentUser?.name?.replace(/\s+/g, " ").trim();   // 🔥 FIX – removes double spaces
 
-  const addSkill = async () => {
-  const trimmed = newSkill.trim();
-  if (!trimmed) return setSkillError("Skill cannot be empty");
-  if (skills.includes(trimmed)) return setSkillError("Skill already exists");
-  try {
-    const response = await fetch(`${API}/api/add-skill`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: "mukund", skillName: trimmed }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setSkills([...skills, trimmed]);
-      setNewSkill("");
-      setSkillError("");
-      setOpenSkill(false);
 
-      // 📧 Send email notification
-      await fetch(`${API}api/sendSkillNotification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ skill: trimmed, user: "mukund" }),
-      });
-    
-    } else {
-      setSkillError(data.error || "Failed to add skill");
+  // ===================== FETCH EMPLOYEE DATA =====================
+  useEffect(() => {
+    const loadSkills = async () => {
+      if (!userName) {
+        setLoadError("⚠️ User name missing from session");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const resp = await fetch(
+          `${API}/api/employee-directory/by-name/${encodeURIComponent(userName)}`
+        );
+        const data = await resp.json();
+
+        if (!data.success) {
+          setLoadError("⚠️ Employee not found in Employee Directory");
+        } else {
+          setEmployee(data.employee);
+          setPrimarySkills(data.employee.primarySkills ?? []);
+          setSecondarySkills(data.employee.secondarySkills ?? []);
+          setCertifications(data.employee.certifications ?? []);
+        }
+      } catch {
+        setLoadError("❌ Server not responding");
+      }
+
+      setLoading(false);
+    };
+
+    loadSkills();
+  }, [userName]);
+
+
+  // ===================== SAVE TO DB =====================
+  const saveSkills = async (
+    p = primarySkills,
+    s = secondarySkills,
+    c = certifications
+  ) => {
+    if (!userName) return;
+
+    try {
+      await fetch(
+        `${API}/api/employee-directory/by-name/${encodeURIComponent(userName)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ primarySkills:p, secondarySkills:s, certifications:c }),
+        }
+      );
+    } catch (err) {
+      console.error("❌ Failed to update skills", err);
     }
-  } catch (err) {
-    setSkillError("Network error, please try again");
-  }
-};
+  };
 
 
- const handleAddCertificationFromDialog = async () => {
-  if (!selectedProvider || !selectedCertificate) {
-    setCertError("Please select both provider and certificate");
-    return;
-  }
-  if (certifications.some((c) => c.title === selectedCertificate && c.provider === selectedProvider))
-    return setCertError("This certification already exists");
-  try {
-    const response = await fetch(`${API}/api/add-certificate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: "mukund", title: selectedCertificate, provider: selectedProvider }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setCertifications([...certifications, { title: selectedCertificate, provider: selectedProvider }]);
-      setSelectedProvider("");
-      setSelectedCertificate("");
-      setIsCertDialogVisible(false);
-      setCertError("");
+  // ===================== ADD SKILLS =====================
+  const handleAddPrimary = async () => {
+    const t = newPrimary.trim();
+    if (!t) return setPrimaryError("Required");
+    if (primarySkills.includes(t)) return setPrimaryError("Duplicate");
 
-      // 📧 Send email notification
-      await fetch(`${API}/api/sendCertificationNotification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ certification: selectedCertificate, provider: selectedProvider, user: "mukund" }),
-      });
-    } else {
-      setCertError(data.error || "Failed to add certificate");
-    }
-  } catch (err) {
-    setCertError("Network error, please try again");
-  }
-};
+    const updated = [...primarySkills, t];
+    setPrimarySkills(updated);
+    setNewPrimary("");
+    setOpenPrimary(false);
+    await saveSkills(updated, secondarySkills, certifications);
+  };
 
- const addCourse = async () => {
-  const { title, instructor, duration, category } = newCourse;
-  if (!title.trim() || !instructor.trim() || !duration.trim()) return setCourseError("All fields required");
-  if (courses.some((c) => c.title === title)) return setCourseError("Course already exists");
-  try {
-    const response = await fetch(`${API}/api/add-course`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: "mukund", title, instructor, duration, category }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setCourses([
-        ...courses,
-        { id: String(courses.length + 1), title, instructor, duration, description: "Newly added course", category, enrolled: false, progress: 0 },
-      ]);
-      setNewCourse({ title: "", instructor: "", duration: "", category: "technical" });
-      setOpenCourse(false);
-      setCourseError("");
+  const handleAddSecondary = async () => {
+    const t = newSecondary.trim();
+    if (!t) return setSecondaryError("Required");
+    if (secondarySkills.includes(t)) return setSecondaryError("Duplicate");
 
-      // 📧 Send email notification
-      // 📧 Send email notification
-await fetch(`${API}/api/sendCourseNotification`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    title,
-    instructor,
-    duration,
-    category,
-    user: "mukund",
-  }),
-});
+    const updated = [...secondarySkills, t];
+    setSecondarySkills(updated);
+    setNewSecondary("");
+    setOpenSecondary(false);
+    await saveSkills(primarySkills, updated, certifications);
+  };
 
-    } else {
-      setCourseError(data.error || "Failed to add course");
-    }
-  } catch (err) {
-    setCourseError("Network error, please try again");
-  }
-};
+  const handleAddCertification = async () => {
+    if (!selectedProvider || !selectedCertificate)
+      return setCertError("Provider + Certificate required");
 
+    const label = `${selectedCertificate} - ${selectedProvider}`;
+    if (certifications.includes(label)) return setCertError("Already Exists");
+
+    const updated = [...certifications, label];
+    setCertifications(updated);
+    setSelectedProvider("");
+    setSelectedCertificate("");
+    setIsCertDialogVisible(false);
+    await saveSkills(primarySkills, secondarySkills, updated);
+  };
+
+
+  // ===================== UI states =====================
+  if (loading) return <div className="p-5 text-lg">Loading your profile…</div>;
+  if (loadError) return <div className="p-5 text-red-600">{loadError}</div>;
+
+  const displayName = employee?.name || userName;
+
+
+  // ========================================================================================
   return (
-    <div className="space-y-8 p-4">
+    <div className="space-y-8 p-6">
       <h1 className="text-3xl font-bold">Learning & Development</h1>
+      <p className="opacity-60 -mt-2">Welcome {displayName} 👋</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
+
+
+{/* ================= Primary Skills ================= */}
         <Card>
           <CardHeader><CardTitle>Primary Skills</CardTitle></CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside mb-3">
-              {skills.map((s, i) => <li key={i}>{s}</li>)}
+            <ul className="list-disc ml-5 space-y-1">
+              {primarySkills.length === 0 && <li className="text-gray-400">None added</li>}
+              {primarySkills.map((s,i)=> <li key={i}>{s}</li>)}
             </ul>
-            <Button className="w-full bg-purple-600 text-white" onClick={() => setOpenSkill(true)}>+ Add Skill</Button>
+            <Button className="mt-3 w-full bg-purple-600 text-white"
+              onClick={()=>setOpenPrimary(true)}>+ Add Skill</Button>
           </CardContent>
         </Card>
 
-       
+
+{/* ================= Secondary Skills ================= */}
         <Card>
-          <CardHeader><CardTitle>secondary skills</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Secondary Skills</CardTitle></CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside mb-3">
-              {courses.map((c, i) => <li key={i}>{c.title} - {c.instructor}</li>)}
+            <ul className="list-disc ml-5 space-y-1">
+              {secondarySkills.length === 0 && <li className="text-gray-400">None added</li>}
+              {secondarySkills.map((s,i)=> <li key={i}>{s}</li>)}
             </ul>
-            <Button className="w-full bg-purple-600 text-white" onClick={() => setOpenCourse(true)}>+ Add Course</Button>
+            <Button className="mt-3 w-full bg-purple-600"
+              onClick={()=>setOpenSecondary(true)}>+ Add Skill/Course</Button>
           </CardContent>
         </Card>
-         <Card>
+
+
+{/* ================= Certifications ================= */}
+        <Card>
           <CardHeader><CardTitle>Certifications</CardTitle></CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside mb-3">
-              {certifications.map((c, i) => <li key={i}>{c.title} - {c.provider}</li>)}
+            <ul className="list-disc ml-5 space-y-1">
+              {certifications.length === 0 && <li className="text-gray-400">No Certifications yet</li>}
+              {certifications.map((c,i)=><li key={i}>{c}</li>)}
             </ul>
-            <Button className="w-full bg-purple-600 text-white" onClick={() => setIsCertDialogVisible(true)}>+ Add Certification</Button>
+            <Button className="mt-3 w-full bg-purple-600"
+              onClick={()=>setIsCertDialogVisible(true)}>+ Add Certification</Button>
           </CardContent>
         </Card>
-
       </div>
 
-      <Dialog open={openSkill} onOpenChange={setOpenSkill}>
+
+{/* ========================================================================================
+   Primary Skill Dialog
+======================================================================================== */}
+      <Dialog open={openPrimary} onOpenChange={setOpenPrimary}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Skill</DialogTitle>
-            <DialogDescription>Enter the skill name and click Add to save.</DialogDescription>
-          </DialogHeader>
-          <Input placeholder="Skill" value={newSkill} onChange={(e) => { setNewSkill(e.target.value); setSkillError(""); }} />
-          {skillError && <p className="text-red-500 text-sm mt-2">{skillError}</p>}
+          <DialogHeader><DialogTitle>Add Primary Skill</DialogTitle></DialogHeader>
+          <Input placeholder="e.g. MERN, AWS"
+            value={newPrimary}
+            onChange={(e)=>{setNewPrimary(e.target.value);setPrimaryError("");}}/>
+          {primaryError && <p className="text-red-600">{primaryError}</p>}
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setOpenSkill(false)}>Cancel</Button>
-            <Button onClick={addSkill}>Add</Button>
+            <Button variant="outline" onClick={()=>setOpenPrimary(false)}>Cancel</Button>
+            <Button onClick={handleAddPrimary}>Add</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={openCourse} onOpenChange={setOpenCourse}>
+
+{/* ========================================================================================
+   Secondary Skill Dialog
+======================================================================================== */}
+      <Dialog open={openSecondary} onOpenChange={setOpenSecondary}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Course</DialogTitle>
-            <DialogDescription>Fill out course details and click Add.</DialogDescription>
-          </DialogHeader>
-          <Input placeholder="Title" value={newCourse.title} onChange={(e) => { setNewCourse({ ...newCourse, title: e.target.value }); setCourseError(""); }} />
-          <Input placeholder="Instructor" value={newCourse.instructor} onChange={(e) => { setNewCourse({ ...newCourse, instructor: e.target.value }); setCourseError(""); }} />
-          <Input placeholder="Duration" value={newCourse.duration} onChange={(e) => { setNewCourse({ ...newCourse, duration: e.target.value }); setCourseError(""); }} />
-          {courseError && <p className="text-red-500 text-sm mt-2">{courseError}</p>}
-          <Select value={newCourse.category} onValueChange={(value) => setNewCourse({ ...newCourse, category: value as Course["category"] })}>
-            <SelectTrigger className="w-full mt-2">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="technical">Technical</SelectItem>
-              <SelectItem value="professional">Professional</SelectItem>
-              <SelectItem value="compliance">Compliance</SelectItem>
-              <SelectItem value="leadership">Leadership</SelectItem>
-            </SelectContent>
-          </Select>
+          <DialogHeader><DialogTitle>Add Secondary Skill</DialogTitle></DialogHeader>
+          <Input placeholder="e.g. NextJS, Python, Azure"
+            value={newSecondary}
+            onChange={(e)=>{setNewSecondary(e.target.value);setSecondaryError("");}}/>
+          {secondaryError && <p className="text-red-600">{secondaryError}</p>}
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setOpenCourse(false)}>Cancel</Button>
-            <Button onClick={addCourse}>Add</Button>
+            <Button variant="outline" onClick={()=>setOpenSecondary(false)}>Cancel</Button>
+            <Button onClick={handleAddSecondary}>Add</Button>
           </div>
         </DialogContent>
       </Dialog>
 
+
+{/* ========================================================================================
+   Certification Add
+======================================================================================== */}
       <Dialog open={isCertDialogVisible} onOpenChange={setIsCertDialogVisible}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Certification</DialogTitle>
-            <DialogDescription>Select a provider and certificate.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right">Provider</label>
-              <Select onValueChange={(v) => { setSelectedProvider(v); setCertError(""); }} value={selectedProvider}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a Provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.keys(providers).map(provider => (
-                    <SelectItem key={provider} value={provider}>{provider}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right">Certificates</label>
-              <Select onValueChange={(v) => { setSelectedCertificate(v); setCertError(""); }} value={selectedCertificate} disabled={!selectedProvider}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a Certificate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectedProvider && providers[selectedProvider]?.map(cert => (
-                    <SelectItem key={cert} value={cert}>{cert}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          {certError && <p className="text-red-500 text-sm mt-2">{certError}</p>}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsCertDialogVisible(false)}>Cancel</Button>
-            <Button onClick={handleAddCertificationFromDialog}>Add</Button>
+          <DialogHeader><DialogTitle>Add Certification</DialogTitle></DialogHeader>
+
+          <label>Provider</label>
+          <Select onValueChange={(v)=>{setSelectedProvider(v);setCertError("");}} value={selectedProvider}>
+            <SelectTrigger><SelectValue placeholder="Select Provider" /></SelectTrigger>
+            <SelectContent>
+              {Object.keys(providersMap).map(p=> <SelectItem key={p} value={p}>{p}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <label className="mt-2 block">Certificate</label>
+          <Select disabled={!selectedProvider}
+                  onValueChange={(v)=>{setSelectedCertificate(v);setCertError("");}}
+                  value={selectedCertificate}>
+            <SelectTrigger><SelectValue placeholder="Choose Certificate" /></SelectTrigger>
+            <SelectContent>
+              {selectedProvider && providersMap[selectedProvider].map(c=>(
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {certError && <p className="text-red-500 text-sm mt-1">{certError}</p>}
+
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={()=>setIsCertDialogVisible(false)}>Cancel</Button>
+            <Button onClick={handleAddCertification}>Add</Button>
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 };
