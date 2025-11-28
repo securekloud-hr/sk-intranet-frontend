@@ -191,7 +191,10 @@ const LearningDevelopment: React.FC = () => {
   // ========================================================================================
   return (
     <div className="space-y-8 p-6">
-      <h1 className="text-3xl font-bold">Learning & Development</h1>
+      <h1 className="text-4xl font-bold">Learning & Development</h1>
+       <h1 className="text-2xl font-bold">Add your Skills, Certifications, and Courses</h1>
+      
+
       <p className="opacity-60 -mt-2">Welcome {displayName} 👋</p>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -220,7 +223,7 @@ const LearningDevelopment: React.FC = () => {
               {secondarySkills.map((s,i)=> <li key={i}>{s}</li>)}
             </ul>
             <Button className="mt-3 w-full bg-purple-600"
-              onClick={()=>setOpenSecondary(true)}>+ Add Skill/Course</Button>
+              onClick={()=>setOpenSecondary(true)}>+ Add Skill</Button>
           </CardContent>
         </Card>
 

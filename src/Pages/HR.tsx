@@ -1,4 +1,6 @@
 ﻿﻿import React, { useState, useEffect } from "react";
+import CollapsibleSkillLine from "./CollapsibleSkillLine";
+
 import {
   Card,
   CardContent,
@@ -4395,18 +4397,24 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                         <strong>Email:</strong>{" "}
                         {emp.Email || "N/A"}
                       </p>
-                      <p>
-                        <strong>Primary Skills:</strong>{" "}
-                        {emp.Tech1 || "N/A"}
-                      </p>
-                      <p>
-                        <strong>Secondary Skills:</strong>{" "}
-                        {emp.Tech2 || "N/A"}
-                      </p>
-                      <p>
-                        <strong>Special Skill:</strong>{" "}
-                        {emp.SpecialSkill || "N/A"}
-                      </p>
+                      <CollapsibleSkillLine
+  label="Primary Skills"
+  value={emp.Tech1 || ""}   // or emp.PrimarySkills if that is your column
+  limit={2}
+/>
+
+<CollapsibleSkillLine
+  label="Secondary Skills"
+  value={emp.Tech2 || ""}   // "HTML,CSS,Word Press,Java Script"
+  limit={2}
+/>
+
+<CollapsibleSkillLine
+  label="Special Skill"
+  value={emp.SpecialSkill || ""}  // "CCNA"
+  limit={2}
+/>
+
 
                       {/* 🔐 Only admins see sensitive info */}
                       {isAdmin && (

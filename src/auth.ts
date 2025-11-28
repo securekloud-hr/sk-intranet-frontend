@@ -3,17 +3,17 @@ import {
   PublicClientApplication,
   type Configuration,
   type AccountInfo,
+  BrowserAuthError,
 } from "@azure/msal-browser";
 
-/**
- * This is your SPA (frontend) app registration.
- * Leave clientId as your SPA's Application (client) ID.
- */
+/* ===========================
+    MSAL CONFIG
+=========================== */
 const msalConfig: Configuration = {
   auth: {
-    clientId: "e6ab8da5-9981-4a10-8892-d6c24c2dca88", // ✅ SPA clientId (frontend)
+    clientId: "e6ab8da5-9981-4a10-8892-d6c24c2dca88",
     authority: "https://login.microsoftonline.com/39282642-8418-47f5-bdec-4c1dfbcf42e9",
-    redirectUri: window.location.origin, // http://localhost:8081 in dev
+    redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
   },
   cache: {
@@ -24,36 +24,60 @@ const msalConfig: Configuration = {
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
-/**
- * IMPORTANT:
- * VITE_API_SCOPE must point to your BACKEND app’s exposed scope, e.g.
- * VITE_API_SCOPE=api://3b7fc1c3-39e2-41aa-96ee-72f90faf4174/user_impersonation
- * (3b7f... is the *backend* app registration's client ID, not the SPA one)
- */
+/* ===========================
+    SCOPES
+=========================== */
 export const loginRequest = {
   scopes: [import.meta.env.VITE_API_SCOPE as string],
 };
 
-// Ensure user is signed in (silent → popup)
+/* ===========================
+    MAIN LOGIN FUNCTION
+    ⬇ THIS IS WHERE FIX ADDED
+=========================== */
 export async function ensureSignedIn(): Promise<AccountInfo> {
   const accounts = msalInstance.getAllAccounts();
   if (accounts && accounts[0]) return accounts[0];
 
   try {
+    // Try silent login first
     const sso = await msalInstance.ssoSilent(loginRequest);
     return sso.account!;
-  } catch {
-    const res = await msalInstance.loginPopup(loginRequest);
-    return res.account!;
+  } catch (err: any) {
+    // 🔥 CATCH popup conflict & redirect out
+    if (err instanceof BrowserAuthError && err.errorCode === "interaction_in_progress") {
+      console.warn("⚠ interaction_in_progress → redirect to SecureKloud...");
+      window.location.href = "https://www.securekloud.com/";
+      throw err;
+    }
+
+    try {
+      // 🔥 Popup login attempt
+      const res = await msalInstance.loginPopup(loginRequest);
+      return res.account!;
+    } catch (popupErr: any) {
+      console.error("❌ Final MSAL login failed → redirecting to SecureKloud");
+
+      // If ANY login fails → redirect
+      window.location.href = "https://www.securekloud.com/";
+      throw popupErr;
+    }
   }
 }
 
-// Acquire token for your backend API (Graph OBO will happen on backend)
+/* ===========================
+    ACQUIRE TOKEN SAFE MODE
+=========================== */
 export async function acquireTokenForApi(account?: AccountInfo) {
   const acc = account || (await ensureSignedIn());
-  const result = await msalInstance.acquireTokenSilent({
-    account: acc,
-    scopes: loginRequest.scopes,
-  });
-  return result.accessToken;
+  try {
+    const result = await msalInstance.acquireTokenSilent({
+      account: acc,
+      scopes: loginRequest.scopes,
+    });
+    return result.accessToken;
+  } catch {
+    window.location.href = "https://www.securekloud.com/";
+    throw new Error("Auth failed — redirected to SecureKloud");
+  }
 }

@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { msalInstance } from "@/auth";
- // ✅ adjust if your path is /Pages/auth.ts
 import API from "@/config";
+import { BrowserAuthError } from "@azure/msal-browser";
 
 type StoredUser = {
   name: string;
@@ -19,21 +19,45 @@ export default function RequireAuth() {
     (async () => {
       try {
         console.log("🔹 Initializing MSAL...");
-        await msalInstance.initialize(); // ✅ critical fix
+        await msalInstance.initialize();
 
-        // 1️⃣ Try to get account from cache or trigger login
+        // 1️⃣ Try cached account
         let account = msalInstance.getAllAccounts()[0];
+
+        // 2️⃣ If no cached account → loginPopup
         if (!account) {
           console.log("🔹 No cached account, logging in with popup...");
-          await msalInstance.loginPopup({
-            scopes: ["openid", "profile", "email"],
-          });
+
+          try {
+            await msalInstance.loginPopup({
+              scopes: ["openid", "profile", "email"],
+            });
+          } catch (loginErr: any) {
+            console.error("❌ loginPopup error:", loginErr);
+
+            // 🔥 if interaction already in progress → redirect
+            if (
+              loginErr instanceof BrowserAuthError &&
+              loginErr.errorCode === "interaction_in_progress"
+            ) {
+              console.warn(
+                "⚠ interaction_in_progress during loginPopup → redirecting to SecureKloud"
+              );
+              window.location.href = "https://www.securekloud.com/";
+              return;
+            }
+
+            // Any other login failure → also redirect
+            window.location.href = "https://www.securekloud.com/";
+            return;
+          }
+
           account = msalInstance.getAllAccounts()[0];
         }
 
         if (!account) throw new Error("MSAL login failed — no account found");
 
-        // 2️⃣ Extract Microsoft data
+        // 3️⃣ Extract Microsoft data
         const msalName =
           (account.idTokenClaims?.name as string) ||
           (account.name as string) ||
@@ -47,7 +71,7 @@ export default function RequireAuth() {
 
         console.log("✅ Logged in as:", msalName, msalEmail);
 
-        // 3️⃣ Upsert user into Mongo
+        // 4️⃣ Upsert user into Mongo
         try {
           await fetch(`${API}/api/aad/ensure-user`, {
             method: "POST",
@@ -62,7 +86,7 @@ export default function RequireAuth() {
           console.warn("⚠️ ensure-user failed, continuing:", err);
         }
 
-        // 4️⃣ Retrieve role (admin/user)
+        // 5️⃣ Retrieve role (admin/user)
         let role: "user" | "admin" = "user";
         try {
           const res = await fetch(
@@ -76,7 +100,7 @@ export default function RequireAuth() {
           console.warn("⚠️ backend /me fetch failed — defaulting to user");
         }
 
-        // 5️⃣ Save locally for AppLayout + Sidebar
+        // 6️⃣ Save locally for AppLayout + Sidebar
         const stored: StoredUser = { name: msalName, email: msalEmail, role };
         localStorage.setItem("user", JSON.stringify(stored));
 
@@ -84,6 +108,19 @@ export default function RequireAuth() {
         setBooting(false);
       } catch (e: any) {
         console.error("❌ MSAL init/login error:", e);
+
+        // 🔥 Catch interaction_in_progress from initialize / other MSAL calls
+        if (
+          e instanceof BrowserAuthError &&
+          e.errorCode === "interaction_in_progress"
+        ) {
+          console.warn(
+            "⚠ interaction_in_progress during init → redirecting to SecureKloud"
+          );
+          window.location.href = "https://www.securekloud.com/";
+          return;
+        }
+
         setError(e?.message || "Sign-in failed");
         setBooting(false);
       }
