@@ -4363,7 +4363,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                   >
                     {/* Top section with initials */}
  
-                   <img src="../../public/collapse.png"></img>
+                   <img src="../../public/collapse.png" className="w-10 h-10"></img>
                     {/* Employee details */}
                     <div className="p-4 text-sm space-y-1">
                       {/* ✅ Shown to everyone */}
