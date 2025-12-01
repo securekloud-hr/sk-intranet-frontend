@@ -56,7 +56,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     { title: "Holidays", href: "/holidays", icon: Calendar },
     { title: "Employee Engagement", href: "/engagement", icon: Users },
     { title: "Learning & Development", href: "/learning", icon: GraduationCap },
-    { title: "Internal Jobs", href: "/jobs", icon: Building },
+   //{ title: "Internal Jobs", href: "/jobs", icon: Building },
     { title: "Talent Acquisition", href: "/talent", icon: Users },
     { title: "Performance", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },

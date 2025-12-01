@@ -236,6 +236,16 @@ useEffect(() => {
   }
 }, []);
 
+const getEmployeeImage = (empID: string = "", name: string = "") => {
+  if (!empID || !name) return "/employee-images/default-avatar.jpg";
+
+  // normalize name → remove extra spaces
+  const cleanName = name.trim().replace(/\s+/g, " ");
+
+  return `/employee-images/${empID}-${cleanName}.jpg`;
+};
+
+
 
 
 
@@ -4363,8 +4373,13 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                   >
                     {/* Top section with initials */}
  
-                   <img src="../../public/employee-images/B22152-Valarmathi V.jpg" className="w-10 h-10"></img>
-                    {/* Employee details */}
+                  <img
+  src={getEmployeeImage(emp.EmpID, emp.EmployeeName)}
+  alt={emp.EmployeeName}
+  className="w-14 h-14 rounded-full object-cover"
+  onError={(e) => (e.currentTarget.src = "/employee-images/default-avatar.jpg")}
+/>
+
                     <div className="p-4 text-sm space-y-1">
                       {/* ✅ Shown to everyone */}
                       <p>
@@ -4374,19 +4389,22 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                       <p>
                         <strong>Emp ID:</strong> {emp.EmpID || "N/A"}
                       </p>
+                       
                       <p>
                         <strong>Department:</strong>{" "}
                         {emp.Department || "N/A"}
                       </p>
-                        <p>
-  <strong>E-Mail ID:</strong>{" "}
-  {emp.Email || "N/A"}
-</p>
+                     <p>
+              <strong>Designation:</strong> {emp.Designation || "N/A"}
+            </p>
+            <p>
+              <strong>E-Mail :</strong> {emp.Email || "N/A"}
+            </p>
+            <p>
+              <strong>Personal Email ID :</strong>{" "}
+              {emp.PersonalEmailID || "N/A"}
+            </p>
 
-                      <p>
-                        <strong>Email:</strong>{" "}
-                        {emp.Email || "N/A"}
-                      </p>
                       <CollapsibleSkillLine
   label="Primary Skills"
   value={emp.Tech1 || ""}   // or emp.PrimarySkills if that is your column
