@@ -4362,23 +4362,8 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                     className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200"
                   >
                     {/* Top section with initials */}
-                    <div className="bg-purple-50 rounded-t-2xl p-4 flex flex-col items-center">
-                      <div className="w-14 h-14 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 text-xl font-semibold">
-                        {emp.EmployeeName
-                          ? emp.EmployeeName.split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)
-                          : "NA"}
-                      </div>
-                      <h2 className="mt-3 text-lg font-semibold text-gray-800 text-center">
-                        {emp.EmployeeName || "Unnamed"}
-                      </h2>
-                      <p className="text-sm text-gray-500">
-                        Emp ID: {emp.EmpID || "N/A"}
-                      </p>
-                    </div>
-
+ 
+                   <img src="ubuntu@ip-172-31-35-47\sk-intranet-frontend\public\expand.png"></img>
                     {/* Employee details */}
                     <div className="p-4 text-sm space-y-1">
                       {/* ✅ Shown to everyone */}
@@ -4393,6 +4378,11 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                         <strong>Department:</strong>{" "}
                         {emp.Department || "N/A"}
                       </p>
+                        <p>
+  <strong>E-Mail ID:</strong>{" "}
+  {emp.Email || "N/A"}
+</p>
+
                       <p>
                         <strong>Email:</strong>{" "}
                         {emp.Email || "N/A"}
