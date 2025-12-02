@@ -638,7 +638,8 @@ const [pipData, setPipData] = useState({
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
 
   // Map HR team to employee directory for email/phone where applicable
-  const enrichedEmployeeDirectory = employeeDirectory.map(emp => {
+ 
+ const enrichedEmployeeDirectory = employeeDirectory.map(emp => {
     const hrMatch = team.find(t => t.name === emp.EmployeeName);
     return {
       ...emp,
