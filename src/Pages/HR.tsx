@@ -4377,7 +4377,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                   <img
   src={getEmployeeImage(emp.EmpID, emp.EmployeeName)}
   alt={emp.EmployeeName}
-  className="w-14 h-14 rounded-full align-center object-cover"
+  className="w-14 h-14 rounded-full align-middle object-cover"
   onError={(e) => (e.currentTarget.src = "/employee-images/default-avatar.jpg")}
 />
 
@@ -4389,6 +4389,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                       </p>
                       <p>
                         <strong>Emp ID:</strong> {emp.EmpID || "N/A"}
+
+
+          
                       </p>
                        
                       <p>

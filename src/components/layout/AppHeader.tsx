@@ -1,4 +1,3 @@
-// src/components/layout/AppHeader.tsx
 import React, { useMemo, useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,10 +28,15 @@ function getEmployeeImage(empID?: string, name?: string) {
   if (!empID || !name) {
     return "/employee-images/default-avatar.jpg";
   }
-
   const cleanName = name.trim().replace(/\s+/g, " ");
   return `/employee-images/${empID}-${cleanName}.jpg`;
 }
+
+const normalizeName = (s?: string | null) =>
+  s ? s.trim().replace(/\s+/g, " ").toLowerCase() : "";
+
+const normalizeEmail = (s?: string | null) =>
+  s ? s.trim().toLowerCase() : "";
 
 export function AppHeader({ user }: { user?: any }) {
   const [showAccountDialog, setShowAccountDialog] = useState(false);
@@ -45,7 +49,9 @@ export function AppHeader({ user }: { user?: any }) {
     try {
       const raw = localStorage.getItem("user");
       if (raw && raw !== "undefined") return JSON.parse(raw);
-    } catch {}
+    } catch (e) {
+      console.error("Failed to read user from localStorage", e);
+    }
     return null;
   }, [user]);
 
@@ -58,38 +64,64 @@ export function AppHeader({ user }: { user?: any }) {
     : "";
   const initial = displayName.charAt(0).toUpperCase();
 
-  // 🔍 Fetch employee directory and map logged-in user to employee record
+  // 🔁 Fetch employee directory and match logged-in user → record
   useEffect(() => {
     if (!mongoUser) return;
 
-    const fetchEmployee = async () => {
+    const fetchAndMatchEmployee = async () => {
       try {
-        const res = await fetch(`${API}/api/employeedirectory`);
-        if (!res.ok) throw new Error("Failed to fetch employee directory");
+        let userRole = "user";
+        const storedUser = localStorage.getItem("user");
+        if (storedUser && storedUser !== "undefined") {
+          try {
+            const parsed = JSON.parse(storedUser);
+            if (parsed?.role) userRole = parsed.role;
+          } catch (e) {
+            console.error(
+              "Error parsing user from localStorage in AppHeader",
+              e
+            );
+          }
+        }
+
+        const res = await fetch(`${API}/api/employeedirectory`, {
+          headers: { "x-user-role": userRole },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch employee data in AppHeader");
 
         const data: EmployeeRecord[] = await res.json();
 
-        const lowerEmail = mongoUser.email?.toLowerCase();
-        const lowerName = mongoUser.name?.trim().toLowerCase();
+        const userEmailNorm = normalizeEmail(mongoUser.email);
+        const userNameNorm = normalizeName(mongoUser.name);
 
         const match = data.find((emp) => {
-          const empEmail = emp.Email?.toLowerCase();
-          const empName = emp.EmployeeName?.trim().toLowerCase();
+          const empEmailNorm = normalizeEmail(emp.Email);
+          const empNameNorm = normalizeName(emp.EmployeeName);
 
           return (
-            (empEmail && lowerEmail && empEmail === lowerEmail) ||
-            (empName && lowerName && empName === lowerName)
+            (userEmailNorm && empEmailNorm && empEmailNorm === userEmailNorm) ||
+            (userNameNorm && empNameNorm && empNameNorm === userNameNorm)
           );
         });
 
+        console.log("AppHeader: normalized user:", {
+          rawName: mongoUser.name,
+          userNameNorm,
+          rawEmail: mongoUser.email,
+          userEmailNorm,
+        });
+        console.log("AppHeader: first few employees:", data.slice(0, 5));
+        console.log("AppHeader matched employee:", match);
+
         setEmployeeRecord(match || null);
       } catch (err) {
-        console.error("Failed to map AppHeader user to employee record", err);
+        console.error("AppHeader: error matching employee record", err);
         setEmployeeRecord(null);
       }
     };
 
-    fetchEmployee();
+    fetchAndMatchEmployee();
   }, [mongoUser]);
 
   const avatarSrc = employeeRecord
@@ -99,12 +131,10 @@ export function AppHeader({ user }: { user?: any }) {
   return (
     <>
       <header className="h-16 border-b flex items-center justify-between px-4 bg-white">
-        {/* Left side: Logo / App name */}
         <div className="flex items-center space-x-2">
           <span className="text-lg font-semibold">SecureKloud Intranet</span>
         </div>
 
-        {/* Right side: Notifications + User menu */}
         <div className="flex items-center space-x-2">
           {/* 🔔 Notifications */}
           <DropdownMenu>
@@ -158,7 +188,7 @@ export function AppHeader({ user }: { user?: any }) {
         </div>
       </header>
 
-      {/* 🪟 My Account Popup */}
+      {/* 🪟 My Account Popup (unchanged) */}
       <Dialog open={showAccountDialog} onOpenChange={setShowAccountDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -170,7 +200,6 @@ export function AppHeader({ user }: { user?: any }) {
 
           {mongoUser ? (
             <div className="mt-2 space-y-3 text-sm">
-              {/* Avatar + basic info */}
               <div className="flex items-center space-x-3">
                 <Avatar className="h-10 w-10">
                   <AvatarImage
@@ -209,8 +238,7 @@ export function AppHeader({ user }: { user?: any }) {
           ) : (
             <div className="mt-4 text-sm text-red-500">
               No profile details found. Please ensure Mongo user data is loaded
-              in
-              <code className="ml-1">localStorage.user</code>.
+              in <code className="ml-1">localStorage.user</code>.
             </div>
           )}
         </DialogContent>
