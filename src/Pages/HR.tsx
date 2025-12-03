@@ -1,4 +1,4 @@
-﻿﻿import React, { useState, useEffect } from "react";
+﻿﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
 
 import {
@@ -4374,12 +4374,15 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                   >
                     {/* Top section with initials */}
  
-                  <img
-  src={getEmployeeImage(emp.EmpID, emp.EmployeeName)}
-  alt={emp.EmployeeName}
-  className="w-14 h-14 rounded-full align-middle object-cover"
-  onError={(e) => (e.currentTarget.src = "/employee-images/default-avatar.jpg")}
-/>
+                 <div className="flex justify-center w-full pt-6 pb-2">
+  <img
+    src={getEmployeeImage(emp.EmpID, emp.EmployeeName)}
+    alt={emp.EmployeeName}
+    className="w-14 h-14 rounded-full object-cover"
+    onError={(e) => (e.currentTarget.src = "/employee-images/default-avatar.jpg")}
+  />
+</div>
+
 
                     <div className="p-4 text-sm space-y-1">
                       {/* ✅ Shown to everyone */}
@@ -4480,3 +4483,4 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 };
 
 export default HR;
+
