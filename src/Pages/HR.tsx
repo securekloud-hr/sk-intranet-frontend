@@ -4422,7 +4422,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 />
 
 <CollapsibleSkillLine
-  label="Special Skill"
+  label="Certifications"
   value={emp.SpecialSkill || ""}  // "CCNA"
   limit={2}
 />

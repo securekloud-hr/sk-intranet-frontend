@@ -188,27 +188,40 @@ export function AppHeader({ user }: { user?: any }) {
           </DropdownMenu>
 
           {/* 👤 User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2"
-                onClick={() => setShowAccountDialog(true)}
-              >
-                <Avatar className="h-8 w-8 cursor-pointer" onClick={handleAvatarClick}>
-                  <AvatarImage
-                    src={avatarSrc}
-                    alt={displayName}
-                    className="h-full w-full object-cover"
-                  />
-                  <AvatarFallback className="bg-skcloud-purple text-white">
-                    {initial}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-          </DropdownMenu>
+          {/* 👤 User Menu */}
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button
+      variant="ghost"
+      size="sm"
+      className="flex items-center space-x-2"
+      onClick={() => setShowAccountDialog(true)}
+    >
+      <Avatar
+        className="h-8 w-8 cursor-pointer"
+        onClick={handleAvatarClick}
+      >
+        <AvatarImage
+          src={avatarSrc}
+          alt={displayName}
+          className="h-full w-full object-cover"
+        />
+        <AvatarFallback className="bg-skcloud-purple text-white">
+          {initial}
+        </AvatarFallback>
+      </Avatar>
+
+      {/* 🔹 Name + role text (restored) */}
+      <div className="flex flex-col items-start text-left leading-tight">
+        <span className="font-medium">{displayName}</span>
+        <span className="text-sm text-muted-foreground">
+          {role === "admin" ? "🛡️ Admin" : "👤 User"}
+        </span>
+      </div>
+    </Button>
+  </DropdownMenuTrigger>
+</DropdownMenu>
+
 
           {/* Hidden input */}
           <input
