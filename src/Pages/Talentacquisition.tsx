@@ -1,4 +1,5 @@
-﻿import { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import {
   Card,
@@ -43,7 +44,65 @@ interface ReferralOpportunity {
   bonus: number;
 }
 
-// ----------------------- MODAL COMPONENT -----------------------
+/* ------------ TA TEAM DATA (for TA Details tab) ------------ */
+
+type TaTeamMember = {
+  name: string;
+  empId: string;
+  designation: string;
+  email: string;
+  phone: string;
+};
+
+const taTeamMembers: TaTeamMember[] = [
+  {
+    name: "Riswana Fathima M S",
+    empId: "B24046",
+    designation: "Associate - Talent Acquisition",
+    email: "riswana.mohammed@securekloud.com",
+    phone: "7395972828",
+  },
+  {
+    name: "Senthamizhselvan P",
+    empId: "B25005",
+    designation: "Trainee - Talent Acquisition",
+    email: "senthamizhselvan.pooranachandiran@securekloud.com",
+    phone: "9566618781",
+  },
+  {
+    name: "Sriram R",
+    empId: "B22131",
+    designation: "Associate - Talent Acquisition",
+    email: "sriram.ravirajan@securekloud.com",
+    phone: "8072446248",
+  },
+  {
+    name: "Sruthi S",
+    empId: "B21104",
+    designation: "Senior Associate - Talent Acquisition",
+    email: "sruthi.sankaranarayanan@securekloud.com",
+    phone: "7010639532",
+  },
+  {
+    name: "Valarmathi V",
+    empId: "B22152",
+    designation: "Associate - Talent Acquisition",
+    email: "valarmathi.venkatesan@securekloud.com",
+    phone: "8056140918",
+  },
+];
+
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+/* ----------------------- MODAL COMPONENT ----------------------- */
+
 interface ModalProps {
   opportunities: ReferralOpportunity[];
 }
@@ -51,45 +110,57 @@ interface ModalProps {
 const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
   const [showModal, setShowModal] = useState(false);
 
+  if (!opportunities || opportunities.length === 0) return null;
+
   return (
     <>
-      <Button className="mt-4" onClick={() => setShowModal(true)}>
+      <Button variant="outline" onClick={() => setShowModal(true)}>
         View Descriptions
       </Button>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start pt-20 overflow-auto">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded w-3/4 max-w-3xl shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">All Job Descriptions</h3>
-              <Button onClick={() => setShowModal(false)}>Close</Button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">
+                Job Descriptions ({opportunities.length})
+              </h2>
+              <Button variant="ghost" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
             </div>
 
-            {opportunities.length === 0 && (
-              <p className="text-muted-foreground">
-                No job opportunities available.
-              </p>
-            )}
-
-            {opportunities.map((job) => (
-              <div key={job.id} className="mb-6 border-b pb-4">
-                <h4 className="font-semibold text-lg">{job.title}</h4>
-                {job.department && (
-                  <p className="text-sm text-muted-foreground">
-                    {job.department}
+            <div className="space-y-6">
+              {opportunities.map((op) => (
+                <div key={op._id || op.id} className="border-b pb-4 last:border-b-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div>
+                      <h3 className="font-semibold">{op.title}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {op.location} • {op.experience}
+                      </p>
+                    </div>
+                    <Badge className="text-xs">
+                      {op.priority.charAt(0).toUpperCase() + op.priority.slice(1)}{" "}
+                      Priority
+                    </Badge>
+                  </div>
+                  <p className="text-sm mb-2 whitespace-pre-line">
+                    {op.description}
                   </p>
-                )}
-                <p className="mt-2">{job.description}</p>
-                <div className="mt-2">
-                  <h5 className="font-medium">Requirements:</h5>
-                  <ul className="list-disc pl-5 text-sm">
-                    {job.requirements.map((req, index) => (
-                      <li key={index}>{req}</li>
-                    ))}
-                  </ul>
+                  {op.requirements?.length > 0 && (
+                    <>
+                      <p className="text-xs font-semibold mb-1">Key Requirements:</p>
+                      <ul className="list-disc pl-5 text-xs space-y-1">
+                        {op.requirements.map((r, i) => (
+                          <li key={i}>{r}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -97,7 +168,8 @@ const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
   );
 };
 
-// ----------------------- MAIN COMPONENT -----------------------
+/* ----------------------- MAIN COMPONENT ----------------------- */
+
 const TalentAcquisition = () => {
   const [opportunities, setOpportunities] = useState<ReferralOpportunity[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -105,7 +177,7 @@ const TalentAcquisition = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  // ✅ referral form state (candidate details)
+  // referral form state (candidate details)
   const [referral, setReferral] = useState({
     candidateName: "",
     email: "",
@@ -115,7 +187,7 @@ const TalentAcquisition = () => {
   });
   const [resume, setResume] = useState<File | null>(null);
 
-  // 🔐 Read user from localStorage and determine role
+  // Read user from localStorage and determine role
   const cachedUser = useMemo<UserLike | null>(() => {
     try {
       const raw = localStorage.getItem("user");
@@ -164,7 +236,7 @@ const TalentAcquisition = () => {
     setCurrentPage(page);
   };
 
-  // ✅ referral input handlers
+  // referral input handlers
   const handleReferralChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setReferral({ ...referral, [name]: value });
@@ -174,21 +246,15 @@ const TalentAcquisition = () => {
     if (e.target.files) setResume(e.target.files[0]);
   };
 
-  // 🔹 Submit referral – includes logged-in user info (with mail fallback)
+  // Submit referral – includes logged-in user info (with mail fallback)
   const submitReferral = async () => {
     if (!cachedUser) {
       alert("Please login before submitting a referral.");
       return;
     }
 
-    const referrerName =
-      cachedUser.fullName || cachedUser.name || "Employee";
-
-    // 👈 IMPORTANT: fall back to mail if email is missing
-    const referrerEmail =
-      cachedUser.email || cachedUser.mail || "";
-
-    console.log("Referral referrer:", referrerName, referrerEmail, cachedUser);
+    const referrerName = cachedUser.fullName || cachedUser.name || "Employee";
+    const referrerEmail = cachedUser.email || cachedUser.mail || "";
 
     if (!referrerEmail) {
       alert("Your profile does not have an email address.");
@@ -196,19 +262,13 @@ const TalentAcquisition = () => {
     }
 
     const data = new FormData();
-
-    // 💥 BACKEND EXPECTS THESE FIELD NAMES:
-    // candidateName, candidateEmail, phone, position, notes
     data.append("candidateName", referral.candidateName);
     data.append("candidateEmail", referral.email);
     data.append("phone", referral.phone);
     data.append("position", referral.position);
     data.append("notes", referral.notes);
-
-    // referrer details
     data.append("referrerName", referrerName);
     data.append("referrerEmail", referrerEmail);
-
     if (resume) data.append("resume", resume);
 
     const res = await fetch(`${API}/api/referral`, {
@@ -244,8 +304,8 @@ const TalentAcquisition = () => {
   const totalPages = Math.ceil(opportunities.length / itemsPerPage);
 
   return (
-    <div className="space-y-8">
-      {/* Intro */}
+    <div className="space-y-6">
+      {/* Page title */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Talent Acquisition</h1>
         <p className="text-muted-foreground">
@@ -253,217 +313,297 @@ const TalentAcquisition = () => {
         </p>
       </div>
 
-      {/* Employee Referral Program */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Employee Referral Program</CardTitle>
-          <CardDescription>
-            Earn bonuses for successful candidate referrals
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <h3 className="font-semibold">How the Referral Program Works</h3>
-          <ul className="list-disc pl-6 space-y-1 text-sm text-muted-foreground">
-            <li>Refer qualified candidates for open positions at SecureKloud.</li>
-            <li>If your referral is hired and completes 90 days, you earn a bonus.</li>
-            <li>
-              Bonus amounts vary by position, with high-priority roles offering higher
-              incentives.
-            </li>
-            <li>
-              Submit referrals through the form below or email recruiting@securekloud.com.
-            </li>
-            <li>No limit to the number of referrals you can submit or bonuses you can earn.</li>
-          </ul>
+      {/* Tabs wrapper */}
+      <Tabs defaultValue="referral" className="space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsTrigger value="referral">Referral Program</TabsTrigger>
+          <TabsTrigger value="details">TA Details</TabsTrigger>
+          <TabsTrigger value="jobs">Jobs</TabsTrigger>
+        </TabsList>
 
-          <h3 className="font-semibold mt-4">Referral Incentive Structure</h3>
-          <table className="w-full border text-sm mt-2">
-            <thead className="bg-muted">
-              <tr>
-                <th className="border px-3 py-2 text-left">Roles</th>
-                <th className="border px-3 py-2 text-left">Band</th>
-                <th className="border px-3 py-2 text-left">Incentive</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border px-3 py-2">Fresher</td>
-                <td className="border px-3 py-2">B1</td>
-                <td className="border px-3 py-2">Rs. 2,500/-</td>
-              </tr>
-              <tr>
-                <td className="border px-3 py-2">Team Member</td>
-                <td className="border px-3 py-2">B2</td>
-                <td className="border px-3 py-2">Rs. 10,000/-</td>
-              </tr>
-              <tr>
-                <td className="border px-3 py-2">Senior Team Member</td>
-                <td className="border px-3 py-2">B3</td>
-                <td className="border px-3 py-2">Rs. 25,000/-</td>
-              </tr>
-              <tr>
-                <td className="border px-3 py-2">Middle Management</td>
-                <td className="border px-3 py-2">B4 - B5</td>
-                <td className="border px-3 py-2">Rs. 50,000/-</td>
-              </tr>
-              <tr>
-                <td className="border px-3 py-2">Management</td>
-                <td className="border px-3 py-2">B6 - B7</td>
-                <td className="border px-3 py-2">Rs. 75,000/-</td>
-              </tr>
-              <tr>
-                <td className="border px-3 py-2">Senior Management and above</td>
-                <td className="border px-3 py-2">B8 & Above</td>
-                <td className="border px-3 py-2">Rs. 1,00,000/-</td>
-              </tr>
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+        {/* 1️⃣ Referral Program tab */}
+        <TabsContent value="referral" className="space-y-6">
+          {/* Top 2 cards – side by side like Holidays page */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Card 1: Employee Referral Program */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Employee Referral Program</CardTitle>
+                <CardDescription>
+                  Earn bonuses for successful candidate referrals
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <h3 className="font-semibold">How the Referral Program Works</h3>
+                <ul className="list-disc pl-6 space-y-1 text-sm text-muted-foreground">
+                  <li>
+                    Refer qualified candidates for open positions at SecureKloud.
+                  </li>
+                  <li>
+                    If your referral is hired and completes 90 days, you earn a bonus.
+                  </li>
+                  <li>
+                    Bonus amounts vary by position, with high-priority roles offering
+                    higher incentives.
+                  </li>
+                  <li>
+                    Submit referrals through the form below or email{" "}
+                    recruiting@securekloud.com.
+                  </li>
+                  <li>
+                    No limit to the number of referrals you can submit or bonuses you can
+                    earn.
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
 
-      {/* ✅ Submit Referral Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Submit a Referral</CardTitle>
-          <CardDescription>Refer a candidate and help us grow</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            name="candidateName"
-            placeholder="Candidate Name"
-            value={referral.candidateName}
-            onChange={handleReferralChange}
-            required
-          />
-          <Input
-            name="email"
-            type="email"
-            placeholder="Email Address"
-            value={referral.email}
-            onChange={handleReferralChange}
-            required
-          />
-          <Input
-            name="phone"
-            type="tel"
-            placeholder="Phone Number"
-            value={referral.phone}
-            onChange={handleReferralChange}
-            required
-          />
-          <Input
-            name="position"
-            placeholder="Position Referred For"
-            value={referral.position}
-            onChange={handleReferralChange}
-            required
-          />
-          <Input type="file" accept=".pdf" onChange={handleResumeChange} />
-          <Input
-            name="notes"
-            placeholder="Additional Notes"
-            value={referral.notes}
-            onChange={handleReferralChange}
-          />
-          <Button className="w-full" onClick={submitReferral}>
-            <UserPlus className="mr-2 h-4 w-4" /> Submit Referral
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Upload Excel – only for Admin */}
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Upload Referral Opportunities</CardTitle>
-            <CardDescription>
-              Upload an Excel sheet to update jobs list
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex gap-4">
-            <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
-            <Button onClick={handleUpload} disabled={!file}>
-              Upload & Update
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Jobs List */}
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-full bg-securekloud-100 dark:bg-securekloud-700 flex items-center justify-center">
-            <Award className="h-5 w-5 text-securekloud-700 dark:text-securekloud-100" />
+            {/* Card 2: Referral Incentive Structure */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Referral Incentive Structure</CardTitle>
+                <CardDescription>Bonus amounts by role and band</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <table className="w-full border text-sm mt-2">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="border px-3 py-2 text-left">Roles</th>
+                      <th className="border px-3 py-2 text-left">Band</th>
+                      <th className="border px-3 py-2 text-left">Incentive</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border px-3 py-2">Fresher</td>
+                      <td className="border px-3 py-2">B1</td>
+                      <td className="border px-3 py-2">Rs. 2,500/-</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-3 py-2">Team Member</td>
+                      <td className="border px-3 py-2">B2</td>
+                      <td className="border px-3 py-2">Rs. 10,000/-</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-3 py-2">Senior Team Member</td>
+                      <td className="border px-3 py-2">B3</td>
+                      <td className="border px-3 py-2">Rs. 25,000/-</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-3 py-2">Middle Management</td>
+                      <td className="border px-3 py-2">B4 - B5</td>
+                      <td className="border px-3 py-2">Rs. 50,000/-</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-3 py-2">Management</td>
+                      <td className="border px-3 py-2">B6 - B7</td>
+                      <td className="border px-3 py-2">Rs. 75,000/-</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-3 py-2">
+                        Senior Management and above
+                      </td>
+                      <td className="border px-3 py-2">B8 &amp; Above</td>
+                      <td className="border px-3 py-2">Rs. 1,00,000/-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
           </div>
-          <h2 className="text-2xl font-bold">Current Referral Opportunities</h2>
-        </div>
 
-        <div className="mb-4">
-          <label htmlFor="jobSelect" className="text-sm font-medium mr-2">
-            Select a Job:
-          </label>
-          <select
-            id="jobSelect"
-            className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-full max-w-xs"
-            value={selectedJobId}
-            onChange={handleJobSelect}
-            aria-label="Select a job opening"
-          >
-            <option value="">All Jobs</option>
-            {opportunities.map((job) => (
-              <option key={job._id || job.id} value={job.id}>
-                {job.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-6">
-          {displayedOpportunities.length > 0 ? (
-            displayedOpportunities.map((opportunity) => (
-              <ReferralCard
-                key={opportunity._id || opportunity.id}
-                opportunity={opportunity}
+          {/* Submit Referral form card (below the two cards) */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Submit a Referral</CardTitle>
+              <CardDescription>Refer a candidate and help us grow</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                name="candidateName"
+                placeholder="Candidate Name"
+                value={referral.candidateName}
+                onChange={handleReferralChange}
+                required
               />
-            ))
-          ) : (
-            <p className="text-muted-foreground">No opportunities available.</p>
-          )}
-        </div>
-
-        {!selectedJobId && totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-6">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i + 1}
-                onClick={() => handlePageChange(i + 1)}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-              >
-                {i + 1}
+              <Input
+                name="email"
+                type="email"
+                placeholder="Email Address"
+                value={referral.email}
+                onChange={handleReferralChange}
+                required
+              />
+              <Input
+                name="phone"
+                type="tel"
+                placeholder="Phone Number"
+                value={referral.phone}
+                onChange={handleReferralChange}
+                required
+              />
+              <Input
+                name="position"
+                placeholder="Position Referred For"
+                value={referral.position}
+                onChange={handleReferralChange}
+                required
+              />
+              <Input type="file" accept=".pdf" onChange={handleResumeChange} />
+              <Input
+                name="notes"
+                placeholder="Additional Notes"
+                value={referral.notes}
+                onChange={handleReferralChange}
+              />
+              <Button className="w-full" onClick={submitReferral}>
+                <UserPlus className="mr-2 h-4 w-4" /> Submit Referral
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 2️⃣ TA Details tab – HR Team style cards */}
+        <TabsContent value="details" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-1">Talent Acquisition Team</h2>
+            <p className="text-sm text-muted-foreground">
+              Key contacts and information about the TA team
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {taTeamMembers.map((member) => (
+              <Card
+                key={member.empId}
+                className="flex flex-col items-center text-center py-6"
+              >
+                <CardHeader className="flex flex-col items-center">
+                  <div className="w-20 h-20 rounded-full bg-securekloud-100 dark:bg-securekloud-700 flex items-center justify-center text-securekloud-700 dark:text-securekloud-50 text-2xl font-semibold mb-3">
+                    {getInitials(member.name)}
+                  </div>
+                  <CardTitle className="text-lg">{member.name}</CardTitle>
+                  <CardDescription className="text-sm">
+                    {member.designation}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-1 text-sm">
+                  <p>
+                    <span className="font-medium">Emp ID: </span>
+                    {member.empId}
+                  </p>
+                  <p>
+                    <span className="font-medium">Email: </span>
+                    {member.email}
+                  </p>
+                  <p>
+                    <span className="font-medium">Phone: </span>
+                    {member.phone}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        )}
-      </div>
+        </TabsContent>
 
-      {/* Talent Acquisition Resources with Modal */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Talent Acquisition Resources</CardTitle>
-          <CardDescription>
-            Tools to help you refer the best candidates
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Access detailed job descriptions for all open positions.</p>
-          <ViewDescriptionsModal opportunities={opportunities} />
-        </CardContent>
-      </Card>
+        {/* 3️⃣ Jobs tab */}
+        <TabsContent value="jobs" className="space-y-6">
+          {/* Upload Excel – only for Admin */}
+          {isAdmin && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Referral Opportunities</CardTitle>
+                <CardDescription>
+                  Upload an Excel sheet to update jobs list
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex gap-4">
+                <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
+                <Button onClick={handleUpload} disabled={!file}>
+                  Upload &amp; Update
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Jobs List */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-10 w-10 rounded-full bg-securekloud-100 dark:bg-securekloud-700 flex items-center justify-center">
+                <Award className="h-5 w-5 text-securekloud-700 dark:text-securekloud-100" />
+              </div>
+              <h2 className="text-2xl font-bold">Current Referral Opportunities</h2>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="jobSelect" className="text-sm font-medium mr-2">
+                Select a Job:
+              </label>
+              <select
+                id="jobSelect"
+                className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-full max-w-xs"
+                value={selectedJobId}
+                onChange={handleJobSelect}
+                aria-label="Select a job opening"
+              >
+                <option value="">All Jobs</option>
+                {opportunities.map((job) => (
+                  <option key={job._id || job.id} value={job.id}>
+                    {job.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-6">
+              {displayedOpportunities.length > 0 ? (
+                displayedOpportunities.map((opportunity) => (
+                  <ReferralCard
+                    key={opportunity._id || opportunity.id}
+                    opportunity={opportunity}
+                  />
+                ))
+              ) : (
+                <p className="text-muted-foreground">No opportunities available.</p>
+              )}
+            </div>
+
+            {!selectedJobId && totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-6">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Talent Acquisition Resources with Modal */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Talent Acquisition Resources</CardTitle>
+              <CardDescription>
+                Tools to help you refer the best candidates
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Access detailed job descriptions for all open positions.</p>
+              <ViewDescriptionsModal opportunities={opportunities} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-// ----------------------- REFERRAL CARD -----------------------
+/* ----------------------- REFERRAL CARD ----------------------- */
+
 interface ReferralCardProps {
   opportunity: ReferralOpportunity;
 }
@@ -535,5 +675,5 @@ const ReferralCard = ({ opportunity }: ReferralCardProps) => {
     </Card>
   );
 };
-//
+
 export default TalentAcquisition;
