@@ -4412,23 +4412,24 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               {emp.PersonalEmailID || "N/A"}
             </p>
 
-                      <CollapsibleSkillLine
+                    <CollapsibleSkillLine
   label="Primary Skills"
-  value={emp.Tech1 || ""}   // or emp.PrimarySkills if that is your column
+  value={emp.Tech1 || "N/A"}
   limit={2}
 />
 
 <CollapsibleSkillLine
   label="Secondary Skills"
-  value={emp.Tech2 || ""}   // "HTML,CSS,Word Press,Java Script"
+  value={emp.Tech2 || "N/A"}
   limit={2}
 />
 
 <CollapsibleSkillLine
   label="Certifications"
-  value={emp.SpecialSkill || ""}  // "CCNA"
+  value={emp.SpecialSkill || "N/A"}
   limit={2}
 />
+
 
 
                       {/* 🔐 Only admins see sensitive info */}
