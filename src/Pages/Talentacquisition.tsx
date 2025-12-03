@@ -317,8 +317,8 @@ const TalentAcquisition = () => {
       <Tabs defaultValue="referral" className="space-y-6">
         <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="referral">Referral Program</TabsTrigger>
-          <TabsTrigger value="details">TA Details</TabsTrigger>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="details">TA Team</TabsTrigger>
+          <TabsTrigger value="jobs">Job Openings</TabsTrigger>
         </TabsList>
 
         {/* 1️⃣ Referral Program tab */}
