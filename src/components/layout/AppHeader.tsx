@@ -44,6 +44,11 @@ export function AppHeader({ user }: { user?: any }) {
     null
   );
 
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  const storedAvatar = JSON.parse(localStorage.getItem("profile-avatar") || "{}");
+
   const mongoUser = useMemo(() => {
     if (user) return user;
     try {
@@ -64,7 +69,7 @@ export function AppHeader({ user }: { user?: any }) {
     : "";
   const initial = displayName.charAt(0).toUpperCase();
 
-  // 🔁 Fetch employee directory and match logged-in user → record
+  // 🔁 Employee Directory match
   useEffect(() => {
     if (!mongoUser) return;
 
@@ -76,19 +81,12 @@ export function AppHeader({ user }: { user?: any }) {
           try {
             const parsed = JSON.parse(storedUser);
             if (parsed?.role) userRole = parsed.role;
-          } catch (e) {
-            console.error(
-              "Error parsing user from localStorage in AppHeader",
-              e
-            );
-          }
+          } catch (e) {}
         }
 
         const res = await fetch(`${API}/api/employeedirectory`, {
           headers: { "x-user-role": userRole },
         });
-
-        if (!res.ok) throw new Error("Failed to fetch employee data in AppHeader");
 
         const data: EmployeeRecord[] = await res.json();
 
@@ -105,18 +103,8 @@ export function AppHeader({ user }: { user?: any }) {
           );
         });
 
-        console.log("AppHeader: normalized user:", {
-          rawName: mongoUser.name,
-          userNameNorm,
-          rawEmail: mongoUser.email,
-          userEmailNorm,
-        });
-        console.log("AppHeader: first few employees:", data.slice(0, 5));
-        console.log("AppHeader matched employee:", match);
-
         setEmployeeRecord(match || null);
-      } catch (err) {
-        console.error("AppHeader: error matching employee record", err);
+      } catch {
         setEmployeeRecord(null);
       }
     };
@@ -124,9 +112,56 @@ export function AppHeader({ user }: { user?: any }) {
     fetchAndMatchEmployee();
   }, [mongoUser]);
 
-  const avatarSrc = employeeRecord
-    ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
-    : "/employee-images/default-avatar.jpg";
+  // FINAL AVATAR SOURCE PRIORITY
+  const avatarSrc =
+    storedAvatar.email === email
+      ? storedAvatar.avatarUrl
+      : employeeRecord
+      ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
+      : "/employee-images/default-avatar.jpg";
+
+  // 🌟 Click to upload
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 🌟 Upload handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+    formData.append("email", email);
+
+    try {
+      setAvatarUploading(true);
+
+      const res = await fetch(`${API}/api/profile/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        alert("Upload failed");
+        return;
+      }
+
+      localStorage.setItem(
+        "profile-avatar",
+        JSON.stringify({ email, avatarUrl: data.avatarUrl })
+      );
+
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
 
   return (
     <>
@@ -161,34 +196,32 @@ export function AppHeader({ user }: { user?: any }) {
                 className="flex items-center space-x-2"
                 onClick={() => setShowAccountDialog(true)}
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 cursor-pointer" onClick={handleAvatarClick}>
                   <AvatarImage
                     src={avatarSrc}
                     alt={displayName}
                     className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "/employee-images/default-avatar.jpg";
-                    }}
                   />
                   <AvatarFallback className="bg-skcloud-purple text-white">
                     {initial}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-start text-left leading-tight">
-                  <span className="font-medium">{displayName}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {role === "admin" ? "🛡️ Admin" : "👤 User"}
-                  </span>
-                </div>
               </Button>
             </DropdownMenuTrigger>
           </DropdownMenu>
+
+          {/* Hidden input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
+          />
         </div>
       </header>
 
-      {/* 🪟 My Account Popup (unchanged) */}
+      {/* 🪟 My Account Popup */}
       <Dialog open={showAccountDialog} onOpenChange={setShowAccountDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -200,28 +233,33 @@ export function AppHeader({ user }: { user?: any }) {
 
           {mongoUser ? (
             <div className="mt-2 space-y-3 text-sm">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    src={avatarSrc}
-                    alt={displayName}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "/employee-images/default-avatar.jpg";
-                    }}
-                  />
-                  <AvatarFallback className="bg-skcloud-purple text-white">
-                    {initial}
-                  </AvatarFallback>
-                </Avatar>
+              <div
+                className="flex items-center space-x-3 cursor-pointer"
+                onClick={handleAvatarClick}
+              >
+                <div className="relative">
+                  <Avatar className="h-12 w-12 border shadow-sm">
+                    <AvatarImage
+                      src={avatarSrc}
+                      alt={displayName}
+                      className="h-full w-full object-cover"
+                    />
+                    <AvatarFallback className="bg-skcloud-purple text-white">
+                      {initial}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {avatarUploading && (
+                    <div className="absolute inset-0 bg-black/40 text-white flex items-center justify-center text-xs rounded-full">
+                      Uploading...
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <div className="font-semibold text-base">{displayName}</div>
                   {email && (
-                    <div className="text-muted-foreground text-xs">
-                      {email}
-                    </div>
+                    <div className="text-muted-foreground text-xs">{email}</div>
                   )}
                 </div>
               </div>
@@ -237,8 +275,7 @@ export function AppHeader({ user }: { user?: any }) {
             </div>
           ) : (
             <div className="mt-4 text-sm text-red-500">
-              No profile details found. Please ensure Mongo user data is loaded
-              in <code className="ml-1">localStorage.user</code>.
+              No profile details found.
             </div>
           )}
         </DialogContent>
