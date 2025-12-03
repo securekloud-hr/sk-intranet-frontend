@@ -25,12 +25,20 @@ import API from "@/config";
 
 // ===================== Certification Provider List =====================
 const providersMap: Record<string, string[]> = {
-  AWS: ["AWS Certified Cloud Practitioner","AWS Certified Solutions Architect","AWS Certified Developer"],
-  "Microsoft Azure": ["Azure Fundamentals","Azure Administrator","Azure Developer"],
-  "Google Cloud": ["Associate Cloud Engineer","Professional Cloud Architect","Professional Data Engineer"],
-  Python: ["PCEP - Entry-Level Python","PCAP - Associate Python Programmer"],
-  Udemy: ["100 Days Python Bootcamp","Ultimate AWS Solutions Architect"],
-  Coursera: ["Google IT Support","IBM Data Science"],
+  AWS: [
+    "AWS Certified Cloud Practitioner",
+    "AWS Certified Solutions Architect",
+    "AWS Certified Developer",
+  ],
+  "Microsoft Azure": ["Azure Fundamentals", "Azure Administrator", "Azure Developer"],
+  "Google Cloud": [
+    "Associate Cloud Engineer",
+    "Professional Cloud Architect",
+    "Professional Data Engineer",
+  ],
+  Python: ["PCEP - Entry-Level Python", "PCAP - Associate Python Programmer"],
+  Udemy: ["100 Days Python Bootcamp", "Ultimate AWS Solutions Architect"],
+  Coursera: ["Google IT Support", "IBM Data Science"],
 };
 
 // ===================== Employee Structure =====================
@@ -79,8 +87,10 @@ const LearningDevelopment: React.FC = () => {
     }
   }, []);
 
-  // 🔑 Use EMAIL for API calls
-  const userEmail: string | undefined = currentUser?.email
+  // 🔑 Use EMAIL for API calls (support email or mail from AAD)
+  const userEmail: string | undefined = (
+    currentUser?.email || currentUser?.mail
+  )
     ?.toString()
     .trim()
     .toLowerCase();
@@ -115,7 +125,8 @@ const LearningDevelopment: React.FC = () => {
           setSecondarySkills(data.employee.secondarySkills ?? []);
           setCertifications(data.employee.certifications ?? []);
         }
-      } catch {
+      } catch (err) {
+        console.error(err);
         setLoadError("❌ Server not responding");
       }
 
@@ -153,6 +164,56 @@ const LearningDevelopment: React.FC = () => {
     }
   };
 
+  // ===================== EMAIL NOTIFICATION =====================
+  const sendSkillEmail = async (
+    kind: "primary" | "secondary" | "certification",
+    value: string
+  ) => {
+    if (!currentUser) return;
+
+    const name =
+      currentUser.fullName ||
+      currentUser.name ||
+      "Intranet User";
+
+    const email =
+      currentUser.email ||
+      currentUser.mail ||
+      userEmail;
+
+    if (!email) return;
+
+    const prettyKind =
+      kind === "certification" ? "Certification" : `${kind} skill`;
+
+    const subject = `New ${prettyKind} added - ${name}`;
+
+    const message = `
+User: ${name}
+Email: ${email}
+Type: ${prettyKind}
+Value: ${value}
+
+Source: Learning & Development → Add your Skills, Certifications, and Courses
+    `;
+
+    try {
+      await fetch(`${API}/api/sendEmail`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          message,
+          type: "query", // 🔹 Goes to HR + CC to user (handled in backend)
+        }),
+      });
+    } catch (err) {
+      console.error("❌ Failed to send skill email", err);
+    }
+  };
+
   // ===================== ADD SKILLS =====================
   const handleAddPrimary = async () => {
     const t = newPrimary.trim();
@@ -164,6 +225,9 @@ const LearningDevelopment: React.FC = () => {
     setNewPrimary("");
     setOpenPrimary(false);
     await saveSkills(updated, secondarySkills, certifications);
+
+    // 🔔 Notify HR + user
+    sendSkillEmail("primary", t);
   };
 
   const handleAddSecondary = async () => {
@@ -176,6 +240,9 @@ const LearningDevelopment: React.FC = () => {
     setNewSecondary("");
     setOpenSecondary(false);
     await saveSkills(primarySkills, updated, certifications);
+
+    // 🔔 Notify HR + user
+    sendSkillEmail("secondary", t);
   };
 
   const handleAddCertification = async () => {
@@ -191,6 +258,9 @@ const LearningDevelopment: React.FC = () => {
     setSelectedCertificate("");
     setIsCertDialogVisible(false);
     await saveSkills(primarySkills, secondarySkills, updated);
+
+    // 🔔 Notify HR + user
+    sendSkillEmail("certification", label);
   };
 
   // ===================== UI states =====================
@@ -226,7 +296,10 @@ const LearningDevelopment: React.FC = () => {
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600 text-white"
-              onClick={() => setOpenPrimary(true)}
+              onClick={() => {
+                setPrimaryError("");
+                setOpenPrimary(true);
+              }}
             >
               + Add Skill
             </Button>
@@ -249,7 +322,10 @@ const LearningDevelopment: React.FC = () => {
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600"
-              onClick={() => setOpenSecondary(true)}
+              onClick={() => {
+                setSecondaryError("");
+                setOpenSecondary(true);
+              }}
             >
               + Add Skill
             </Button>
@@ -272,7 +348,10 @@ const LearningDevelopment: React.FC = () => {
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600"
-              onClick={() => setIsCertDialogVisible(true)}
+              onClick={() => {
+                setCertError("");
+                setIsCertDialogVisible(true);
+              }}
             >
               + Add Certification
             </Button>
@@ -298,7 +377,13 @@ const LearningDevelopment: React.FC = () => {
           />
           {primaryError && <p className="text-red-600">{primaryError}</p>}
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setOpenPrimary(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPrimaryError("");
+                setOpenPrimary(false);
+              }}
+            >
               Cancel
             </Button>
             <Button onClick={handleAddPrimary}>Add</Button>
@@ -326,7 +411,13 @@ const LearningDevelopment: React.FC = () => {
             <p className="text-red-600">{secondaryError}</p>
           )}
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setOpenSecondary(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSecondaryError("");
+                setOpenSecondary(false);
+              }}
+            >
               Cancel
             </Button>
             <Button onClick={handleAddSecondary}>Add</Button>
@@ -395,7 +486,10 @@ const LearningDevelopment: React.FC = () => {
           <div className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
-              onClick={() => setIsCertDialogVisible(false)}
+              onClick={() => {
+                setCertError("");
+                setIsCertDialogVisible(false);
+              }}
             >
               Cancel
             </Button>

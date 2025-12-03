@@ -487,20 +487,23 @@ const TalentAcquisition = () => {
                     {member.designation}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-1 text-sm">
-                  <p>
-                    <span className="font-medium">Emp ID: </span>
-                    {member.empId}
-                  </p>
-                  <p>
-                    <span className="font-medium">Email: </span>
-                    {member.email}
-                  </p>
-                  <p>
-                    <span className="font-medium">Phone: </span>
-                    {member.phone}
-                  </p>
-                </CardContent>
+                <CardContent className="space-y-1 text-sm w-full px-4 break-words">
+  <p>
+    <span className="font-medium">Emp ID: </span>
+    {member.empId}
+  </p>
+  <p className="break-all">
+    <span className="font-medium">Email: </span>
+    {member.email}
+  </p>
+  <p>
+    <span className="font-medium">Phone: </span>
+    {member.phone}
+  </p>
+</CardContent>
+
+               
+                
               </Card>
             ))}
           </div>
