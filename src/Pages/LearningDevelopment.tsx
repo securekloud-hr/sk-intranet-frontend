@@ -7,7 +7,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -42,15 +41,31 @@ const LearningDevelopment: React.FC = () => {
   const [secondarySkills, setSecondarySkills] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<string[]>([]);
 
-  const [newPrimary, setNewPrimary] = useState("");
-  const [newSecondary, setNewSecondary] = useState("");
-
   const [openPrimary, setOpenPrimary] = useState(false);
   const [openSecondary, setOpenSecondary] = useState(false);
   const [isCertDialogVisible, setIsCertDialogVisible] = useState(false);
 
+  // 🔹 Certification state (already working)
   const [selectedProvider, setSelectedProvider] = useState("");
   const [selectedCertificate, setSelectedCertificate] = useState("");
+  const [providerList, setProviderList] = useState<string[]>([]);
+  const [certificateList, setCertificateList] = useState<string[]>([]);
+  const [providersLoading, setProvidersLoading] = useState(false);
+  const [certsLoading, setCertsLoading] = useState(false);
+
+  // 🔹 New: dynamic Skill data (Provider + Skill) for Primary & Secondary
+  const [skillProviders, setSkillProviders] = useState<string[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+
+  // Primary skill selection
+  const [primarySkillProvider, setPrimarySkillProvider] = useState("");
+  const [primarySkillName, setPrimarySkillName] = useState("");
+  const [primarySkillOptions, setPrimarySkillOptions] = useState<string[]>([]);
+
+  // Secondary skill selection
+  const [secondarySkillProvider, setSecondarySkillProvider] = useState("");
+  const [secondarySkillName, setSecondarySkillName] = useState("");
+  const [secondarySkillOptions, setSecondarySkillOptions] = useState<string[]>([]);
 
   const [primaryError, setPrimaryError] = useState("");
   const [secondaryError, setSecondaryError] = useState("");
@@ -58,12 +73,6 @@ const LearningDevelopment: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-
-  // 🔹 New: dynamic certification data from Mongo
-  const [providerList, setProviderList] = useState<string[]>([]);
-  const [certificateList, setCertificateList] = useState<string[]>([]);
-  const [providersLoading, setProvidersLoading] = useState(false);
-  const [certsLoading, setCertsLoading] = useState(false);
 
   // ===================== GET LOGGED USER FROM LOCALSTORAGE =====================
   const currentUser = useMemo(() => {
@@ -204,33 +213,53 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
 
   // ===================== ADD SKILLS =====================
   const handleAddPrimary = async () => {
-    const t = newPrimary.trim();
-    if (!t) return setPrimaryError("Required");
-    if (primarySkills.includes(t)) return setPrimaryError("Duplicate");
+    if (!primarySkillProvider || !primarySkillName) {
+      return setPrimaryError("Provider + Skill required");
+    }
 
-    const updated = [...primarySkills, t];
+    const label = `${primarySkillName} - ${primarySkillProvider}`;
+
+    if (primarySkills.includes(label)) return setPrimaryError("Duplicate");
+
+    const updated = [...primarySkills, label];
     setPrimarySkills(updated);
-    setNewPrimary("");
+
+    // reset dialog state
+    setPrimarySkillProvider("");
+    setPrimarySkillName("");
+    setPrimarySkillOptions([]);
     setOpenPrimary(false);
+    setPrimaryError("");
+
     await saveSkills(updated, secondarySkills, certifications);
 
     // 🔔 Notify HR + user
-    sendSkillEmail("primary", t);
+    sendSkillEmail("primary", label);
   };
 
   const handleAddSecondary = async () => {
-    const t = newSecondary.trim();
-    if (!t) return setSecondaryError("Required");
-    if (secondarySkills.includes(t)) return setSecondaryError("Duplicate");
+    if (!secondarySkillProvider || !secondarySkillName) {
+      return setSecondaryError("Provider + Skill required");
+    }
 
-    const updated = [...secondarySkills, t];
+    const label = `${secondarySkillName} - ${secondarySkillProvider}`;
+
+    if (secondarySkills.includes(label)) return setSecondaryError("Duplicate");
+
+    const updated = [...secondarySkills, label];
     setSecondarySkills(updated);
-    setNewSecondary("");
+
+    // reset dialog state
+    setSecondarySkillProvider("");
+    setSecondarySkillName("");
+    setSecondarySkillOptions([]);
     setOpenSecondary(false);
+    setSecondaryError("");
+
     await saveSkills(primarySkills, updated, certifications);
 
     // 🔔 Notify HR + user
-    sendSkillEmail("secondary", t);
+    sendSkillEmail("secondary", label);
   };
 
   const handleAddCertification = async () => {
@@ -245,13 +274,14 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     setSelectedProvider("");
     setSelectedCertificate("");
     setIsCertDialogVisible(false);
+    setCertError("");
     await saveSkills(primarySkills, secondarySkills, updated);
 
     // 🔔 Notify HR + user
     sendSkillEmail("certification", label);
   };
 
-  // ===================== Load Providers from API =====================
+  // ===================== Load Cert Providers from API =====================
   const loadProviders = async () => {
     if (providerList.length > 0) return; // already loaded
     setProvidersLoading(true);
@@ -288,6 +318,47 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     }
   };
 
+  // ===================== Load skill providers (for primary + secondary) =====================
+  const loadSkillProviders = async () => {
+    if (skillProviders.length > 0) return; // already loaded
+    setSkillsLoading(true);
+    try {
+      const res = await fetch(`${API}/api/learning/skill-providers`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setSkillProviders(json.data);
+      }
+    } catch (e) {
+      console.error("Failed to load skill providers", e);
+    } finally {
+      setSkillsLoading(false);
+    }
+  };
+
+  // ===================== Load skills list for a provider =====================
+  const loadSkillsForProvider = async (
+    provider: string,
+    kind: "primary" | "secondary"
+  ) => {
+    if (!provider) return;
+
+    try {
+      const res = await fetch(
+        `${API}/api/learning/skill-list/${encodeURIComponent(provider)}`
+      );
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        if (kind === "primary") {
+          setPrimarySkillOptions(json.data);
+        } else {
+          setSecondarySkillOptions(json.data);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load skills for provider", e);
+    }
+  };
+
   // ===================== UI states =====================
   if (loading) return <div className="p-5 text-lg">Loading your profile…</div>;
   if (loadError) return <div className="p-5 text-red-600">{loadError}</div>;
@@ -321,9 +392,10 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600 text-white"
-              onClick={() => {
+              onClick={async () => {
                 setPrimaryError("");
                 setOpenPrimary(true);
+                await loadSkillProviders();
               }}
             >
               + Add Skill
@@ -347,9 +419,10 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600"
-              onClick={() => {
+              onClick={async () => {
                 setSecondaryError("");
                 setOpenSecondary(true);
+                await loadSkillProviders();
               }}
             >
               + Add Skill
@@ -393,15 +466,75 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
           <DialogHeader>
             <DialogTitle>Add Primary Skill</DialogTitle>
           </DialogHeader>
-          <Input
-            placeholder="e.g. MERN, AWS"
-            value={newPrimary}
-            onChange={(e) => {
-              setNewPrimary(e.target.value);
+
+          <label>Provider</label>
+          <Select
+            value={primarySkillProvider}
+            onValueChange={async (v) => {
+              setPrimarySkillProvider(v);
+              setPrimarySkillName("");
+              setPrimaryError("");
+              setPrimarySkillOptions([]);
+              await loadSkillsForProvider(v, "primary");
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  skillsLoading ? "Loading providers..." : "Select Provider"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {skillProviders.length === 0 && !skillsLoading && (
+                <SelectItem value="__none" disabled>
+                  No providers found
+                </SelectItem>
+              )}
+              {skillProviders.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <label className="mt-2 block">Skill</label>
+          <Select
+            disabled={!primarySkillProvider}
+            value={primarySkillName}
+            onValueChange={(v) => {
+              setPrimarySkillName(v);
               setPrimaryError("");
             }}
-          />
-          {primaryError && <p className="text-red-600">{primaryError}</p>}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  !primarySkillProvider
+                    ? "Select provider first"
+                    : "Choose Skill"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {primarySkillOptions.length === 0 && primarySkillProvider && (
+                <SelectItem value="__none" disabled>
+                  No skills found
+                </SelectItem>
+              )}
+              {primarySkillOptions.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {primaryError && (
+            <p className="text-red-600 text-sm mt-1">{primaryError}</p>
+          )}
+
           <div className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
@@ -425,17 +558,75 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
           <DialogHeader>
             <DialogTitle>Add Secondary Skill</DialogTitle>
           </DialogHeader>
-          <Input
-            placeholder="e.g. NextJS, Python, Azure"
-            value={newSecondary}
-            onChange={(e) => {
-              setNewSecondary(e.target.value);
+
+          <label>Provider</label>
+          <Select
+            value={secondarySkillProvider}
+            onValueChange={async (v) => {
+              setSecondarySkillProvider(v);
+              setSecondarySkillName("");
+              setSecondaryError("");
+              setSecondarySkillOptions([]);
+              await loadSkillsForProvider(v, "secondary");
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  skillsLoading ? "Loading providers..." : "Select Provider"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {skillProviders.length === 0 && !skillsLoading && (
+                <SelectItem value="__none" disabled>
+                  No providers found
+                </SelectItem>
+              )}
+              {skillProviders.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <label className="mt-2 block">Skill</label>
+          <Select
+            disabled={!secondarySkillProvider}
+            value={secondarySkillName}
+            onValueChange={(v) => {
+              setSecondarySkillName(v);
               setSecondaryError("");
             }}
-          />
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  !secondarySkillProvider
+                    ? "Select provider first"
+                    : "Choose Skill"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {secondarySkillOptions.length === 0 && secondarySkillProvider && (
+                <SelectItem value="__none" disabled>
+                  No skills found
+                </SelectItem>
+              )}
+              {secondarySkillOptions.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {secondaryError && (
-            <p className="text-red-600">{secondaryError}</p>
+            <p className="text-red-600 text-sm mt-1">{secondaryError}</p>
           )}
+
           <div className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
