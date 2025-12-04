@@ -23,24 +23,6 @@ import {
 } from "@/components/ui/select";
 import API from "@/config";
 
-// ===================== Certification Provider List =====================
-const providersMap: Record<string, string[]> = {
-  AWS: [
-    "AWS Certified Cloud Practitioner",
-    "AWS Certified Solutions Architect",
-    "AWS Certified Developer",
-  ],
-  "Microsoft Azure": ["Azure Fundamentals", "Azure Administrator", "Azure Developer"],
-  "Google Cloud": [
-    "Associate Cloud Engineer",
-    "Professional Cloud Architect",
-    "Professional Data Engineer",
-  ],
-  Python: ["PCEP - Entry-Level Python", "PCAP - Associate Python Programmer"],
-  Udemy: ["100 Days Python Bootcamp", "Ultimate AWS Solutions Architect"],
-  Coursera: ["Google IT Support", "IBM Data Science"],
-};
-
 // ===================== Employee Structure =====================
 interface EmployeeSkills {
   id: string;
@@ -76,6 +58,12 @@ const LearningDevelopment: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+
+  // 🔹 New: dynamic certification data from Mongo
+  const [providerList, setProviderList] = useState<string[]>([]);
+  const [certificateList, setCertificateList] = useState<string[]>([]);
+  const [providersLoading, setProvidersLoading] = useState(false);
+  const [certsLoading, setCertsLoading] = useState(false);
 
   // ===================== GET LOGGED USER FROM LOCALSTORAGE =====================
   const currentUser = useMemo(() => {
@@ -263,6 +251,43 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     sendSkillEmail("certification", label);
   };
 
+  // ===================== Load Providers from API =====================
+  const loadProviders = async () => {
+    if (providerList.length > 0) return; // already loaded
+    setProvidersLoading(true);
+    try {
+      const res = await fetch(`${API}/api/learning/certification-providers`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setProviderList(json.data);
+      }
+    } catch (e) {
+      console.error("Failed to load providers", e);
+    } finally {
+      setProvidersLoading(false);
+    }
+  };
+
+  // ===================== Load Certificates when Provider changes =====================
+  const loadCertificatesForProvider = async (provider: string) => {
+    if (!provider) return;
+    setCertsLoading(true);
+    setCertificateList([]);
+    try {
+      const res = await fetch(
+        `${API}/api/learning/certificates/${encodeURIComponent(provider)}`
+      );
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setCertificateList(json.data);
+      }
+    } catch (e) {
+      console.error("Failed to load certificates", e);
+    } finally {
+      setCertsLoading(false);
+    }
+  };
+
   // ===================== UI states =====================
   if (loading) return <div className="p-5 text-lg">Loading your profile…</div>;
   if (loadError) return <div className="p-5 text-red-600">{loadError}</div>;
@@ -348,9 +373,10 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             </ul>
             <Button
               className="mt-3 w-full bg-purple-600"
-              onClick={() => {
+              onClick={async () => {
                 setCertError("");
                 setIsCertDialogVisible(true);
+                await loadProviders();
               }}
             >
               + Add Certification
@@ -439,17 +465,28 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
 
           <label>Provider</label>
           <Select
-            onValueChange={(v) => {
+            onValueChange={async (v) => {
               setSelectedProvider(v);
+              setSelectedCertificate("");
               setCertError("");
+              await loadCertificatesForProvider(v);
             }}
             value={selectedProvider}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Provider" />
+              <SelectValue
+                placeholder={
+                  providersLoading ? "Loading providers..." : "Select Provider"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(providersMap).map((p) => (
+              {providerList.length === 0 && !providersLoading && (
+                <SelectItem value="__none" disabled>
+                  No providers found
+                </SelectItem>
+              )}
+              {providerList.map((p) => (
                 <SelectItem key={p} value={p}>
                   {p}
                 </SelectItem>
@@ -459,7 +496,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
 
           <label className="mt-2 block">Certificate</label>
           <Select
-            disabled={!selectedProvider}
+            disabled={!selectedProvider || certsLoading}
             onValueChange={(v) => {
               setSelectedCertificate(v);
               setCertError("");
@@ -467,15 +504,27 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             value={selectedCertificate}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Choose Certificate" />
+              <SelectValue
+                placeholder={
+                  !selectedProvider
+                    ? "Select provider first"
+                    : certsLoading
+                    ? "Loading certificates..."
+                    : "Choose Certificate"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {selectedProvider &&
-                providersMap[selectedProvider].map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
+              {certificateList.length === 0 && !certsLoading && (
+                <SelectItem value="__none" disabled>
+                  No certificates found
+                </SelectItem>
+              )}
+              {certificateList.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
