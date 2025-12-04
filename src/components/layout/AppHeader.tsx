@@ -47,7 +47,9 @@ export function AppHeader({ user }: { user?: any }) {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  const storedAvatar = JSON.parse(localStorage.getItem("profile-avatar") || "{}");
+  const storedAvatar = JSON.parse(
+    localStorage.getItem("profile-avatar") || "{}"
+  );
 
   const mongoUser = useMemo(() => {
     if (user) return user;
@@ -61,13 +63,25 @@ export function AppHeader({ user }: { user?: any }) {
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
-  const email = mongoUser?.email || "";
+  const rawEmail = mongoUser?.email || "";
   const role = mongoUser?.role || "user";
   const jobTitle = mongoUser?.jobTitle || "";
   const createdAt = mongoUser?.createdAt
     ? new Date(mongoUser.createdAt).toLocaleDateString()
     : "";
   const initial = displayName.charAt(0).toUpperCase();
+
+  // 👇 Try to derive a reliable email from multiple possible fields
+  const effectiveEmail =
+    (mongoUser as any)?.email ||
+    (mongoUser as any)?.upn ||
+    (mongoUser as any)?.userPrincipalName ||
+    (mongoUser as any)?.username ||
+    "";
+
+  // Debug log (optional – can remove later)
+  console.log("🔎 mongoUser:", mongoUser);
+  console.log("🔎 rawEmail:", rawEmail, "effectiveEmail:", effectiveEmail);
 
   // 🔁 Employee Directory match
   useEffect(() => {
@@ -90,7 +104,9 @@ export function AppHeader({ user }: { user?: any }) {
 
         const data: EmployeeRecord[] = await res.json();
 
-        const userEmailNorm = normalizeEmail(mongoUser.email);
+        const userEmailNorm = normalizeEmail(
+          (mongoUser as any)?.email || (mongoUser as any)?.userPrincipalName
+        );
         const userNameNorm = normalizeName(mongoUser.name);
 
         const match = data.find((emp) => {
@@ -114,7 +130,7 @@ export function AppHeader({ user }: { user?: any }) {
 
   // FINAL AVATAR SOURCE PRIORITY
   const avatarSrc =
-    storedAvatar.email === email
+    storedAvatar.email === effectiveEmail && storedAvatar.avatarUrl
       ? storedAvatar.avatarUrl
       : employeeRecord
       ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
@@ -126,13 +142,30 @@ export function AppHeader({ user }: { user?: any }) {
   };
 
   // 🌟 Upload handler
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    console.log("📤 Trying to upload avatar for:", effectiveEmail);
+
+    // 🔒 make sure we have a REAL email so backend can save per-user file
+    if (!effectiveEmail || effectiveEmail.toLowerCase() === "user") {
+      alert(
+        "No valid email found for this user – cannot upload profile image. Please check login user data."
+      );
+      console.error(
+        "Profile upload attempted with invalid email:",
+        effectiveEmail
+      );
+      return;
+    }
+
     const formData = new FormData();
+    // ⭐ IMPORTANT: email FIRST so Multer sees it in req.body
+    formData.append("email", effectiveEmail);
     formData.append("avatar", file);
-    formData.append("email", email);
 
     try {
       setAvatarUploading(true);
@@ -145,13 +178,13 @@ export function AppHeader({ user }: { user?: any }) {
       const data = await res.json();
 
       if (!data.success) {
-        alert("Upload failed");
+        alert(data.error || "Upload failed");
         return;
       }
 
       localStorage.setItem(
         "profile-avatar",
-        JSON.stringify({ email, avatarUrl: data.avatarUrl })
+        JSON.stringify({ email: effectiveEmail, avatarUrl: data.avatarUrl })
       );
 
       window.location.reload();
@@ -188,40 +221,43 @@ export function AppHeader({ user }: { user?: any }) {
           </DropdownMenu>
 
           {/* 👤 User Menu */}
-          {/* 👤 User Menu */}
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button
-      variant="ghost"
-      size="sm"
-      className="flex items-center space-x-2"
-      onClick={() => setShowAccountDialog(true)}
-    >
-      <Avatar
-        className="h-8 w-8 cursor-pointer"
-        onClick={handleAvatarClick}
-      >
-        <AvatarImage
-          src={avatarSrc}
-          alt={displayName}
-          className="h-full w-full object-cover"
-        />
-        <AvatarFallback className="bg-skcloud-purple text-white">
-          {initial}
-        </AvatarFallback>
-      </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2"
+                onClick={() => setShowAccountDialog(true)}
+              >
+                <Avatar
+                  className="h-8 w-8 cursor-pointer"
+                  onClick={handleAvatarClick}
+                >
+                  <AvatarImage
+                    src={avatarSrc}
+                    alt={displayName}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src =
+                        "/employee-images/default-avatar.jpg";
+                    }}
+                  />
+                  <AvatarFallback className="bg-skcloud-purple text-white">
+                    {initial}
+                  </AvatarFallback>
+                </Avatar>
 
-      {/* 🔹 Name + role text (restored) */}
-      <div className="flex flex-col items-start text-left leading-tight">
-        <span className="font-medium">{displayName}</span>
-        <span className="text-sm text-muted-foreground">
-          {role === "admin" ? "🛡️ Admin" : "👤 User"}
-        </span>
-      </div>
-    </Button>
-  </DropdownMenuTrigger>
-</DropdownMenu>
-
+                {/* 🔹 Name + role text */}
+                <div className="flex flex-col items-start text-left leading-tight">
+                  <span className="font-medium">{displayName}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {role === "admin" ? "🛡️ Admin" : "👤 User"}
+                  </span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+          </DropdownMenu>
 
           {/* Hidden input */}
           <input
@@ -256,6 +292,11 @@ export function AppHeader({ user }: { user?: any }) {
                       src={avatarSrc}
                       alt={displayName}
                       className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src =
+                          "/employee-images/default-avatar.jpg";
+                      }}
                     />
                     <AvatarFallback className="bg-skcloud-purple text-white">
                       {initial}
@@ -271,8 +312,10 @@ export function AppHeader({ user }: { user?: any }) {
 
                 <div>
                   <div className="font-semibold text-base">{displayName}</div>
-                  {email && (
-                    <div className="text-muted-foreground text-xs">{email}</div>
+                  {effectiveEmail && (
+                    <div className="text-muted-foreground text-xs">
+                      {effectiveEmail}
+                    </div>
                   )}
                 </div>
               </div>
