@@ -24,11 +24,13 @@ import { Search, Trash2 } from "lucide-react";
 import { FiDownload, FiEye } from "react-icons/fi";
 import API from "@/config";
 
-interface Policy {
+ interface Policy {
   name: string;
   fileUrl: string;
   updated: string;
+  description?: string; // 👈 NEW: comes from Desc.txt
 }
+
 
 type DragItem =
   | { type: "policy"; category: string; policyName: string }
@@ -536,12 +538,20 @@ const Policies: React.FC = () => {
                         startDragPolicyToTrash(e, key, policy.name)
                       }
                     >
-                      <CardHeader className="pb-2 flex-grow">
-                        <CardTitle>{policy.name}</CardTitle>
-                        <CardDescription>
-                          Last updated: {policy.updated}
-                        </CardDescription>
-                      </CardHeader>
+                     <CardHeader className="pb-2 flex-grow">
+  <CardTitle>{policy.name}</CardTitle>
+
+  <CardDescription>
+    Last updated: {policy.updated}
+  </CardDescription>
+
+  {policy.description && (
+    <p className="mt-2 text-[11px] text-gray-600 line-clamp-3">
+      {policy.description}
+    </p>
+  )}
+</CardHeader>
+
 
                       <CardContent className="flex-shrink-0 pt-0">
                         <div className="flex justify-center space-x-2">
