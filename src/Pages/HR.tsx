@@ -889,21 +889,25 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                 title: "Benefits Information",
                 description: "Health, retirement, and more",
                 content: "Learn about your benefits package, including health insurance, retirement plans, and additional perks.",
+                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
               },
               {
                 title: "Leave Management",
                 description: "Request and track time off",
                 content: "Submit leave requests, view your balance, and track approval status for time off.",
+                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
               },
               {
                 title: "Payroll Information",
                 description: "Pay slips and tax documents",
                 content: "Access your pay slips, tax documents, and manage your payment details.",
+                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
               },
               {
                 title: "Employee Directory",
                 description: "Find and connect with colleagues",
                 content: "View details of all employees including contact information and certifications.",
+                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
               },
             ].map((card, i) => (
               <Card key={i} className="sk-card">
@@ -917,12 +921,12 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                     variant="outline"
                     className="w-full border-skcloud-purple text-skcloud-purple hover:bg-skcloud-purple hover:text-white"
                     onClick={() => {
-                      if (card.title === "Payroll Information") {
-                        setShowPayrollModal(true);
-                      } else if (card.title === "Benefits Information") {
-                        setShowBenefitsModal(true);
-                      } else if (card.title === "Leave Management") {
-                        setShowLeaveModal(true);
+                      if (card.title === "Payroll Information" && card.fileName) {
+                        handleView(card.fileName);
+                      } else if (card.title === "Benefits Information"  && card.fileName) {
+                        handleView(card.fileName);
+                      } else if (card.title === "Leave Management"  && card.fileName) {
+                        handleView(card.fileName);
                       } else if (card.title === "Employee Directory") {
                         setShowEmployeeModal(true);
                       } else if (card.title === "Employee Handbook" && card.fileName) {
