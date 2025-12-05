@@ -52,7 +52,7 @@ export default function App() {
                 <Route path="/faqs" element={<FAQs />} />
                 <Route path="/learning" element={<LearningDevelopment />} />
                 <Route path="/my-courses" element={<MyCourses />} />
-                <Route path="/products" element={<Products />} />
+                <Route path="/qus" element={<Products />} />
                 <Route path="/engagement" element={<EmployeeEngagement />} />
                 <Route path="/jobs" element={<InternalJobs />} />
                 <Route path="/talent" element={<Talentacquisition />} />
