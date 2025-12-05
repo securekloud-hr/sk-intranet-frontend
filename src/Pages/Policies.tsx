@@ -243,7 +243,6 @@ const Policies: React.FC = () => {
         const newPolicy: Policy = {
           name: policyName,
           fileUrl: data.fileUrl,
-          description  
           updated: data.updated,
         };
 
