@@ -889,19 +889,19 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                 title: "Benefits Information",
                 description: "Health, retirement, and more",
                 content: "Learn about your benefits package, including health insurance, retirement plans, and additional perks.",
-                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+                                fileName: "Benefits Information.pdf",
               },
               {
                 title: "Leave Management",
                 description: "Request and track time off",
                 content: "Submit leave requests, view your balance, and track approval status for time off.",
-                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+                                fileName: "Leave Management.pdf",
               },
               {
                 title: "Payroll Information",
                 description: "Pay slips and tax documents",
                 content: "Access your pay slips, tax documents, and manage your payment details.",
-                                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+                                fileName: "Payroll Information.pdf",
               },
               {
                 title: "Employee Directory",
