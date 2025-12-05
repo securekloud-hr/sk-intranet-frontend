@@ -1,11 +1,6 @@
 ﻿import React, { useState, useEffect, useMemo } from "react";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -65,7 +60,9 @@ const LearningDevelopment: React.FC = () => {
   // Secondary skill selection
   const [secondarySkillProvider, setSecondarySkillProvider] = useState("");
   const [secondarySkillName, setSecondarySkillName] = useState("");
-  const [secondarySkillOptions, setSecondarySkillOptions] = useState<string[]>([]);
+  const [secondarySkillOptions, setSecondarySkillOptions] = useState<string[]>(
+    []
+  );
 
   const [primaryError, setPrimaryError] = useState("");
   const [secondaryError, setSecondaryError] = useState("");
@@ -169,14 +166,9 @@ const LearningDevelopment: React.FC = () => {
     if (!currentUser) return;
 
     const name =
-      currentUser.fullName ||
-      currentUser.name ||
-      "Intranet User";
+      currentUser.fullName || currentUser.name || "Intranet User";
 
-    const email =
-      currentUser.email ||
-      currentUser.mail ||
-      userEmail;
+    const email = currentUser.email || currentUser.mail || userEmail;
 
     if (!email) return;
 
@@ -286,7 +278,9 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     if (providerList.length > 0) return; // already loaded
     setProvidersLoading(true);
     try {
-      const res = await fetch(`${API}/api/learning/certification-providers`);
+      const res = await fetch(
+        `${API}/api/learning/skill-data?type=certification-providers`
+      );
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setProviderList(json.data);
@@ -305,7 +299,9 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     setCertificateList([]);
     try {
       const res = await fetch(
-        `${API}/api/learning/certificates/${encodeURIComponent(provider)}`
+        `${API}/api/learning/skill-data?type=certificates&provider=${encodeURIComponent(
+          provider
+        )}`
       );
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
@@ -323,7 +319,9 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
     if (skillProviders.length > 0) return; // already loaded
     setSkillsLoading(true);
     try {
-      const res = await fetch(`${API}/api/learning/skill-providers`);
+      const res = await fetch(
+        `${API}/api/learning/skill-data?type=skill-providers`
+      );
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setSkillProviders(json.data);
@@ -344,7 +342,9 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
 
     try {
       const res = await fetch(
-        `${API}/api/learning/skill-list/${encodeURIComponent(provider)}`
+        `${API}/api/learning/skill-data?type=skill-list&provider=${encodeURIComponent(
+          provider
+        )}`
       );
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
