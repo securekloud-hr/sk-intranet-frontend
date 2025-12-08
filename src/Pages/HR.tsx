@@ -818,16 +818,13 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                     : "bg-green-100 text-green-800"
                 }`}
               >
-                {isSubmitting ? "Submitting..." : "Submit"}
+                Submit
+
               </button>
             </div>
 
             {/* Optional status message */}
-            {isSubmitting && (
-              <p className="text-center text-xs mt-1 text-gray-600">
-                {submitStatus}
-              </p>
-            )}
+            
           </CardContent>
         </Card>
       );

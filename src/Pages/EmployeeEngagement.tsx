@@ -1,10 +1,22 @@
 ﻿import { useEffect, useState } from "react";
 import { Calendar, Users, Trophy, Heart } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import API from "@/config";
 
 // ---------------------- Types ----------------------
@@ -20,7 +32,11 @@ interface Event {
   date: string;
   location: string;
   description: string;
-  type: "Wellness" | "Holidays/Festivals" | "Sports/Entertainment" | "BOM-Birthdays of the Month";
+  type:
+    | "Wellness"
+    | "Holidays/Festivals"
+    | "Sports/Entertainment"
+    | "BOM-Birthdays of the Month";
   registrationOpen?: boolean;
   images?: string[];
   folder?: string;
@@ -39,6 +55,27 @@ interface BirthdayEmployee {
 interface EventCardProps {
   event: Event;
   onViewDetails: (event: Event) => void;
+}
+
+// ---------------------- Helpers (image path) ----------------------
+
+// Same idea as your Employee Directory helper
+function normalizeName(s?: string | null) {
+  return s ? s.trim().replace(/\s+/g, " ") : "";
+}
+
+function getEmployeeImage(empId?: string, name?: string) {
+  if (!empId) return "/employee-images/default-avatar.jpg";
+
+  const cleanName = normalizeName(name);
+
+  // Try EmpID-Name.jpg first
+  if (cleanName) {
+    return `/employee-images/${empId}-${cleanName}.jpg`;
+  }
+
+  // Fallback: EmpID.jpg
+  return `/employee-images/${empId}.jpg`;
 }
 
 // ---------------------- Components ----------------------
@@ -70,7 +107,11 @@ const EventPhotoGallery = ({ photos, eventName }: EventPhotoGalleryProps) => {
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl">
           {selectedPhoto && (
-            <img src={selectedPhoto} alt="Selected Event" className="w-full h-auto rounded-xl" />
+            <img
+              src={selectedPhoto}
+              alt="Selected Event"
+              className="w-full h-auto rounded-xl"
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -80,13 +121,20 @@ const EventPhotoGallery = ({ photos, eventName }: EventPhotoGalleryProps) => {
 
 const EmployeeEngagement: React.FC = () => {
   // ---------- State ----------
-  const [activeSection, setActiveSection] = useState<"upcoming" | "past">("upcoming");
+  const [activeSection, setActiveSection] = useState<"upcoming" | "past">(
+    "upcoming"
+  );
   const [activeCategory, setActiveCategory] = useState<
-    "all" | "Wellness" | "Holidays/Festivals" | "Sports/Entertainment" | "BOM-Birthdays of the Month"
+    | "all"
+    | "Wellness"
+    | "Holidays/Festivals"
+    | "Sports/Entertainment"
+    | "BOM-Birthdays of the Month"
   >("all");
 
   const [dynamicPastEvents, setDynamicPastEvents] = useState<Partial<Event>[]>([]);
-  const [selectedPastEvent, setSelectedPastEvent] = useState<Partial<Event> | null>(null);
+  const [selectedPastEvent, setSelectedPastEvent] =
+    useState<Partial<Event> | null>(null);
 
   const [selectedBomEvent, setSelectedBomEvent] = useState<Event | null>(null);
   const [bomBirthdays, setBomBirthdays] = useState<BirthdayEmployee[]>([]);
@@ -138,7 +186,6 @@ const EmployeeEngagement: React.FC = () => {
     setBomBirthdays([]);
 
     fetch(`${API}/api/birthdays/bom?month=${month}`)
-
       .then(async (res) => {
         if (!res.ok) {
           const text = await res.text();
@@ -162,7 +209,9 @@ const EmployeeEngagement: React.FC = () => {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Employee Engagement</h1>
-        <p className="text-muted-foreground">Connect, participate, and grow with your colleagues</p>
+        <p className="text-muted-foreground">
+          Connect, participate, and grow with your colleagues
+        </p>
       </div>
 
       <div>
@@ -211,20 +260,32 @@ const EmployeeEngagement: React.FC = () => {
               Wellness
             </Button>
             <Button
-              variant={activeCategory === "Holidays/Festivals" ? "default" : "outline"}
+              variant={
+                activeCategory === "Holidays/Festivals" ? "default" : "outline"
+              }
               onClick={() => setActiveCategory("Holidays/Festivals")}
             >
               Holidays/Festivals
             </Button>
             <Button
-              variant={activeCategory === "Sports/Entertainment" ? "default" : "outline"}
+              variant={
+                activeCategory === "Sports/Entertainment"
+                  ? "default"
+                  : "outline"
+              }
               onClick={() => setActiveCategory("Sports/Entertainment")}
             >
               Sports/Entertainment
             </Button>
             <Button
-              variant={activeCategory === "BOM-Birthdays of the Month" ? "default" : "outline"}
-              onClick={() => setActiveCategory("BOM-Birthdays of the Month")}
+              variant={
+                activeCategory === "BOM-Birthdays of the Month"
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() =>
+                setActiveCategory("BOM-Birthdays of the Month")
+              }
             >
               BOM-Birthdays
             </Button>
@@ -242,7 +303,9 @@ const EmployeeEngagement: React.FC = () => {
               className="w-full p-2 border rounded"
               onChange={(e) => {
                 const selectedEventId = e.target.value;
-                const selected = dynamicPastEvents.find((ev) => ev.id === selectedEventId) || null;
+                const selected =
+                  dynamicPastEvents.find((ev) => ev.id === selectedEventId) ||
+                  null;
                 setSelectedPastEvent(selected);
               }}
             >
@@ -256,14 +319,19 @@ const EmployeeEngagement: React.FC = () => {
 
             {selectedPastEvent && (
               <div className="mt-4">
-                <h3 className="text-xl font-semibold mb-2">{selectedPastEvent.title} Photos</h3>
-                {selectedPastEvent.images && selectedPastEvent.images.length > 0 ? (
+                <h3 className="text-xl font-semibold mb-2">
+                  {selectedPastEvent.title} Photos
+                </h3>
+                {selectedPastEvent.images &&
+                selectedPastEvent.images.length > 0 ? (
                   <EventPhotoGallery
                     photos={selectedPastEvent.images as string[]}
                     eventName={selectedPastEvent.title as string}
                   />
                 ) : (
-                  <p className="text-muted-foreground">No images available for this event.</p>
+                  <p className="text-muted-foreground">
+                    No images available for this event.
+                  </p>
                 )}
               </div>
             )}
@@ -272,7 +340,11 @@ const EmployeeEngagement: React.FC = () => {
           // Upcoming events grid
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} onViewDetails={(ev) => setSelectedBomEvent(ev)} />
+              <EventCard
+                key={event.id}
+                event={event}
+                onViewDetails={(ev) => setSelectedBomEvent(ev)}
+              />
             ))}
           </div>
         )}
@@ -292,12 +364,15 @@ const EmployeeEngagement: React.FC = () => {
       >
         <DialogContent className="max-w-5xl">
           <DialogHeader>
-            <DialogTitle>{selectedBomEvent?.title || "Event Details"}</DialogTitle>
+            <DialogTitle>
+              {selectedBomEvent?.title || "Event Details"}
+            </DialogTitle>
             <DialogDescription>
               {/* If not BOM, just show description */}
               {selectedBomEvent?.type !== "BOM-Birthdays of the Month" && (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {selectedBomEvent?.description || "Event details are not available."}
+                  {selectedBomEvent?.description ||
+                    "Event details are not available."}
                 </p>
               )}
 
@@ -325,20 +400,20 @@ const EmployeeEngagement: React.FC = () => {
                             className="flex flex-col items-center p-3 border rounded-lg shadow bg-white"
                           >
                             <img
-                              src={`/employee-images/${bd.empId}.jpg`}
+                              src={getEmployeeImage(bd.empId, bd.name)}
                               alt={bd.name}
                               className="w-24 h-24 rounded-full object-cover mb-2"
                               onError={(e) => {
-                                const currentSrc = e.currentTarget.src;
-                                if (currentSrc.endsWith(".jpg")) {
-                                  e.currentTarget.src = `/employee-images/${bd.empId}.png`;
-                                } else {
-                                  e.currentTarget.src = "/employee-images/default-avatar.jpg";
-                                }
+                                e.currentTarget.src =
+                                  "/employee-images/default-avatar.jpg";
                               }}
                             />
-                            <p className="text-sm font-medium text-center">{bd.name}</p>
-                            <p className="text-xs text-gray-500">{bd.birthday}</p>
+                            <p className="text-sm font-medium text-center">
+                              {bd.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {bd.birthday}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -451,25 +526,35 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">{event.description}</p>
+        <p className="text-sm text-muted-foreground mb-4">
+          {event.description}
+        </p>
 
         <div className="flex flex-col gap-2 mt-4">
           {event.registrationOpen && (
             <Button
               onClick={handleRegister}
               disabled={loading}
-              className={`flex-1 ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+              className={`flex-1 ${
+                loading ? "opacity-60 cursor-not-allowed" : ""
+              }`}
             >
               {loading ? "Submitting..." : "Register Now"}
             </Button>
           )}
 
-          <Button className="flex-1" variant="outline" onClick={() => onViewDetails(event)}>
+          <Button
+            className="flex-1"
+            variant="outline"
+            onClick={() => onViewDetails(event)}
+          >
             View Details
           </Button>
 
           {statusMsg && (
-            <p className="text-center text-sm text-gray-600 mt-1">{statusMsg}</p>
+            <p className="text-center text-sm text-gray-600 mt-1">
+              {statusMsg}
+            </p>
           )}
         </div>
       </CardContent>
@@ -479,47 +564,54 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
 
 export default EmployeeEngagement;
 
-// ---------------------- Static Events ----------------------
-// NOTE: For BOM events we add `month` so the API knows which month to query.
+// ---------------------- Dynamic BOM Events ----------------------
 
-const events: Event[] = [
-  {
-    id: "4",
-    title: "BOM: April Birthdays",
-    date: "April 30, 2025",
-    location: "",
-    description: "Celebrating all April birthdays.",
-    type: "BOM-Birthdays of the Month",
-    month: 4,
-  },
-  {
-    id: "8",
-    title: "BOM: May Birthdays",
-    date: "May 31, 2025",
-    location: "",
-    description: "Celebrating all May birthdays.",
-    type: "BOM-Birthdays of the Month",
-    month: 5,
-  },
-  {
-    id: "12",
-    title: "BOM: June Birthdays",
-    date: "June 30, 2025",
-    location: "",
-    description: "Celebrating all June birthdays.",
-    type: "BOM-Birthdays of the Month",
-    month: 6,
-  },
-  {
-    id: "17",
-    title: "BOM: July Birthdays",
-    date: "July 31, 2025",
-    location: "",
-    description: "Celebrating all July birthdays.",
-    type: "BOM-Birthdays of the Month",
-    month: 7,
-  },
-  // ... keep all your other non-BOM events exactly as before ...
-  // Just ensure each BOM event has the correct `month`:
-  // August = 8, September = 9, October = 10, November = 11, December = 12, etc.
+// Generates 12 BOM events starting from the current month.
+function generateDynamicBomEvents(): Event[] {
+  const now = new Date();
+  let currentMonth = now.getMonth() + 1; // 1–12
+  let currentYear = now.getFullYear();
+
+  const bomEvents: Event[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    const month = currentMonth;
+    const year = currentYear;
+
+    const lastDayOfMonth = new Date(year, month, 0);
+    const monthName = lastDayOfMonth.toLocaleString("en-US", { month: "long" });
+    const formattedDate = lastDayOfMonth.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    bomEvents.push({
+      id: `bom-${year}-${month}`,
+      title: `BOM: ${monthName} Birthdays`,
+      date: formattedDate,
+      location: "",
+      description: `Celebrating all ${monthName} birthdays.`,
+      type: "BOM-Birthdays of the Month",
+      month: month,
+    });
+
+    currentMonth++;
+    if (currentMonth > 12) {
+      currentMonth = 1;
+      currentYear++;
+    }
+  }
+
+  return bomEvents;
+}
+
+// ---------------------- Static Events ----------------------
+
+// Add *non-BOM* fixed events (sports, festivals, wellness, etc.) here.
+const baseEvents: Event[] = [
+  // e.g. cricket, yoga, etc.
 ];
+
+// Final list: dynamic BOM + your other events
+const events: Event[] = [...generateDynamicBomEvents(), ...baseEvents];
