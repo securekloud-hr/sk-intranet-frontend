@@ -59,7 +59,6 @@ interface EventCardProps {
 
 // ---------------------- Helpers (image path) ----------------------
 
-// Same idea as your Employee Directory helper
 function normalizeName(s?: string | null) {
   return s ? s.trim().replace(/\s+/g, " ") : "";
 }
@@ -69,12 +68,10 @@ function getEmployeeImage(empId?: string, name?: string) {
 
   const cleanName = normalizeName(name);
 
-  // Try EmpID-Name.jpg first
   if (cleanName) {
     return `/employee-images/${empId}-${cleanName}.jpg`;
   }
 
-  // Fallback: EmpID.jpg
   return `/employee-images/${empId}.jpg`;
 }
 
@@ -119,6 +116,17 @@ const EventPhotoGallery = ({ photos, eventName }: EventPhotoGalleryProps) => {
   );
 };
 
+// 🔹 Fetch logged-in user from localStorage (same as Support page)
+const getCurrentUser = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw || raw === "undefined") return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
 const EmployeeEngagement: React.FC = () => {
   // ---------- State ----------
   const [activeSection, setActiveSection] = useState<"upcoming" | "past">(
@@ -132,7 +140,8 @@ const EmployeeEngagement: React.FC = () => {
     | "BOM-Birthdays of the Month"
   >("all");
 
-  const [dynamicPastEvents, setDynamicPastEvents] = useState<Partial<Event>[]>([]);
+  const [dynamicPastEvents, setDynamicPastEvents] =
+    useState<Partial<Event>[]>([]);
   const [selectedPastEvent, setSelectedPastEvent] =
     useState<Partial<Event> | null>(null);
 
@@ -141,9 +150,16 @@ const EmployeeEngagement: React.FC = () => {
   const [bomLoading, setBomLoading] = useState(false);
   const [bomError, setBomError] = useState<string | null>(null);
 
+  // 🔹 NEW: events created from Admin Dashboard (DB)
+  const [adminEvents, setAdminEvents] = useState<Event[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+
   // ---------- Derived ----------
-  // For now treat all events as upcoming so nothing is hidden
-  const upcomingEvents = events;
+  const bomEvents = generateDynamicBomEvents();
+
+  // Combine BOM + admin-created events
+  const upcomingEvents: Event[] = [...bomEvents, ...adminEvents];
 
   const filteredEvents =
     activeSection === "upcoming"
@@ -153,6 +169,53 @@ const EmployeeEngagement: React.FC = () => {
       : [];
 
   // ---------- Effects ----------
+
+  // 🔹 Fetch events created in Admin Dashboard
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setEventsLoading(true);
+      setEventsError(null);
+
+      try {
+        const res = await fetch(`${API}/api/admin/events`);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+
+        const today = new Date();
+
+        const mapped: Event[] = (data as any[])
+          .filter((ev) => !ev.date || new Date(ev.date) >= today) // only upcoming
+          .map((ev) => ({
+            id: ev._id || ev.id,
+            title: ev.title,
+            date: ev.date
+              ? new Date(ev.date).toLocaleDateString(undefined, {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "",
+            location: ev.location ?? "",
+            description: ev.description ?? "",
+            type: (ev.type || "Wellness") as Event["type"],
+            registrationOpen: !!ev.registrationOpen,
+          }));
+
+        setAdminEvents(mapped);
+      } catch (err: any) {
+        console.error("Error fetching admin events:", err);
+        setEventsError("Failed to load events.");
+        setAdminEvents([]);
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // Past events (photos) — from /api/past-events
   useEffect(() => {
@@ -169,7 +232,10 @@ const EmployeeEngagement: React.FC = () => {
 
   // Load BOM birthdays dynamically when a BOM event is selected
   useEffect(() => {
-    if (!selectedBomEvent || selectedBomEvent.type !== "BOM-Birthdays of the Month") {
+    if (
+      !selectedBomEvent ||
+      selectedBomEvent.type !== "BOM-Birthdays of the Month"
+    ) {
       return;
     }
 
@@ -338,14 +404,26 @@ const EmployeeEngagement: React.FC = () => {
           </div>
         ) : (
           // Upcoming events grid
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onViewDetails={(ev) => setSelectedBomEvent(ev)}
-              />
-            ))}
+          <div className="mt-6">
+            {eventsLoading && <p>Loading events…</p>}
+            {!eventsLoading && eventsError && (
+              <p className="text-sm text-red-600 mb-4">{eventsError}</p>
+            )}
+            {!eventsLoading && !eventsError && filteredEvents.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No events found.
+              </p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onViewDetails={(ev) => setSelectedBomEvent(ev)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -466,39 +544,50 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
   };
 
   const EventIcon = getEventIcon(event.type);
+const handleRegister = async () => {
+  if (loading) return;
 
-  const handleRegister = async () => {
-    if (loading) return;
-    setLoading(true);
-    setStatusMsg("Submitting...");
+  const user = getCurrentUser();
+  const name = user?.fullName || user?.name || "Anonymous User";
+  const email = user?.email || user?.mail || "";
 
-    try {
-      const res = await fetch(`${API}/api/registerEvent/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventId: event.id,
-          eventName: event.title,
-          user: "Current User", // TODO: wire real user
-          email: "user@example.com", // TODO: wire real email
-        }),
-      });
+  if (!email) {
+    setStatusMsg("User email not available. Please re-login.");
+    return;
+  }
 
-      if (res.ok) {
-        setStatusMsg("✅ Successfully registered!");
-      } else {
-        setStatusMsg("❌ Failed to register. Try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      setStatusMsg("⚠️ Network error while registering.");
-    } finally {
-      setTimeout(() => {
-        setLoading(false);
-        setStatusMsg("");
-      }, 2000);
+  setLoading(true);
+  setStatusMsg("Submitting...");
+
+  try {
+    const res = await fetch(`${API}/api/registerEvent/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventId: event.id,
+        eventName: event.title,
+        user: name,      // ✔ backend expects this
+        email: email,    // ✔ backend expects this
+      }),
+    });
+
+    if (res.ok) {
+      setStatusMsg("✅ Successfully registered!");
+    } else {
+      setStatusMsg("❌ Failed to register. Try again.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setStatusMsg("⚠️ Network error while registering.");
+  } finally {
+    setTimeout(() => {
+      setLoading(false);
+      setStatusMsg("");
+    }, 2000);
+  }
+};
+
+
 
   return (
     <Card>
@@ -579,7 +668,9 @@ function generateDynamicBomEvents(): Event[] {
     const year = currentYear;
 
     const lastDayOfMonth = new Date(year, month, 0);
-    const monthName = lastDayOfMonth.toLocaleString("en-US", { month: "long" });
+    const monthName = lastDayOfMonth.toLocaleString("en-US", {
+      month: "long",
+    });
     const formattedDate = lastDayOfMonth.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -605,13 +696,3 @@ function generateDynamicBomEvents(): Event[] {
 
   return bomEvents;
 }
-
-// ---------------------- Static Events ----------------------
-
-// Add *non-BOM* fixed events (sports, festivals, wellness, etc.) here.
-const baseEvents: Event[] = [
-  // e.g. cricket, yoga, etc.
-];
-
-// Final list: dynamic BOM + your other events
-const events: Event[] = [...generateDynamicBomEvents(), ...baseEvents];

@@ -30,13 +30,18 @@ interface Announcement {
   _id: string;
   title: string;
   content: string;
-  imageUrl?: string; // 👈 NEW
+  imageUrl?: string;
 }
+
+type EventType = "Wellness" | "Holidays/Festivals" | "Sports/Entertainment";
 
 interface Event {
   _id: string;
   title: string;
   date: string;
+  type?: EventType;
+  description?: string;
+  registrationOpen?: boolean;
 }
 
 export default function AdminDashboard() {
@@ -46,9 +51,17 @@ export default function AdminDashboard() {
     title: "",
     content: "",
   });
-  const [announcementImage, setAnnouncementImage] = useState<File | null>(null); // 👈 NEW
+  const [announcementImage, setAnnouncementImage] = useState<File | null>(null);
 
-  const [newEvent, setNewEvent] = useState({ title: "", date: "" });
+  const initialEventState = {
+    title: "",
+    date: "",
+    type: "Wellness" as EventType,
+    description: "",
+    registrationOpen: false,
+  };
+
+  const [newEvent, setNewEvent] = useState(initialEventState);
 
   // Employee Directory Upload
   const [uploading, setUploading] = useState(false);
@@ -85,7 +98,7 @@ export default function AdminDashboard() {
       formData.append("title", payload.title);
       formData.append("content", payload.content);
       if (payload.imageFile) {
-        formData.append("image", payload.imageFile); // 👈 must match upload.single("image") on backend
+        formData.append("image", payload.imageFile);
       }
 
       return fetch(`${API}/api/admin/announcements`, {
@@ -128,9 +141,15 @@ export default function AdminDashboard() {
     },
   });
 
-  // ✅ Add event
+  // ✅ Add event (now with type, description, registrationOpen)
   const addEvent = useMutation({
-    mutationFn: (event: { title: string; date: string }) =>
+    mutationFn: (event: {
+      title: string;
+      date: string;
+      type: EventType;
+      description: string;
+      registrationOpen: boolean;
+    }) =>
       api(`${API}/api/admin/events`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -138,7 +157,7 @@ export default function AdminDashboard() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      setNewEvent({ title: "", date: "" });
+      setNewEvent(initialEventState);
       toast({ title: "✅ Event added successfully" });
     },
     onError: (err: any) => {
@@ -244,7 +263,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* 🔹 Tab strip like HR: Resources / HR Team / HR Forms */}
+      {/* Tabs */}
       <Tabs defaultValue="announcements" className="space-y-6">
         <TabsList className="grid w-full max-w-xl grid-cols-4">
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
@@ -367,7 +386,8 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col md:flex-row gap-2">
+              {/* Form */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <input
                   className="border p-2 rounded w-full"
                   placeholder="Event Title"
@@ -384,23 +404,88 @@ export default function AdminDashboard() {
                     setNewEvent({ ...newEvent, date: e.target.value })
                   }
                 />
-                <Button onClick={() => addEvent.mutate(newEvent)}>Add</Button>
+                <select
+                  className="border p-2 rounded"
+                  value={newEvent.type}
+                  onChange={(e) =>
+                    setNewEvent({
+                      ...newEvent,
+                      type: e.target.value as EventType,
+                    })
+                  }
+                >
+                  <option value="Wellness">Wellness</option>
+                  <option value="Holidays/Festivals">Holidays/Festivals</option>
+                  <option value="Sports/Entertainment">
+                    Sports/Entertainment
+                  </option>
+                </select>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={newEvent.registrationOpen}
+                    onChange={(e) =>
+                      setNewEvent({
+                        ...newEvent,
+                        registrationOpen: e.target.checked,
+                      })
+                    }
+                  />
+                  Registration
+                </label>
               </div>
 
+              <textarea
+                className="border p-2 rounded w-full"
+                placeholder="Event Description"
+                rows={2}
+                value={newEvent.description}
+                onChange={(e) =>
+                  setNewEvent({
+                    ...newEvent,
+                    description: e.target.value,
+                  })
+                }
+              />
+
+              <Button
+                onClick={() =>
+                  addEvent.mutate({
+                    title: newEvent.title,
+                    date: newEvent.date,
+                    type: newEvent.type,
+                    description: newEvent.description,
+                    registrationOpen: newEvent.registrationOpen,
+                  })
+                }
+              >
+                Add
+              </Button>
+
+              {/* List */}
               <ul className="space-y-2">
                 {events.map((ev) => (
                   <li
                     key={ev._id}
-                    className="flex justify-between items-center border-b py-2"
+                    className="flex flex-col md:flex-row justify-between items-start md:items-center border-b py-2 gap-2"
                   >
-                    <span>
-                      {ev.title} —{" "}
-                      {new Date(ev.date).toLocaleDateString(undefined, {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
+                    <div>
+                      <div className="font-medium">{ev.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(ev.date).toLocaleDateString(undefined, {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                        {ev.type && ` • ${ev.type}`}
+                        {ev.registrationOpen ? " • Registration Open" : ""}
+                      </div>
+                      {ev.description && (
+                        <div className="text-xs text-gray-600">
+                          {ev.description}
+                        </div>
+                      )}
+                    </div>
                     <Button
                       variant="destructive"
                       onClick={() => deleteEvent.mutate(ev._id)}
