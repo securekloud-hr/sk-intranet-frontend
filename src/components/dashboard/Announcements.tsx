@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import API from "@/config";
 
 type Announcement = {
@@ -8,7 +13,7 @@ type Announcement = {
   content: string;
   date?: string;
   category?: string;
-  imageUrl?: string; // 👈 NEW
+  imageUrl?: string;
 };
 
 export function Announcements() {
@@ -63,11 +68,23 @@ export function Announcements() {
                   IMAGE PREVIEW (IF EXISTS)
               ============================ */}
               {a.imageUrl && (
-                <img
-                  src={`${API}${a.imageUrl}`} // 👈 FIXED
-                  alt={a.title}
-                  className="w-20 h-20 rounded-md object-cover flex-shrink-0"
-                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <img
+                      src={`${API}${a.imageUrl}`}
+                      alt={a.title}
+                      className="w-20 h-20 rounded-md object-cover flex-shrink-0 cursor-pointer hover:opacity-90"
+                    />
+                  </DialogTrigger>
+
+                  <DialogContent className="max-w-3xl border-none bg-transparent p-0">
+                    <img
+                      src={`${API}${a.imageUrl}`}
+                      alt={a.title}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </DialogContent>
+                </Dialog>
               )}
 
               {/* ===========================
