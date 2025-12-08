@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import API from "@/config";
 
-
 type Announcement = {
   _id?: string;
   title: string;
   content: string;
   date?: string;
   category?: string;
+  imageUrl?: string; // 👈 NEW
 };
 
 export function Announcements() {
@@ -51,31 +51,45 @@ export function Announcements() {
       <CardHeader className="pb-3">
         <CardTitle>Announcements</CardTitle>
       </CardHeader>
+
       <CardContent className="grid gap-4">
         {announcements.length > 0 ? (
           announcements.map((a) => (
             <div
               key={a._id}
-              className="flex flex-col space-y-2 border-b pb-3 last:border-b-0 last:pb-0"
+              className="flex gap-3 border-b pb-3 last:border-b-0 last:pb-0"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-semibold">{a.title}</h4>
-                  <p className="text-sm text-muted-foreground">{a.content}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    {a.date && (
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(a.date).toLocaleDateString()}
-                      </span>
-                    )}
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${getCategoryColor(
-                        a.category
-                      )}`}
-                    >
-                      {a.category || "General"}
+              {/* ===========================
+                  IMAGE PREVIEW (IF EXISTS)
+              ============================ */}
+              {a.imageUrl && (
+                <img
+                  src={`${API}${a.imageUrl}`} // 👈 FIXED
+                  alt={a.title}
+                  className="w-20 h-20 rounded-md object-cover flex-shrink-0"
+                />
+              )}
+
+              {/* ===========================
+                  ANNOUNCEMENT TEXT
+              ============================ */}
+              <div className="flex-grow">
+                <h4 className="font-semibold">{a.title}</h4>
+                <p className="text-sm text-muted-foreground">{a.content}</p>
+
+                <div className="flex items-center space-x-2 mt-1">
+                  {a.date && (
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(a.date).toLocaleDateString()}
                     </span>
-                  </div>
+                  )}
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${getCategoryColor(
+                      a.category
+                    )}`}
+                  >
+                    {a.category || "General"}
+                  </span>
                 </div>
               </div>
             </div>

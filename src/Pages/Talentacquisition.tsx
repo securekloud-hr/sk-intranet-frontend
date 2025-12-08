@@ -132,7 +132,10 @@ const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
 
             <div className="space-y-6">
               {opportunities.map((op) => (
-                <div key={op._id || op.id} className="border-b pb-4 last:border-b-0">
+                <div
+                  key={op._id || op.id}
+                  className="border-b pb-4 last:border-b-0"
+                >
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div>
                       <h3 className="font-semibold">{op.title}</h3>
@@ -141,7 +144,8 @@ const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
                       </p>
                     </div>
                     <Badge className="text-xs">
-                      {op.priority.charAt(0).toUpperCase() + op.priority.slice(1)}{" "}
+                      {op.priority.charAt(0).toUpperCase() +
+                        op.priority.slice(1)}{" "}
                       Priority
                     </Badge>
                   </div>
@@ -150,7 +154,9 @@ const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
                   </p>
                   {op.requirements?.length > 0 && (
                     <>
-                      <p className="text-xs font-semibold mb-1">Key Requirements:</p>
+                      <p className="text-xs font-semibold mb-1">
+                        Key Requirements:
+                      </p>
                       <ul className="list-disc pl-5 text-xs space-y-1">
                         {op.requirements.map((r, i) => (
                           <li key={i}>{r}</li>
@@ -323,9 +329,9 @@ const TalentAcquisition = () => {
 
         {/* 1️⃣ Referral Program tab */}
         <TabsContent value="referral" className="space-y-6">
-          {/* Top 2 cards – side by side like Holidays page */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Card 1: Employee Referral Program */}
+          {/* Left: Program + Incentive   Right: Submit Referral */}
+          <div className="grid gap-6 lg:grid-cols-[3fr,2fr]">
+            {/* LEFT CARD: Employee Referral Program + Incentive Structure */}
             <Card>
               <CardHeader>
                 <CardTitle>Employee Referral Program</CardTitle>
@@ -333,134 +339,148 @@ const TalentAcquisition = () => {
                   Earn bonuses for successful candidate referrals
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <h3 className="font-semibold">How the Referral Program Works</h3>
-                <ul className="list-disc pl-6 space-y-1 text-sm text-muted-foreground">
-                  <li>
-                    Refer qualified candidates for open positions at SecureKloud.
-                  </li>
-                  <li>
-                    If your referral is hired and completes 90 days, you earn a bonus.
-                  </li>
-                  <li>
-                    Bonus amounts vary by position, with high-priority roles offering
-                    higher incentives.
-                  </li>
-                  <li>
-                    Submit referrals through the form below or email{" "}
-                    recruiting@securekloud.com.
-                  </li>
-                  <li>
-                    No limit to the number of referrals you can submit or bonuses you can
-                    earn.
-                  </li>
-                </ul>
+              <CardContent className="space-y-6">
+                {/* How the Referral Program Works */}
+                <div>
+                  <h3 className="font-semibold">How the Referral Program Works</h3>
+                  <ul className="list-disc pl-6 space-y-1 text-sm text-muted-foreground">
+                    <li>
+                      Refer qualified candidates for open positions at
+                      SecureKloud.
+                    </li>
+                    <li>
+                      If your referral is hired and completes 90 days, you earn
+                      a bonus.
+                    </li>
+                    <li>
+                      Bonus amounts vary by position, with high-priority roles
+                      offering higher incentives.
+                    </li>
+                    <li>
+                      Submit referrals through the form below or email{" "}
+                      recruiting@securekloud.com.
+                    </li>
+                    <li>
+                      No limit to the number of referrals you can submit or
+                      bonuses you can earn.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Referral Incentive Structure INSIDE the same card */}
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-1">
+                    Referral Incentive Structure
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Bonus amounts by role and band
+                  </p>
+
+                  <table className="w-full border text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="border px-3 py-2 text-left">Roles</th>
+                        <th className="border px-3 py-2 text-left">Band</th>
+                        <th className="border px-3 py-2 text-left">Incentive</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border px-3 py-2">Fresher</td>
+                        <td className="border px-3 py-2">B1</td>
+                        <td className="border px-3 py-2">Rs. 2,500/-</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-3 py-2">Team Member</td>
+                        <td className="border px-3 py-2">B2</td>
+                        <td className="border px-3 py-2">Rs. 10,000/-</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-3 py-2">
+                          Senior Team Member
+                        </td>
+                        <td className="border px-3 py-2">B3</td>
+                        <td className="border px-3 py-2">Rs. 25,000/-</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-3 py-2">Middle Management</td>
+                        <td className="border px-3 py-2">B4 - B5</td>
+                        <td className="border px-3 py-2">Rs. 50,000/-</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-3 py-2">Management</td>
+                        <td className="border px-3 py-2">B6 - B7</td>
+                        <td className="border px-3 py-2">Rs. 75,000/-</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-3 py-2">
+                          Senior Management and above
+                        </td>
+                        <td className="border px-3 py-2">B8 &amp; Above</td>
+                        <td className="border px-3 py-2">Rs. 1,00,000/-</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Card 2: Referral Incentive Structure */}
+            {/* RIGHT CARD: Submit a Referral */}
             <Card>
               <CardHeader>
-                <CardTitle>Referral Incentive Structure</CardTitle>
-                <CardDescription>Bonus amounts by role and band</CardDescription>
+                <CardTitle>Submit a Referral</CardTitle>
+                <CardDescription>
+                  Refer a candidate and help us grow
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <table className="w-full border text-sm mt-2">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="border px-3 py-2 text-left">Roles</th>
-                      <th className="border px-3 py-2 text-left">Band</th>
-                      <th className="border px-3 py-2 text-left">Incentive</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border px-3 py-2">Fresher</td>
-                      <td className="border px-3 py-2">B1</td>
-                      <td className="border px-3 py-2">Rs. 2,500/-</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-3 py-2">Team Member</td>
-                      <td className="border px-3 py-2">B2</td>
-                      <td className="border px-3 py-2">Rs. 10,000/-</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-3 py-2">Senior Team Member</td>
-                      <td className="border px-3 py-2">B3</td>
-                      <td className="border px-3 py-2">Rs. 25,000/-</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-3 py-2">Middle Management</td>
-                      <td className="border px-3 py-2">B4 - B5</td>
-                      <td className="border px-3 py-2">Rs. 50,000/-</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-3 py-2">Management</td>
-                      <td className="border px-3 py-2">B6 - B7</td>
-                      <td className="border px-3 py-2">Rs. 75,000/-</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-3 py-2">
-                        Senior Management and above
-                      </td>
-                      <td className="border px-3 py-2">B8 &amp; Above</td>
-                      <td className="border px-3 py-2">Rs. 1,00,000/-</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <CardContent className="space-y-4">
+                <Input
+                  name="candidateName"
+                  placeholder="Candidate Name"
+                  value={referral.candidateName}
+                  onChange={handleReferralChange}
+                  required
+                />
+                <Input
+                  name="email"
+                  type="email"
+                  placeholder="Email Address"
+                  value={referral.email}
+                  onChange={handleReferralChange}
+                  required
+                />
+                <Input
+                  name="phone"
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={referral.phone}
+                  onChange={handleReferralChange}
+                  required
+                />
+                <Input
+                  name="position"
+                  placeholder="Position Referred For"
+                  value={referral.position}
+                  onChange={handleReferralChange}
+                  required
+                />
+                <Input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleResumeChange}
+                />
+                <Input
+                  name="notes"
+                  placeholder="Additional Notes"
+                  value={referral.notes}
+                  onChange={handleReferralChange}
+                />
+                <Button className="w-full" onClick={submitReferral}>
+                  <UserPlus className="mr-2 h-4 w-4" /> Submit Referral
+                </Button>
               </CardContent>
             </Card>
           </div>
-
-          {/* Submit Referral form card (below the two cards) */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Submit a Referral</CardTitle>
-              <CardDescription>Refer a candidate and help us grow</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                name="candidateName"
-                placeholder="Candidate Name"
-                value={referral.candidateName}
-                onChange={handleReferralChange}
-                required
-              />
-              <Input
-                name="email"
-                type="email"
-                placeholder="Email Address"
-                value={referral.email}
-                onChange={handleReferralChange}
-                required
-              />
-              <Input
-                name="phone"
-                type="tel"
-                placeholder="Phone Number"
-                value={referral.phone}
-                onChange={handleReferralChange}
-                required
-              />
-              <Input
-                name="position"
-                placeholder="Position Referred For"
-                value={referral.position}
-                onChange={handleReferralChange}
-                required
-              />
-              <Input type="file" accept=".pdf" onChange={handleResumeChange} />
-              <Input
-                name="notes"
-                placeholder="Additional Notes"
-                value={referral.notes}
-                onChange={handleReferralChange}
-              />
-              <Button className="w-full" onClick={submitReferral}>
-                <UserPlus className="mr-2 h-4 w-4" /> Submit Referral
-              </Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* 2️⃣ TA Details tab – HR Team style cards */}
@@ -488,22 +508,19 @@ const TalentAcquisition = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-1 text-sm w-full px-4 break-words">
-  <p>
-    <span className="font-medium">Emp ID: </span>
-    {member.empId}
-  </p>
-  <p className="break-all">
-    <span className="font-medium">Email: </span>
-    {member.email}
-  </p>
-  <p>
-    <span className="font-medium">Phone: </span>
-    {member.phone}
-  </p>
-</CardContent>
-
-               
-                
+                  <p>
+                    <span className="font-medium">Emp ID: </span>
+                    {member.empId}
+                  </p>
+                  <p className="break-all">
+                    <span className="font-medium">Email: </span>
+                    {member.email}
+                  </p>
+                  <p>
+                    <span className="font-medium">Phone: </span>
+                    {member.phone}
+                  </p>
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -521,7 +538,11 @@ const TalentAcquisition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex gap-4">
-                <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
+                <Input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileChange}
+                />
                 <Button onClick={handleUpload} disabled={!file}>
                   Upload &amp; Update
                 </Button>
@@ -535,7 +556,9 @@ const TalentAcquisition = () => {
               <div className="h-10 w-10 rounded-full bg-securekloud-100 dark:bg-securekloud-700 flex items-center justify-center">
                 <Award className="h-5 w-5 text-securekloud-700 dark:text-securekloud-100" />
               </div>
-              <h2 className="text-2xl font-bold">Current Referral Opportunities</h2>
+              <h2 className="text-2xl font-bold">
+                Current Referral Opportunities
+              </h2>
             </div>
 
             <div className="mb-4">
@@ -567,7 +590,9 @@ const TalentAcquisition = () => {
                   />
                 ))
               ) : (
-                <p className="text-muted-foreground">No opportunities available.</p>
+                <p className="text-muted-foreground">
+                  No opportunities available.
+                </p>
               )}
             </div>
 

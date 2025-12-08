@@ -71,7 +71,7 @@ export function AppHeader({ user }: { user?: any }) {
     : "";
   const initial = displayName.charAt(0).toUpperCase();
 
-  // 👇 Try to derive a reliable email from multiple possible fields
+  // Derive email from multiple possible fields
   const effectiveEmail =
     (mongoUser as any)?.email ||
     (mongoUser as any)?.upn ||
@@ -79,11 +79,10 @@ export function AppHeader({ user }: { user?: any }) {
     (mongoUser as any)?.username ||
     "";
 
-  // Debug log (optional – can remove later)
   console.log("🔎 mongoUser:", mongoUser);
   console.log("🔎 rawEmail:", rawEmail, "effectiveEmail:", effectiveEmail);
 
-  // 🔁 Employee Directory match
+  // Match with Employee Directory
   useEffect(() => {
     if (!mongoUser) return;
 
@@ -128,7 +127,7 @@ export function AppHeader({ user }: { user?: any }) {
     fetchAndMatchEmployee();
   }, [mongoUser]);
 
-  // FINAL AVATAR SOURCE PRIORITY
+  // Final avatar image priority
   const avatarSrc =
     storedAvatar.email === effectiveEmail && storedAvatar.avatarUrl
       ? storedAvatar.avatarUrl
@@ -136,12 +135,12 @@ export function AppHeader({ user }: { user?: any }) {
       ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
       : "/employee-images/default-avatar.jpg";
 
-  // 🌟 Click to upload
+  // Click handler to trigger file input
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 🌟 Upload handler
+  // Upload handler
   const handleAvatarUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -150,7 +149,6 @@ export function AppHeader({ user }: { user?: any }) {
 
     console.log("📤 Trying to upload avatar for:", effectiveEmail);
 
-    // 🔒 make sure we have a REAL email so backend can save per-user file
     if (!effectiveEmail || effectiveEmail.toLowerCase() === "user") {
       alert(
         "No valid email found for this user – cannot upload profile image. Please check login user data."
@@ -163,7 +161,6 @@ export function AppHeader({ user }: { user?: any }) {
     }
 
     const formData = new FormData();
-    // ⭐ IMPORTANT: email FIRST so Multer sees it in req.body
     formData.append("email", effectiveEmail);
     formData.append("avatar", file);
 
@@ -227,12 +224,9 @@ export function AppHeader({ user }: { user?: any }) {
                 variant="ghost"
                 size="sm"
                 className="flex items-center space-x-2"
-                onClick={() => setShowAccountDialog(true)}
+                onClick={() => setShowAccountDialog(true)} // only open dialog
               >
-                <Avatar
-                  className="h-8 w-8 cursor-pointer"
-                  onClick={handleAvatarClick}
-                >
+                <Avatar className="h-8 w-8">
                   <AvatarImage
                     src={avatarSrc}
                     alt={displayName}
@@ -248,7 +242,7 @@ export function AppHeader({ user }: { user?: any }) {
                   </AvatarFallback>
                 </Avatar>
 
-                {/* 🔹 Name + role text */}
+                {/* Name + role text */}
                 <div className="flex flex-col items-start text-left leading-tight">
                   <span className="font-medium">{displayName}</span>
                   <span className="text-sm text-muted-foreground">
@@ -259,7 +253,7 @@ export function AppHeader({ user }: { user?: any }) {
             </DropdownMenuTrigger>
           </DropdownMenu>
 
-          {/* Hidden input */}
+          {/* Hidden file input for avatar upload */}
           <input
             ref={fileInputRef}
             type="file"
@@ -282,10 +276,7 @@ export function AppHeader({ user }: { user?: any }) {
 
           {mongoUser ? (
             <div className="mt-2 space-y-3 text-sm">
-              <div
-                className="flex items-center space-x-3 cursor-pointer"
-                onClick={handleAvatarClick}
-              >
+              <div className="flex items-center space-x-3">
                 <div className="relative">
                   <Avatar className="h-12 w-12 border shadow-sm">
                     <AvatarImage
@@ -310,13 +301,22 @@ export function AppHeader({ user }: { user?: any }) {
                   )}
                 </div>
 
-                <div>
+                <div className="flex flex-col items-start">
                   <div className="font-semibold text-base">{displayName}</div>
                   {effectiveEmail && (
                     <div className="text-muted-foreground text-xs">
                       {effectiveEmail}
                     </div>
                   )}
+
+                  {/* ✏️ Edit profile picture link */}
+                  <button
+                    type="button"
+                    className="mt-1 text-xs text-blue-600 hover:underline"
+                    onClick={handleAvatarClick}
+                  >
+                    Edit profile picture
+                  </button>
                 </div>
               </div>
 
