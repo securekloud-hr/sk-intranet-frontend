@@ -203,33 +203,34 @@ export default function AdminDashboard() {
   });
 
   // 🔹 View registrations for an event
-  const handleViewRegistrations = async (ev: Event) => {
-    if (!ev._id) return;
+      const handleViewRegistrations = async (ev: Event) => {
+  if (!ev._id) return;
 
-    setRegDialogOpen(true);
-    setRegLoading(true);
-    setRegError(null);
-    setRegistrations([]);
-    setRegEventTitle(ev.title);
+  setRegDialogOpen(true);
+  setRegLoading(true);
+  setRegError(null);
+  setRegistrations([]);
+  setRegEventTitle(ev.title);
 
-    try {
-      const res = await fetch(`${API}/api/registerevent/event/${ev._id}`);
-      if (!res.ok) throw new Error(await res.text());
+  try {
+    // ✅ correct backend URL
+    const res = await fetch(`${API}/api/registrations/event/${ev._id}`);
+    if (!res.ok) throw new Error(await res.text());
 
-      const json = await res.json();
-      // Support both: plain array OR { success, data }
-      const list: Registration[] = Array.isArray(json)
-        ? json
-        : (json.data as Registration[]) || [];
+    // ✅ backend returns { success, count, data }
+    const json = await res.json();
+    const list: Registration[] = Array.isArray(json)
+      ? json
+      : (json.data as Registration[]) || [];
 
-      setRegistrations(list);
-    } catch (err: any) {
-      console.error("Error fetching registrations:", err);
-      setRegError(err.message || "Failed to load registrations");
-    } finally {
-      setRegLoading(false);
-    }
-  };
+    setRegistrations(list);
+  } catch (err: any) {
+    console.error("Error fetching registrations:", err);
+    setRegError(err.message || "Failed to load registrations");
+  } finally {
+    setRegLoading(false);
+  }
+};
 
   // ✅ Upload Employee Directory Excel
   const handleEmployeeUpload = async () => {
