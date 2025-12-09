@@ -4385,24 +4385,21 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 </div>
 
 
-                    <div className="p-4 text-sm space-y-1">
-                      {/* ✅ Shown to everyone */}
-                      <p>
-                        <strong>Name:</strong>{" "}
-                        {emp.EmployeeName || "N/A"}
-                      </p>
-                      <p>
-                        <strong>Emp ID:</strong> {emp.EmpID || "N/A"}
+          <div className="p-4 text-sm space-y-1">
+            {/* ✅ Shown to everyone */}
+            <p>
+              <strong>Name:</strong>{" "}
+              {emp.EmployeeName || "N/A"}
+            </p>
+            <p>
+              <strong>Emp ID:</strong> {emp.EmpID || "N/A"}
+            </p>
 
-
-          
-                      </p>
-                       
-                      <p>
-                        <strong>Department:</strong>{" "}
-                        {emp.Department || "N/A"}
-                      </p>
-                     <p>
+            <p>
+              <strong>Department:</strong>{" "}
+              {emp.Department || "N/A"}
+            </p>
+            <p>
               <strong>Designation:</strong> {emp.Designation || "N/A"}
             </p>
             <p>
@@ -4412,7 +4409,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               <strong>Personal Email ID :</strong>{" "}
               {emp.PersonalEmailID || "N/A"}
             </p>
-
+            <p>
+            <strong>Birthday:</strong> {emp.Birthday || "N/A"}
+            </p>
                     <CollapsibleSkillLine
   label="Primary Skills"
   value={emp.Tech1 || "N/A"}
