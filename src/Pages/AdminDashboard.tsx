@@ -201,36 +201,35 @@ export default function AdminDashboard() {
       toast({ title: "❌ Failed to delete event", description: err.message });
     },
   });
-// 🔹 View registrations for an event
-const handleViewRegistrations = async (ev: Event) => {
-  if (!ev._id) return;
 
-  setRegDialogOpen(true);
-  setRegLoading(true);
-  setRegError(null);
-  setRegistrations([]);
-  setRegEventTitle(ev.title);
+  // 🔹 View registrations for an event
+  const handleViewRegistrations = async (ev: Event) => {
+    if (!ev._id) return;
 
-  try {
-    const res = await fetch(`${API}/api/registerevent/event/${ev._id}`
-);
-    if (!res.ok) throw new Error(await res.text());
+    setRegDialogOpen(true);
+    setRegLoading(true);
+    setRegError(null);
+    setRegistrations([]);
+    setRegEventTitle(ev.title);
 
-    const json = await res.json();
-    // Support both: plain array OR { success, data }
-    const list: Registration[] = Array.isArray(json)
-      ? json
-      : (json.data as Registration[]) || [];
+    try {
+      const res = await fetch(`${API}/api/registerevent/event/${ev._id}`);
+      if (!res.ok) throw new Error(await res.text());
 
-    setRegistrations(list);
-  } catch (err: any) {
-    console.error("Error fetching registrations:", err);
-    setRegError(err.message || "Failed to load registrations");
-  } finally {
-    setRegLoading(false);
-  }
-};
+      const json = await res.json();
+      // Support both: plain array OR { success, data }
+      const list: Registration[] = Array.isArray(json)
+        ? json
+        : (json.data as Registration[]) || [];
 
+      setRegistrations(list);
+    } catch (err: any) {
+      console.error("Error fetching registrations:", err);
+      setRegError(err.message || "Failed to load registrations");
+    } finally {
+      setRegLoading(false);
+    }
+  };
 
   // ✅ Upload Employee Directory Excel
   const handleEmployeeUpload = async () => {
@@ -371,6 +370,7 @@ const handleViewRegistrations = async (ev: Event) => {
                   }
                 />
                 <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md"
                   onClick={() =>
                     addAnnouncement.mutate({
                       ...newAnnouncement,
@@ -501,6 +501,7 @@ const handleViewRegistrations = async (ev: Event) => {
               />
 
               <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md"
                 onClick={() =>
                   addEvent.mutate({
                     title: newEvent.title,
