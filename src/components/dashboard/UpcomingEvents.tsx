@@ -6,7 +6,7 @@ import API from "@/config";
 type Event = {
   _id?: string;
   title: string;
-  date: string;
+  date: string; // ISO string or anything new Date() can parse
 };
 
 export function UpcomingEvents() {
@@ -32,6 +32,25 @@ export function UpcomingEvents() {
 
   if (loading) return <p>Loading events...</p>;
 
+  // 👉 Get current month & year (based on today's date)
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0–11
+  const currentYear = now.getFullYear();
+
+  // 👉 Filter events for ONLY the current month & year
+  const currentMonthEvents = events
+    .filter((event) => {
+      const eventDate = new Date(event.date);
+      return (
+        eventDate.getMonth() === currentMonth &&
+        eventDate.getFullYear() === currentYear
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(a.date).getTime() - new Date(b.date).getTime() // sort by date ascending
+    );
+
   return (
     <Card className="sk-card">
       <CardHeader className="pb-3">
@@ -39,8 +58,8 @@ export function UpcomingEvents() {
       </CardHeader>
       <CardContent>
         <div className="space-y-5">
-          {events.length > 0 ? (
-            events.map((event) => (
+          {currentMonthEvents.length > 0 ? (
+            currentMonthEvents.map((event) => (
               <div key={event._id} className="flex items-start space-x-3">
                 <div className="mt-1">
                   <Calendar className="h-4 w-4 text-skcloud-purple" />
@@ -59,7 +78,7 @@ export function UpcomingEvents() {
               </div>
             ))
           ) : (
-            <p>No upcoming events.</p>
+            <p>No events this month.</p>
           )}
         </div>
       </CardContent>

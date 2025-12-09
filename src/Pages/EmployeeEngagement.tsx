@@ -29,7 +29,10 @@ interface EventPhotoGalleryProps {
 interface Event {
   id: string;
   title: string;
+  // raw date (ISO or backend format) – used for sorting
   date: string;
+  // formatted date for display (e.g. "Dec 11, 2025")
+  displayDate?: string;
   location: string;
   description: string;
   type:
@@ -156,10 +159,30 @@ const EmployeeEngagement: React.FC = () => {
   const [eventsError, setEventsError] = useState<string | null>(null);
 
   // ---------- Derived ----------
+
+  // 🔹 Helper to sort events by date (oldest ➜ newest)
+  const sortByDate = (events: Event[]): Event[] => {
+    return [...events].sort((a, b) => {
+      if (!a.date && !b.date) return 0;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+
+      const da = new Date(a.date);
+      const db = new Date(b.date);
+
+      if (isNaN(da.getTime()) && isNaN(db.getTime())) return 0;
+      if (isNaN(da.getTime())) return 1;
+      if (isNaN(db.getTime())) return -1;
+
+      // ascending: earlier dates first
+      return da.getTime() - db.getTime();
+    });
+  };
+
   const bomEvents = generateDynamicBomEvents();
 
-  // Combine BOM + admin-created events
-  const upcomingEvents: Event[] = [...bomEvents, ...adminEvents];
+  // Combine BOM + admin-created events and sort by date
+  const upcomingEvents: Event[] = sortByDate([...bomEvents, ...adminEvents]);
 
   const filteredEvents =
     activeSection === "upcoming"
@@ -188,21 +211,27 @@ const EmployeeEngagement: React.FC = () => {
 
         const mapped: Event[] = (data as any[])
           .filter((ev) => !ev.date || new Date(ev.date) >= today) // only upcoming
-          .map((ev) => ({
-            id: ev._id || ev.id,
-            title: ev.title,
-            date: ev.date
-              ? new Date(ev.date).toLocaleDateString(undefined, {
+          .map((ev) => {
+            const rawDate = ev.date || "";
+            const displayDate = rawDate
+              ? new Date(rawDate).toLocaleDateString(undefined, {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",
                 })
-              : "",
-            location: ev.location ?? "",
-            description: ev.description ?? "",
-            type: (ev.type || "Wellness") as Event["type"],
-            registrationOpen: !!ev.registrationOpen,
-          }));
+              : "";
+
+            return {
+              id: ev._id || ev.id,
+              title: ev.title,
+              date: rawDate,
+              displayDate,
+              location: ev.location ?? "",
+              description: ev.description ?? "",
+              type: (ev.type || "Wellness") as Event["type"],
+              registrationOpen: !!ev.registrationOpen,
+            };
+          });
 
         setAdminEvents(mapped);
       } catch (err: any) {
@@ -410,9 +439,7 @@ const EmployeeEngagement: React.FC = () => {
               <p className="text-sm text-red-600 mb-4">{eventsError}</p>
             )}
             {!eventsLoading && !eventsError && filteredEvents.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No events found.
-              </p>
+              <p className="text-sm text-muted-foreground">No events found.</p>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -544,50 +571,49 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
   };
 
   const EventIcon = getEventIcon(event.type);
-const handleRegister = async () => {
-  if (loading) return;
 
-  const user = getCurrentUser();
-  const name = user?.fullName || user?.name || "Anonymous User";
-  const email = user?.email || user?.mail || "";
+  const handleRegister = async () => {
+    if (loading) return;
 
-  if (!email) {
-    setStatusMsg("User email not available. Please re-login.");
-    return;
-  }
+    const user = getCurrentUser();
+    const name = user?.fullName || user?.name || "Anonymous User";
+    const email = user?.email || user?.mail || "";
 
-  setLoading(true);
-  setStatusMsg("Submitting...");
-
-  try {
-    const res = await fetch(`${API}/api/registerEvent/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        eventId: event.id,
-        eventName: event.title,
-        user: name,      // ✔ backend expects this
-        email: email,    // ✔ backend expects this
-      }),
-    });
-
-    if (res.ok) {
-      setStatusMsg("✅ Successfully registered!");
-    } else {
-      setStatusMsg("❌ Failed to register. Try again.");
+    if (!email) {
+      setStatusMsg("User email not available. Please re-login.");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    setStatusMsg("⚠️ Network error while registering.");
-  } finally {
-    setTimeout(() => {
-      setLoading(false);
-      setStatusMsg("");
-    }, 2000);
-  }
-};
 
+    setLoading(true);
+    setStatusMsg("Submitting...");
 
+    try {
+      const res = await fetch(`${API}/api/registerEvent/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: event.id,
+          eventName: event.title,
+          user: name, // ✔ backend expects this
+          email: email, // ✔ backend expects this
+        }),
+      });
+
+      if (res.ok) {
+        setStatusMsg("✅ Successfully registered!");
+      } else {
+        setStatusMsg("❌ Failed to register. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatusMsg("⚠️ Network error while registering.");
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+        setStatusMsg("");
+      }, 2000);
+    }
+  };
 
   return (
     <Card>
@@ -608,7 +634,8 @@ const handleRegister = async () => {
           <div>
             <CardTitle>{event.title}</CardTitle>
             <CardDescription>
-              {event.date} {event.location && `at ${event.location}`}
+              {(event.displayDate || event.date) +
+                (event.location ? ` at ${event.location}` : "")}
             </CardDescription>
           </div>
         </div>
@@ -680,7 +707,10 @@ function generateDynamicBomEvents(): Event[] {
     bomEvents.push({
       id: `bom-${year}-${month}`,
       title: `BOM: ${monthName} Birthdays`,
-      date: formattedDate,
+      // raw ISO date for sorting
+      date: lastDayOfMonth.toISOString(),
+      // display date for UI
+      displayDate: formattedDate,
       location: "",
       description: `Celebrating all ${monthName} birthdays.`,
       type: "BOM-Birthdays of the Month",

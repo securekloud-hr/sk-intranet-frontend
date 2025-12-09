@@ -17,6 +17,12 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // ✅ Reusable fetch API wrapper
 const api = async (url: string, options?: RequestInit) => {
@@ -42,6 +48,15 @@ interface Event {
   type?: EventType;
   description?: string;
   registrationOpen?: boolean;
+}
+
+interface Registration {
+  _id: string;
+  user: string;
+  email: string;
+  eventId: string;
+  eventName: string;
+  createdAt?: string;
 }
 
 export default function AdminDashboard() {
@@ -74,6 +89,13 @@ export default function AdminDashboard() {
   );
   const [holidayRegion, setHolidayRegion] = useState<string>("IN");
   const [holidayBusy, setHolidayBusy] = useState<boolean>(false);
+
+  // 🔹 Registrations dialog state
+  const [regDialogOpen, setRegDialogOpen] = useState(false);
+  const [regLoading, setRegLoading] = useState(false);
+  const [regError, setRegError] = useState<string | null>(null);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [regEventTitle, setRegEventTitle] = useState<string>("");
 
   // ✅ Fetch announcements
   const { data: announcements = [] } = useQuery<Announcement[]>({
@@ -179,6 +201,36 @@ export default function AdminDashboard() {
       toast({ title: "❌ Failed to delete event", description: err.message });
     },
   });
+// 🔹 View registrations for an event
+const handleViewRegistrations = async (ev: Event) => {
+  if (!ev._id) return;
+
+  setRegDialogOpen(true);
+  setRegLoading(true);
+  setRegError(null);
+  setRegistrations([]);
+  setRegEventTitle(ev.title);
+
+  try {
+    const res = await fetch(`${API}/api/registerevent/event/${ev._id}`
+);
+    if (!res.ok) throw new Error(await res.text());
+
+    const json = await res.json();
+    // Support both: plain array OR { success, data }
+    const list: Registration[] = Array.isArray(json)
+      ? json
+      : (json.data as Registration[]) || [];
+
+    setRegistrations(list);
+  } catch (err: any) {
+    console.error("Error fetching registrations:", err);
+    setRegError(err.message || "Failed to load registrations");
+  } finally {
+    setRegLoading(false);
+  }
+};
+
 
   // ✅ Upload Employee Directory Excel
   const handleEmployeeUpload = async () => {
@@ -486,12 +538,22 @@ export default function AdminDashboard() {
                         </div>
                       )}
                     </div>
-                    <Button
-                      variant="destructive"
-                      onClick={() => deleteEvent.mutate(ev._id)}
-                    >
-                      Delete
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewRegistrations(ev)}
+                      >
+                        View Registrations
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => deleteEvent.mutate(ev._id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </li>
                 ))}
                 {events.length === 0 && (
@@ -589,6 +651,47 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* 🔹 Registrations Dialog */}
+        <Dialog open={regDialogOpen} onOpenChange={setRegDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Registrations for {regEventTitle}</DialogTitle>
+            </DialogHeader>
+
+            {regLoading && <p>Loading registrations…</p>}
+
+            {!regLoading && regError && (
+              <p className="text-sm text-red-600">{regError}</p>
+            )}
+
+            {!regLoading && !regError && registrations.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No one has registered for this event yet.
+              </p>
+            )}
+
+            {!regLoading && !regError && registrations.length > 0 && (
+              <ul className="space-y-2 max-h-80 overflow-y-auto">
+                {registrations.map((r) => (
+                  <li
+                    key={r._id}
+                    className="border rounded-md p-2 text-sm space-y-0.5"
+                  >
+                    <div className="font-medium">{r.user}</div>
+                    <div className="text-muted-foreground">{r.email}</div>
+                    {r.createdAt && (
+                      <div className="text-xs text-muted-foreground">
+                        Registered on{" "}
+                        {new Date(r.createdAt).toLocaleString()}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </DialogContent>
+        </Dialog>
       </Tabs>
     </div>
   );
