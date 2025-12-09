@@ -52,12 +52,16 @@ interface Event {
 interface BirthdayEmployee {
   empId: string;
   name: string;
-  birthday: string; // "21/06"
+  birthday?: string; // "21/06"
 }
 
 interface EventCardProps {
   event: Event;
   onViewDetails: (event: Event) => void;
+
+  // NEW: registration status
+  registeredEventIds: string[];
+  onRegistered: (eventId: string) => void;
 }
 
 // ---------------------- Helpers (image path) ----------------------
@@ -153,14 +157,17 @@ const EmployeeEngagement: React.FC = () => {
   const [bomLoading, setBomLoading] = useState(false);
   const [bomError, setBomError] = useState<string | null>(null);
 
-  // 🔹 NEW: events created from Admin Dashboard (DB)
+  // events created from Admin Dashboard (DB)
   const [adminEvents, setAdminEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventsError, setEventsError] = useState<string | null>(null);
 
+  // 🔹 NEW: events this user already registered for
+  const [registeredEventIds, setRegisteredEventIds] = useState<string[]>([]);
+
   // ---------- Derived ----------
 
-  // 🔹 Helper to sort events by date (oldest ➜ newest)
+  // Helper to sort events by date (oldest ➜ newest)
   const sortByDate = (events: Event[]): Event[] => {
     return [...events].sort((a, b) => {
       if (!a.date && !b.date) return 0;
@@ -193,7 +200,7 @@ const EmployeeEngagement: React.FC = () => {
 
   // ---------- Effects ----------
 
-  // 🔹 Fetch events created in Admin Dashboard
+  // Fetch events created in Admin Dashboard
   useEffect(() => {
     const fetchEvents = async () => {
       setEventsLoading(true);
@@ -246,6 +253,40 @@ const EmployeeEngagement: React.FC = () => {
     fetchEvents();
   }, []);
 
+  // 🔹 Fetch events user already registered for (used to disable button)
+  useEffect(() => {
+    const user = getCurrentUser();
+    const email = user?.email || user?.mail;
+    if (!email) return;
+
+    const fetchRegs = async () => {
+      try {
+        const res = await fetch(
+          `${API}/api/registerEvent/user/${encodeURIComponent(email)}`
+        );
+        if (!res.ok) {
+          console.error("User registrations fetch failed:", res.status);
+          return;
+        }
+
+        const data = await res.json();
+        console.log("User registrations response:", data);
+
+        let regs: any[] = [];
+        if (Array.isArray(data)) regs = data;
+        else if (Array.isArray(data.data)) regs = data.data;
+        else if (Array.isArray(data.events)) regs = data.events;
+
+        const ids = regs.map((reg) => reg.eventId);
+        setRegisteredEventIds(Array.from(new Set(ids)));
+      } catch (err) {
+        console.error("Error fetching user registrations:", err);
+      }
+    };
+
+    fetchRegs();
+  }, []);
+
   // Past events (photos) — from /api/past-events
   useEffect(() => {
     if (activeSection === "past") {
@@ -288,8 +329,18 @@ const EmployeeEngagement: React.FC = () => {
         }
         return res.json();
       })
-      .then((data: BirthdayEmployee[]) => {
-        setBomBirthdays(Array.isArray(data) ? data : []);
+      .then((data: any[]) => {
+        console.log("BOM birthdays raw data:", data);
+
+        const normalized: BirthdayEmployee[] = Array.isArray(data)
+          ? data.map((item) => ({
+              empId: item.empId ?? item.EmpID ?? "",
+              name: item.name ?? item.EmployeeName ?? "",
+              birthday: item.birthday ?? item.Birthday ?? "",
+            }))
+          : [];
+
+        setBomBirthdays(normalized);
       })
       .catch((err) => {
         console.error("Error fetching BOM birthdays:", err);
@@ -448,6 +499,12 @@ const EmployeeEngagement: React.FC = () => {
                   key={event.id}
                   event={event}
                   onViewDetails={(ev) => setSelectedBomEvent(ev)}
+                  registeredEventIds={registeredEventIds}
+                  onRegistered={(eventId) =>
+                    setRegisteredEventIds((prev) =>
+                      prev.includes(eventId) ? prev : [...prev, eventId]
+                    )
+                  }
                 />
               ))}
             </div>
@@ -516,9 +573,11 @@ const EmployeeEngagement: React.FC = () => {
                             <p className="text-sm font-medium text-center">
                               {bd.name}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              {bd.birthday}
-                            </p>
+                              {bd.birthday && (
+                                <p className="text-xs text-gray-500">
+                                  {bd.birthday}
+                                </p>
+                              )}
                           </div>
                         ))}
                       </div>
@@ -536,9 +595,16 @@ const EmployeeEngagement: React.FC = () => {
 
 // ---------------------- EventCard ----------------------
 
-const EventCard = ({ event, onViewDetails }: EventCardProps) => {
+const EventCard = ({
+  event,
+  onViewDetails,
+  registeredEventIds,
+  onRegistered,
+}: EventCardProps) => {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
+
+  const isRegistered = registeredEventIds.includes(event.id);
 
   const getBadgeVariant = (type: string) => {
     switch (type) {
@@ -573,7 +639,7 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
   const EventIcon = getEventIcon(event.type);
 
   const handleRegister = async () => {
-    if (loading) return;
+    if (loading || isRegistered) return;
 
     const user = getCurrentUser();
     const name = user?.fullName || user?.name || "Anonymous User";
@@ -594,13 +660,20 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
         body: JSON.stringify({
           eventId: event.id,
           eventName: event.title,
-          user: name, // ✔ backend expects this
-          email: email, // ✔ backend expects this
+          user: name,
+          email: email,
         }),
       });
 
+      if (res.status === 409) {
+        setStatusMsg("You are already registered for this event.");
+        onRegistered(event.id);
+        return;
+      }
+
       if (res.ok) {
         setStatusMsg("✅ Successfully registered!");
+        onRegistered(event.id);
       } else {
         setStatusMsg("❌ Failed to register. Try again.");
       }
@@ -650,12 +723,16 @@ const EventCard = ({ event, onViewDetails }: EventCardProps) => {
           {event.registrationOpen && (
             <Button
               onClick={handleRegister}
-              disabled={loading}
+              disabled={loading || isRegistered}
               className={`flex-1 ${
-                loading ? "opacity-60 cursor-not-allowed" : ""
+                loading || isRegistered ? "opacity-60 cursor-not-allowed" : ""
               }`}
             >
-              {loading ? "Submitting..." : "Register Now"}
+              {isRegistered
+                ? "Registered"
+                : loading
+                ? "Submitting..."
+                : "Register Now"}
             </Button>
           )}
 
