@@ -938,7 +938,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                   >
                     {/*}
                     View {card.title.split(" ")[0]} */}
-                    card.btntext
+                    {card.btntext}
 
                   </Button>
                 </CardContent>
