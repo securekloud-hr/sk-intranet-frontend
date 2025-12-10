@@ -736,13 +736,17 @@ const EventCard = ({
             </Button>
           )}
 
-          <Button
-            className="flex-1"
-            variant="outline"
-            onClick={() => onViewDetails(event)}
-          >
-            View Details
-          </Button>
+       {/* Show View Details ONLY for BOM-Birthdays events */}
+{event.type === "BOM-Birthdays of the Month" && (
+  <Button
+    className="flex-1"
+    variant="outline"
+    onClick={() => onViewDetails(event)}
+  >
+    View Details
+  </Button>
+)}
+
 
           {statusMsg && (
             <p className="text-center text-sm text-gray-600 mt-1">
