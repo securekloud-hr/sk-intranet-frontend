@@ -157,8 +157,8 @@ const Holidays = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>{year} Holiday Calendar</CardTitle>
-            <CardDescription>View all company holidays</CardDescription>
+            <CardTitle>Holiday Calendar</CardTitle>
+            <CardDescription>Calendar view of all company holidays (across all years)</CardDescription>
           </CardHeader>
           <CardContent>
             <Calendar
@@ -249,31 +249,7 @@ const Holidays = () => {
         </Card>
       </div>
 
-      <Card>
 
-        <CardContent>
-
-          <div className="mt-4 p-4 bg-securekloud-50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <CalendarIcon className="h-5 w-5 text-securekloud-700" />
-              <h3 className="font-medium">Time Off Requests</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              For time off requests, please submit your request
-              through the{" "}
-              <a
-                href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline font-medium hover:text-blue-800 cursor-pointer"
-              >
-                ADP Portal
-              </a>
-              .
-            </p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

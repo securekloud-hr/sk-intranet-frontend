@@ -881,30 +881,35 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                 description: "Company policies and procedures",
                 content: "Access the latest employee handbook containing all company policies, procedures, and guidelines.",
                 fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+                btntext: "1",
               },
               {
                 title: "Benefits Information",
                 description: "Health, retirement, and more",
                 content: "Learn about your benefits package, including health insurance, retirement plans, and additional perks.",
-                                fileName: "Benefits Information.pdf",
+                fileName: "Benefits Information.pdf",
+                  btntext: "2",
               },
               {
                 title: "Leave Management",
                 description: "Request and track time off",
                 content: "Submit leave requests, view your balance, and track approval status for time off.",
                                 fileName: "Leave Management.pdf",
+                                  btntext: "3",
               },
               {
                 title: "Payroll Information",
                 description: "Pay slips and tax documents",
                 content: "Access your pay slips, tax documents, and manage your payment details.",
                                 fileName: "Payroll Information.pdf",
+                                  btntext: "4",
               },
               {
                 title: "Employee Directory",
                 description: "Find and connect with colleagues",
                 content: "View details of all employees including contact information and certifications.",
                                 fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+                                  btntext: "5",
               },
             ].map((card, i) => (
               <Card key={i} className="sk-card">
@@ -931,7 +936,10 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                       }
                     }}
                   >
-                    View {card.title.split(" ")[0]}
+                    {/*}
+                    View {card.title.split(" ")[0]} */}
+                    card.btntext
+
                   </Button>
                 </CardContent>
               </Card>
