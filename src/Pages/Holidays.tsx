@@ -21,9 +21,11 @@ interface Holiday {
 const Holidays = () => {
   const today = new Date();
 
-  // 🔹 Selected year (default = current year, you can change to 2026 if you want)
-const [year, setYear] = useState<number>(2026);
+  // 🔹 Selected year for data (holidays API)
+  const [year, setYear] = useState<number>(today.getFullYear());
 
+  // 🔹 Calendar currently visible month (always starts at *current* month/year)
+  const [month, setMonth] = useState<Date>(() => new Date());
 
   // dynamic data state
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -86,49 +88,6 @@ const [year, setYear] = useState<number>(2026);
     []
   );
 
-  // --- Calendar Initial Month Logic ---
-  const sortedHolidays = useMemo(
-    () => [...holidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
-    [holidays]
-  );
-
-  const currentMonthHolidays = useMemo(
-    () =>
-      sortedHolidays.filter(
-        (h) =>
-          h.date.getMonth() === today.getMonth() &&
-          h.date.getFullYear() === today.getFullYear()
-      ),
-    [sortedHolidays, today]
-  );
-
-  const lastCurrentMonthHoliday =
-    currentMonthHolidays.length > 0
-      ? currentMonthHolidays[currentMonthHolidays.length - 1].date
-      : null;
-
-  let initialCalendarMonth: Date | undefined = today;
-
-  if (year !== today.getFullYear()) {
-    if (sortedHolidays.length > 0) {
-      initialCalendarMonth = sortedHolidays[0].date;
-    }
-  } else {
-    if (
-      lastCurrentMonthHoliday &&
-      today.getTime() > lastCurrentMonthHoliday.getTime()
-    ) {
-      const nextUpcomingHoliday = sortedHolidays.find(
-        (h) => h.date.getTime() > today.getTime()
-      );
-      if (nextUpcomingHoliday) {
-        initialCalendarMonth = nextUpcomingHoliday.date;
-      }
-    }
-  }
-
-  const [month, setMonth] = useState<Date | undefined>(initialCalendarMonth);
-
   const isHoliday = (day: Date) => {
     return holidays.some(
       (holiday) =>
@@ -155,14 +114,7 @@ const [year, setYear] = useState<number>(2026);
     return map;
   }, [holidays, ALL_MONTHS, year]);
 
-  const orderedMonths = useMemo(() => {
-    const currentMonthName = today.toLocaleString("default", { month: "long" });
-    const startIndex = ALL_MONTHS.indexOf(currentMonthName);
-    if (startIndex === -1) return ALL_MONTHS;
-    const monthsFromCurrent = ALL_MONTHS.slice(startIndex);
-    const monthsBeforeCurrent = ALL_MONTHS.slice(0, startIndex);
-    return [...monthsFromCurrent, ...monthsBeforeCurrent];
-  }, [ALL_MONTHS, today]);
+  const orderedMonths = ALL_MONTHS;
 
   return (
     <div className="space-y-8">
@@ -179,7 +131,12 @@ const [year, setYear] = useState<number>(2026);
           <span className="text-sm text-muted-foreground">Year:</span>
           <select
             value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
+            onChange={(e) => {
+              const newYear = Number(e.target.value);
+              // ✅ Only update which year's holidays to load
+              setYear(newYear);
+             
+            }}
             className="border rounded px-2 py-1 text-sm"
           >
             <option value={2024}>2024</option>
@@ -210,7 +167,6 @@ const [year, setYear] = useState<number>(2026);
               mode="default"
               month={month}
               onMonthChange={setMonth}
-              defaultMonth={initialCalendarMonth}
               modifiers={{
                 holiday: isHoliday,
               }}
