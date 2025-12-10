@@ -121,9 +121,7 @@ const Holidays = () => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold mb-1">Company Holidays</h1>
-          <p className="text-muted-foreground">
-            Official holidays and time off schedule for {year}
-          </p>
+
         </div>
 
         {/* 🔹 Year selector */}
@@ -229,26 +227,16 @@ const Holidays = () => {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Holiday Policy Highlights ...</CardTitle>
-          <CardDescription>
-            Key points from our company holiday policy
-          </CardDescription>
-        </CardHeader>
+
         <CardContent>
-          <ul className="space-y-3 list-disc pl-6">
-            <li>
-              <span className="font-medium">Observed Holidays:</span>{" "}
-              SecureKloud observes the holidays listed above.
-            </li>
-          </ul>
+
           <div className="mt-4 p-4 bg-securekloud-50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <CalendarIcon className="h-5 w-5 text-securekloud-700" />
               <h3 className="font-medium">Time Off Requests</h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              For additional time off requests, please submit your request
+              For time off requests, please submit your request
               through the{" "}
               <a
                 href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
@@ -256,7 +244,7 @@ const Holidays = () => {
                 rel="noopener noreferrer"
                 className="text-blue-600 underline font-medium hover:text-blue-800 cursor-pointer"
               >
-                HR Portal
+                ADP Portal
               </a>
               .
             </p>
