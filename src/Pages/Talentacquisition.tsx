@@ -560,18 +560,7 @@ const TalentAcquisition = () => {
           </div>
 
           {/* Talent Acquisition Resources with Modal */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Talent Acquisition Resources</CardTitle>
-              <CardDescription>
-                Tools to help you refer the best candidates
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Access detailed job descriptions for all open positions.</p>
-              <ViewDescriptionsModal opportunities={opportunities} />
-            </CardContent>
-          </Card>
+         
         </TabsContent>
       </Tabs>
     </div>
