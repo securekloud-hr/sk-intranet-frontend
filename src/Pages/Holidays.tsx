@@ -24,6 +24,10 @@ const Holidays = () => {
   // 🔹 Selected year for data (holidays API)
   const [year, setYear] = useState<number>(today.getFullYear());
 
+  // 🔹 Years coming from backend (for dropdown)
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [yearsLoading, setYearsLoading] = useState<boolean>(true);
+
   // 🔹 Calendar currently visible month (always starts at *current* month/year)
   const [month, setMonth] = useState<Date>(() => new Date());
 
@@ -32,7 +36,39 @@ const Holidays = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // fetch from backend for the selected year
+  // 🔹 Fetch years from backend once
+  useEffect(() => {
+    const loadYears = async () => {
+      try {
+        setYearsLoading(true);
+        const res = await fetch(`${API}/api/holidays/years?region=IN`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = (await res.json()) as { years: number[] };
+
+        const yrs = (data.years || [])
+          .map((y) => Number(y))
+          .filter((y) => !Number.isNaN(y))
+          .sort((a, b) => a - b);
+
+        setAvailableYears(yrs);
+
+        // if current year is not in list, default to latest year
+        if (yrs.length > 0 && !yrs.includes(year)) {
+          setYear(yrs[yrs.length - 1]);
+        }
+      } catch (err) {
+        console.error("Failed to load years:", err);
+      } finally {
+        setYearsLoading(false);
+      }
+    };
+
+    loadYears();
+  }, []); // run once on mount
+
+  // 🔹 Fetch holidays whenever `year` changes
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -121,26 +157,25 @@ const Holidays = () => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold mb-1">Company Holidays</h1>
-
         </div>
 
-        {/* 🔹 Year selector */}
+        {/* 🔹 Year selector (now dynamic) */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Year:</span>
           <select
             value={year}
             onChange={(e) => {
               const newYear = Number(e.target.value);
-              // ✅ Only update which year's holidays to load
               setYear(newYear);
-             
             }}
+            disabled={yearsLoading || availableYears.length === 0}
             className="border rounded px-2 py-1 text-sm"
           >
-            <option value={2024}>2024</option>
-            <option value={2025}>2025</option>
-            <option value={2026}>2026</option>
-            <option value={2027}>2027</option>
+            {availableYears.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -158,7 +193,9 @@ const Holidays = () => {
         <Card>
           <CardHeader>
             <CardTitle>Holiday Calendar</CardTitle>
-            <CardDescription>Calendar view of all company holidays (across all years)</CardDescription>
+            <CardDescription>
+              Calendar view of all company holidays (across all years)
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Calendar
@@ -173,15 +210,12 @@ const Holidays = () => {
               }}
             />
 
-
-
-             <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 mt-4">
               <CalendarIcon className="h-5 w-5 text-securekloud-700" />
               <h3 className="font-medium">Time Off Requests</h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              For time off requests, please submit your request
-              through the{" "}
+              For time off requests, please submit your request through the{" "}
               <a
                 href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
                 target="_blank"
@@ -192,9 +226,6 @@ const Holidays = () => {
               </a>
               .
             </p>
-
-
-
           </CardContent>
         </Card>
 
@@ -248,8 +279,6 @@ const Holidays = () => {
           </CardContent>
         </Card>
       </div>
-
-
     </div>
   );
 };
