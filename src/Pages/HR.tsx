@@ -57,26 +57,26 @@ interface Employee {
 const formsData = {
   onboarding: [
     { name: "Access Request Form", DWNfileName: "Access_Request_Form.docx", fileName: "Access_Request_Form.pdf", updated: "Jun 16, 2025", purpose: "For email Id & other access creation" },
-    { name: "Employee Information Form", DWNfileName: "Employee_Information_Form.docx", fileName: "Employee_Information_Form.docx", updated: "Jun 16, 2025", purpose: "Employee master details" },
+    { name: "Employee Information Form", DWNfileName: "Employee_Information_Form.docx", fileName: "Employee_Information_Form.pdf", updated: "Jun 16, 2025", purpose: "Employee master details" },
     { name: "Form11",  DWNfileName: "Form11.docx", fileName: "Form11.pdf", updated: "Jun 16, 2025", purpose: "Provident Fund eligibility and compliance under EPF regulations." },
     { name: "Gratuity Nomination Form",  DWNfileName: "Gratuity_Nomination_Form.docx", fileName: "Gratuity_Nomination_Form.pdf", updated: "Jun 16, 2025", purpose: "To nominate a beneficiary to receive gratuity benefits in the absence of the employee" },
     { name: "Insurance Enrolment Form",  DWNfileName: "Insurance_Enrolment_Form.docx", fileName: "Insurance_Enrolment_Form.pdf", updated: "Jun 16, 2025", purpose: "To capture employee & dependents details for coverage under the Group Mediclaim Policy" },
     { name: "Letter of Undertaking Onboarding",  DWNfileName: "Letter_of_Undertaking.docx", fileName: "Letter_of_Undertaking.pdf", updated: "Jun 16, 2025", purpose: "To confirm the employee’s acceptance of company policies, rules, and responsibilities." },
   ],
   bgv: [
-    { name: "Candidate Information form",  DWNfileName: "Candidate_Information_form_BGV.docx", fileName: "Candidate_Information_form_BGV1111.pdf", updated: "Jun 16, 2025", purpose: "To Collect personal, academic, and professional details required for background verification." },
+    { name: "Candidate Information form",  DWNfileName: "Candidate_Information_form_BGV.docx", fileName: "Candidate_Information_form_BGV.pdf", updated: "Jun 16, 2025", purpose: "To Collect personal, academic, and professional details required for background verification." },
     { name: "Letter of Authorization",  DWNfileName: "Letter_of_Authorization_BGV.docx", fileName: "Letter_of_Authorization_BGV.pdf", updated: "Jun 16, 2025", purpose: "To grant consent for verifying the candidate’s details" },
   ],
   rewards: [
     { name: "Nomination Form - Star of the Quarter",  DWNfileName: "Nomination_Star_Quarter.docx", fileName: "Nomination_Star_Quarter.pdf", updated: "Jun 16, 2025" },
     { name: "Nomination Form - Team of the Quarter",  DWNfileName: "Nomination_Team_Quarter.docx", fileName: "Nomination_Team_Quarter.pdf", updated: "Jun 16, 2025" },
-    { name: "Nomination Form - Associate of the Year",  DWNfileName: ".docx", fileName: "Nomination_Associate_Year.pdf", updated: "Jun 16, 2025" },
-    { name: "Nomination Form - Team of the Year",  DWNfileName: "Nomination_Associate_Year.docx", fileName: "Nomination_Team_Year.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Associate of the Year",  DWNfileName: "Nomination_Associate_Year.docx", fileName: "Nomination_Associate_Year.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Team of the Year",  DWNfileName: "Nomination_Team_Year.docx", fileName: "Nomination_Team_Year.pdf", updated: "Jun 16, 2025" },
   ],
   others: [
     { name: "Contract Invoice Template ",  DWNfileName: "Contract_Invoice_Template.docx", fileName: "Contract_Invoice_Template.pdf", updated: "Jun 16, 2025", purpose: "To standardize billing details for services rendered under a contract." },
     { name: "Contract Timesheet Template",  DWNfileName: "Contract_Timesheet_Template.docx", fileName: "Contract_Timesheet_Template.pdf", updated: "Jun 16, 2025", purpose: "To record and track hours worked by contract employees for payment processing." },
-    { name: "Expense Reimbursement Form ",  DWNfileName: "Expense.docx", fileName: "Expense Reimbursement Form.pdf", updated: "Jun 16, 2025", purpose: "To claim and process repayment of business/certifications related expenses incurred by employees." },
+    { name: "Expense Reimbursement Form ",  DWNfileName: "Expense_Reimbursement_Form.docx", fileName: "Expense_Reimbursement_Form.pdf", updated: "Jun 16, 2025", purpose: "To claim and process repayment of business/certifications related expenses incurred by employees." },
     { name: "Induction Feedback Form",  DWNfileName: "Induction_Feedback_Form.docx", fileName: "Induction_Feedback_Form.pdf", updated: "Jun 16, 2025", purpose: "To gather employee feedback on the onboarding and induction program for improvement." },
     { name: "Intern to Onroll Movement Template",  DWNfileName: "Intern_to_Onroll_Template.docx", fileName: "Intern_to_Onroll_Template.pdf", updated: "Jun 16, 2025", purpose: "To formalize and document the transition of an intern to a full-time employee." },
     { name: "PIP Letter Template",  DWNfileName: "PIP_Letter_Template.docx", fileName: "PIP_Letter_Template.pdf", updated: "Jun 16, 2025", purpose: "To outline performance concerns and set clear goals for employee improvement within a defined timeframe." },
