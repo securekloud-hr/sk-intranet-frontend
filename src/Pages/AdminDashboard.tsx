@@ -49,15 +49,16 @@ interface Event {
   description?: string;
   registrationOpen?: boolean;
 }
-
 interface Registration {
   _id: string;
   user: string;
   email: string;
+  empId?: string;      // ✅ new
   eventId: string;
   eventName: string;
   createdAt?: string;
 }
+
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -214,7 +215,8 @@ export default function AdminDashboard() {
 
   try {
     // ✅ correct backend URL
-    const res = await fetch(`${API}/api/registrations/event/${ev._id}`);
+    const res = await fetch(`${API}/api/registerEvent/event/${ev._id}`);
+
     if (!res.ok) throw new Error(await res.text());
 
     // ✅ backend returns { success, count, data }
@@ -675,21 +677,28 @@ export default function AdminDashboard() {
 
             {!regLoading && !regError && registrations.length > 0 && (
               <ul className="space-y-2 max-h-80 overflow-y-auto">
-                {registrations.map((r) => (
-                  <li
-                    key={r._id}
-                    className="border rounded-md p-2 text-sm space-y-0.5"
-                  >
-                    <div className="font-medium">{r.user}</div>
-                    <div className="text-muted-foreground">{r.email}</div>
-                    {r.createdAt && (
-                      <div className="text-xs text-muted-foreground">
-                        Registered on{" "}
-                        {new Date(r.createdAt).toLocaleString()}
-                      </div>
-                    )}
-                  </li>
-                ))}
+               {registrations.map((r) => (
+  <li
+    key={r._id}
+    className="border rounded-md p-2 text-sm space-y-0.5"
+  >
+    <div className="font-medium">
+      {r.user}
+      {r.empId && (
+        <span className="ml-1 text-xs text-muted-foreground">
+          ({r.empId})
+        </span>
+      )}
+    </div>
+    <div className="text-muted-foreground">{r.email}</div>
+    {r.createdAt && (
+      <div className="text-xs text-muted-foreground">
+        Registered on {new Date(r.createdAt).toLocaleString()}
+      </div>
+    )}
+  </li>
+))}
+
               </ul>
             )}
           </DialogContent>
