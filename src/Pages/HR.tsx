@@ -1,4 +1,4 @@
-﻿﻿﻿import React, { useState, useEffect } from "react";
+﻿﻿﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
 
 import {
@@ -56,37 +56,37 @@ interface Employee {
 
 const formsData = {
   onboarding: [
-    { name: "Access Request Form", fileName: "Access Request Form (1).docx", updated: "Jun 16, 2025", purpose: "For email Id & other access creation" },
-    { name: "Employee Information Form", fileName: "Employee_Information_FormV1.0(1).docx", updated: "Jun 16, 2025", purpose: "Employee master details" },
-    { name: "Form11", fileName: "Form11.pdf", updated: "Jun 16, 2025", purpose: "Provident Fund eligibility and compliance under EPF regulations." },
-    { name: "Gratuity Nomination Form", fileName: "Gratuity_Nomination_Form.pdf", updated: "Jun 16, 2025", purpose: "To nominate a beneficiary to receive gratuity benefits in the absence of the employee" },
-    { name: "Insurance Enrolment Form", fileName: "Insurance_Enrolment_Form.pdf", updated: "Jun 16, 2025", purpose: "To capture employee & dependents details for coverage under the Group Mediclaim Policy" },
-    { name: "Letter of Undertaking Onboarding", fileName: "Letter_of_Undertaking_Onboarding.pdf", updated: "Jun 16, 2025", purpose: "To confirm the employee’s acceptance of company policies, rules, and responsibilities." },
+    { name: "Access Request Form", DWNfileName: "Access_Request_Form.docx", fileName: "Access_Request_Form.pdf", updated: "Jun 16, 2025", purpose: "For email Id & other access creation" },
+    { name: "Employee Information Form", DWNfileName: "Employee_Information_Form.docx", fileName: "Employee_Information_Form.docx", updated: "Jun 16, 2025", purpose: "Employee master details" },
+    { name: "Form11",  DWNfileName: "Form11.docx", fileName: "Form11.pdf", updated: "Jun 16, 2025", purpose: "Provident Fund eligibility and compliance under EPF regulations." },
+    { name: "Gratuity Nomination Form",  DWNfileName: "Gratuity_Nomination_Form.docx", fileName: "Gratuity_Nomination_Form.pdf", updated: "Jun 16, 2025", purpose: "To nominate a beneficiary to receive gratuity benefits in the absence of the employee" },
+    { name: "Insurance Enrolment Form",  DWNfileName: "Insurance_Enrolment_Form.docx", fileName: "Insurance_Enrolment_Form.pdf", updated: "Jun 16, 2025", purpose: "To capture employee & dependents details for coverage under the Group Mediclaim Policy" },
+    { name: "Letter of Undertaking Onboarding",  DWNfileName: "Letter_of_Undertaking.docx", fileName: "Letter_of_Undertaking.pdf", updated: "Jun 16, 2025", purpose: "To confirm the employee’s acceptance of company policies, rules, and responsibilities." },
   ],
   bgv: [
-    { name: "Candidate Information form", fileName: "Candidate_Information_form_BGV.pdf", updated: "Jun 16, 2025", purpose: "To Collect personal, academic, and professional details required for background verification." },
-    { name: "Letter of Authorization", fileName: "Letter_of_Authorization_BGV.pdf", updated: "Jun 16, 2025", purpose: "To grant consent for verifying the candidate’s details" },
+    { name: "Candidate Information form",  DWNfileName: "Candidate_Information_form_BGV.docx", fileName: "Candidate_Information_form_BGV1111.pdf", updated: "Jun 16, 2025", purpose: "To Collect personal, academic, and professional details required for background verification." },
+    { name: "Letter of Authorization",  DWNfileName: "Letter_of_Authorization_BGV.docx", fileName: "Letter_of_Authorization_BGV.pdf", updated: "Jun 16, 2025", purpose: "To grant consent for verifying the candidate’s details" },
   ],
   rewards: [
-    { name: "Nomination Form - Star of the Quarter", fileName: "Nomination_Star_Quarter.pdf", updated: "Jun 16, 2025" },
-    { name: "Nomination Form - Team of the Quarter", fileName: "Nomination_Team_Quarter.pdf", updated: "Jun 16, 2025" },
-    { name: "Nomination Form - Associate of the Year", fileName: "Nomination_Associate_Year.pdf", updated: "Jun 16, 2025" },
-    { name: "Nomination Form - Team of the Year", fileName: "Nomination_Team_Year.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Star of the Quarter",  DWNfileName: "Nomination_Star_Quarter.docx", fileName: "Nomination_Star_Quarter.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Team of the Quarter",  DWNfileName: "Nomination_Team_Quarter.docx", fileName: "Nomination_Team_Quarter.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Associate of the Year",  DWNfileName: ".docx", fileName: "Nomination_Associate_Year.pdf", updated: "Jun 16, 2025" },
+    { name: "Nomination Form - Team of the Year",  DWNfileName: "Nomination_Associate_Year.docx", fileName: "Nomination_Team_Year.pdf", updated: "Jun 16, 2025" },
   ],
   others: [
-    { name: "Contract Invoice Template ", fileName: "Contract_Invoice_Template.pdf", updated: "Jun 16, 2025", purpose: "To standardize billing details for services rendered under a contract." },
-    { name: "Contract Timesheet Template", fileName: "Contract_Timesheet_Template.pdf", updated: "Jun 16, 2025", purpose: "To record and track hours worked by contract employees for payment processing." },
-    { name: "Expense Reimbursement Form ", fileName: "Expense Reimbursement Form.docx", updated: "Jun 16, 2025", purpose: "To claim and process repayment of business/certifications related expenses incurred by employees." },
-    { name: "Induction Feedback Form", fileName: "Induction_Feedback_Form.pdf", updated: "Jun 16, 2025", purpose: "To gather employee feedback on the onboarding and induction program for improvement." },
-    { name: "Intern to Onroll Movement Template", fileName: "Intern_to_Onroll_Template.pdf", updated: "Jun 16, 2025", purpose: "To formalize and document the transition of an intern to a full-time employee." },
-    { name: "PIP Letter Template", fileName: "PIP_Letter_Template_2.pdf", updated: "Jun 16, 2025", purpose: "To outline performance concerns and set clear goals for employee improvement within a defined timeframe." },
+    { name: "Contract Invoice Template ",  DWNfileName: "Contract_Invoice_Template.docx", fileName: "Contract_Invoice_Template.pdf", updated: "Jun 16, 2025", purpose: "To standardize billing details for services rendered under a contract." },
+    { name: "Contract Timesheet Template",  DWNfileName: "Contract_Timesheet_Template.docx", fileName: "Contract_Timesheet_Template.pdf", updated: "Jun 16, 2025", purpose: "To record and track hours worked by contract employees for payment processing." },
+    { name: "Expense Reimbursement Form ",  DWNfileName: "Expense.docx", fileName: "Expense Reimbursement Form.pdf", updated: "Jun 16, 2025", purpose: "To claim and process repayment of business/certifications related expenses incurred by employees." },
+    { name: "Induction Feedback Form",  DWNfileName: "Induction_Feedback_Form.docx", fileName: "Induction_Feedback_Form.pdf", updated: "Jun 16, 2025", purpose: "To gather employee feedback on the onboarding and induction program for improvement." },
+    { name: "Intern to Onroll Movement Template",  DWNfileName: "Intern_to_Onroll_Template.docx", fileName: "Intern_to_Onroll_Template.pdf", updated: "Jun 16, 2025", purpose: "To formalize and document the transition of an intern to a full-time employee." },
+    { name: "PIP Letter Template",  DWNfileName: "PIP_Letter_Template.docx", fileName: "PIP_Letter_Template.pdf", updated: "Jun 16, 2025", purpose: "To outline performance concerns and set clear goals for employee improvement within a defined timeframe." },
   ],
   separation: [
-    { name: "Associate Clearance Form", fileName: "Associate_Clearance_Form.pdf", updated: "Jun 16, 2025", purpose: "To ensure all company assets and responsibilities are settled before an employee’s departure." },
-    { name: "Exit Interview Template", fileName: "Exit_Interview_Template.pdf", updated: "Jun 16, 2025", purpose: "To capture feedback from departing employees to identify areas for organizational improvement." },
-    { name: "Gratuity Declaration Form", fileName: "Gratuity_Declaration_Form.pdf", updated: "Jun 16, 2025", purpose: "To confirm and process the employee’s eligibility and claim for gratuity benefits." },
-    { name: "Leave Encashment Declaration Form", fileName: "Leave_Encashment_Declaration_Form.pdf", updated: "Jun 16, 2025", purpose: "To document and process payment for an employee’s unused leave balance." },
-    { name: "Letter of Undertaking Separation", fileName: "Letter_of_Undertaking(2).pdf", updated: "Jun 16, 2025", purpose: "To confirm the employee’s compliance with pending obligations and company policies after resignation." },
+    { name: "Associate Clearance Form",  DWNfileName: "Associate_Clearance_Form.docx", fileName: "Associate_Clearance_Form.pdf", updated: "Jun 16, 2025", purpose: "To ensure all company assets and responsibilities are settled before an employee’s departure." },
+    { name: "Exit Interview Template",  DWNfileName: "Exit_Interview_Template.docx", fileName: "Exit_Interview_Template.pdf", updated: "Jun 16, 2025", purpose: "To capture feedback from departing employees to identify areas for organizational improvement." },
+    { name: "Gratuity Declaration Form",  DWNfileName: "Gratuity_Declaration_Form.docx", fileName: "Gratuity_Declaration_Form.pdf", updated: "Jun 16, 2025", purpose: "To confirm and process the employee’s eligibility and claim for gratuity benefits." },
+    { name: "Leave Encashment Declaration Form",  DWNfileName: "Leave_Encashment_Declaration_Form.docx", fileName: "Leave_Encashment_Declaration_Form.pdf", updated: "Jun 16, 2025", purpose: "To document and process payment for an employee’s unused leave balance." },
+    { name: "Letter of Undertaking Separation",  DWNfileName: "Letter_of_Undertaking.docx", fileName: "Letter_of_Undertaking.pdf", updated: "Jun 16, 2025", purpose: "To confirm the employee’s compliance with pending obligations and company policies after resignation." },
   ],
 };
 
@@ -636,6 +636,7 @@ const [pipData, setPipData] = useState({
   const [isDocx, setIsDocx] = useState(false); // Flag for .docx files
   const [showDocModal, setShowDocModal] = useState(false);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
   // Map HR team to employee directory for email/phone where applicable
  
@@ -647,45 +648,77 @@ const [pipData, setPipData] = useState({
       phone: hrMatch ? hrMatch.phone : "N/A",
     };
   });
+  const handleView = async (fileName: string) => {
+  if (!fileName) {
+    alert("File name is missing");
+    return;
+  }
 
-  const handleView = async (fileName) => {
-    if (fileName) {
-      const filePath = `/files/${fileName}`;
+  const filePath = `/files/${fileName}`;
 
+  try {
+    // 🔹 Actually fetch the file
+    const res = await fetch(filePath);
+    const contentType = (res.headers.get("content-type") || "").toLowerCase();
 
-      setDocToView(filePath);
-      if (fileName.endsWith('.docx')) {
-        setIsDocx(true);
-        try {
-          const response = await fetch(filePath);
-          const arrayBuffer = await response.arrayBuffer();
-          const result = await mammoth.convertToHtml({ arrayBuffer });
-          setDocContent(result.value);
-        } catch (error) {
-          console.error("Error rendering .docx:", error);
-          alert("Failed to render .docx file.");
-          return;
-        }
-      } else {
-        setIsDocx(false);
-        setDocContent(null);
-      }
+    const isPdf =
+      fileName.toLowerCase().endsWith(".pdf") || contentType.includes("pdf");
+    const isDocx =
+      fileName.toLowerCase().endsWith(".docx") ||
+      contentType.includes("officedocument.wordprocessingml.document");
+
+    // ❌ If 404 / 500 OR it's actually HTML (your app) → show error
+    if (!res.ok || (!isPdf && !isDocx)) {
+      setPreviewError("Document not found. Please contact HR.");
+      setDocToView(null);
+      setDocContent(null);
+      setIsDocx(false);
       setShowDocModal(true);
-    } else {
-      alert("File not found for: " + fileName);
+      return;
     }
-  };
 
-  const handleDownload = (fileName) => {
-    if (fileName) {
+    // ✅ Clear any old error
+    setPreviewError(null);
+
+    if (isDocx) {
+      // ─── DOCX: convert to HTML using mammoth ───
+      const arrayBuffer = await res.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+
+      setIsDocx(true);
+      setDocContent(result.value);
+      setDocToView(null);
+    } else {
+      // ─── PDF: create a blob URL and show in iframe ───
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      setIsDocx(false);
+      setDocContent(null);
+      setDocToView(url);
+    }
+
+    setShowDocModal(true);
+  } catch (error) {
+    console.error("Error checking / loading document:", error);
+    setPreviewError("Unable to load document. Please try again later.");
+    setDocToView(null);
+    setDocContent(null);
+    setIsDocx(false);
+    setShowDocModal(true);
+  }
+};
+
+  const handleDownload = (DWNfileName) => {
+    if (DWNfileName) {
       const link = document.createElement("a");
-      link.href = `/files/${fileName}`;
-      link.download = fileName;
+      link.href = `/files/${DWNfileName}`;
+      link.download = DWNfileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } else {
-      alert("File not found for: " + fileName);
+      alert("File not found for: " + DWNfileName);
     }
   };
   const handleSubmit = (fileName) => {
@@ -798,7 +831,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
               {/* ⬇ Download */}
               <a
-                href={`/files/${form.fileName}`}
+                href={`/files/${form.DWNfileName}`}
                 download
                 className={`text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center ${
                   isSubmitting ? "opacity-60 pointer-events-none" : ""
@@ -873,79 +906,83 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
           <TabsTrigger value="forms">HR Forms</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="resources" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-             {
-                title: "Employee Handbook",
-                description: "Company policies and procedures",
-                content: "Access the employee handbook containing all company policies, procedures, and guidelines",
-                fileName: "Employee_Handbook_SecureKloud_2025.pdf",
-                btntext: "View Employee Handbook",
-              },
-              {
-                title: "Benefits Information",
-                description: "Health, retirement, and more",
-                content: "Learn about your benefits package, including health insurance, retirement plans, and additional perks",
-                fileName: "Benefits Information.pdf",
-                  btntext: "View benefits information",
-              },
-              {
-                title: "Leave Management",
-                description: "Request and track time off",
-                content: "Information on leave process and balance",
-                fileName: "Leave Management.pdf",
-                btntext: "View Leave process information",
-              },
-              {
-                title: "Payroll Information",
-                description: "Payroll & tax information",
-                content: "Access information on payroll and tax",
-                fileName: "Payroll Information.pdf",
-                btntext: "View Payroll process information",
-              },
-              {
-                title: "Employee Directory",
-                description: "Find and connect with colleagues",
-                content: "View details of all employees including contact information and certifications.",
-                 fileName: "Employee_Handbook_SecureKloud_2025.pdf",
-                 btntext: "Search & View Employee Details",
-              },
-            ].map((card, i) => (
-              <Card key={i} className="sk-card">
-                <CardHeader>
-                  <CardTitle>{card.title}</CardTitle>
-                  <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm mb-4">{card.content}</p>
-                  <Button
-                    variant="outline"
-                    className="w-full border-skcloud-purple text-skcloud-purple hover:bg-skcloud-purple hover:text-white"
-                    onClick={() => {
-                      if (card.title === "Payroll Information" && card.fileName) {
-                        handleView(card.fileName);
-                      } else if (card.title === "Benefits Information"  && card.fileName) {
-                        handleView(card.fileName);
-                      } else if (card.title === "Leave Management"  && card.fileName) {
-                        handleView(card.fileName);
-                      } else if (card.title === "Employee Directory") {
-                        setShowEmployeeModal(true);
-                      } else if (card.title === "Employee Handbook" && card.fileName) {
-                        handleView(card.fileName);
-                      }
-                    }}
-                  >
-                    {/*}
-                    View {card.title.split(" ")[0]} */}
-                    {card.btntext}
+       <TabsContent value="resources" className="mt-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {[
+      {
+        title: "Employee Handbook",
+        description: "Company policies and procedures",
+        content:
+          "Access the employee handbook containing all company policies, procedures, and guidelines",
+        fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+        btntext: "View Employee Handbook",
+      },
+      {
+        title: "Benefits Information",
+        description: "Health, retirement, and more",
+        content:
+          "Learn about your benefits package, including health insurance, retirement plans, and additional perks",
+        fileName: "Benefits Information.pdf",
+        btntext: "View benefits information",
+      },
+      {
+        title: "Leave Management",
+        description: "Request and track time off",
+        content: "Information on leave process and balance",
+        fileName: "Leave Management.pdf",
+        btntext: "View Leave process information",
+      },
+      {
+        title: "Payroll Information",
+        description: "Payroll & tax information",
+        content: "Access information on payroll and tax",
+        fileName: "Payroll Information.pdf",
+        btntext: "View Payroll process information",
+      },
+      {
+        title: "Employee Directory",
+        description: "Find and connect with colleagues",
+        content:
+          "View details of all employees including contact information and certifications.",
+        fileName: "Employee_Handbook_SecureKloud_2025.pdf",
+        btntext: "Search & View Employee Details",
+      },
+    ].map((card, i) => (
+      <Card key={i} className="sk-card h-full flex flex-col">
+        <CardHeader>
+          <CardTitle>{card.title}</CardTitle>
+          <CardDescription>{card.description}</CardDescription>
+        </CardHeader>
 
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+        {/* make content fill height, button sits at bottom */}
+        <CardContent className="flex flex-col flex-1">
+          <p className="text-sm mb-4 flex-1">{card.content}</p>
+
+          <Button
+            variant="outline"
+            className="mt-auto w-full border-skcloud-purple text-skcloud-purple hover:bg-skcloud-purple hover:text-white"
+            onClick={() => {
+              if (card.title === "Payroll Information" && card.fileName) {
+                handleView(card.fileName);
+              } else if (card.title === "Benefits Information" && card.fileName) {
+                handleView(card.fileName);
+              } else if (card.title === "Leave Management" && card.fileName) {
+                handleView(card.fileName);
+              } else if (card.title === "Employee Directory") {
+                setShowEmployeeModal(true);
+              } else if (card.title === "Employee Handbook" && card.fileName) {
+                handleView(card.fileName);
+              }
+            }}
+          >
+            {card.btntext}
+          </Button>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+</TabsContent>
+
 
         <TabsContent value="team" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -984,7 +1021,8 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
     }
   }}
 >
-
+  
+  
 
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -4200,29 +4238,56 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
         </DialogContent>
       </Dialog>
         {/* Document View Modal */}
-      <Dialog open={showDocModal} onOpenChange={setShowDocModal}>
-        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
-          <DialogHeader className="px-4 pt-4 pb-2">
-            <DialogTitle>Document Preview</DialogTitle>
-          </DialogHeader>
-          {docToView ? (
-            isDocx ? (
-              <div
-                className="p-4 overflow-y-auto h-[calc(90vh-60px)]"
-                dangerouslySetInnerHTML={{ __html: docContent }}
-              />
-            ) : (
-              <iframe
-                src={`${docToView}#toolbar=1&navpanes=0&view=fitH`}
-                title="Document Viewer"
-                className="w-full h-[90vh]"
-              />
-            )
-          ) : (
-            <p className="text-sm text-muted-foreground">No document selected</p>
-          )}
-        </DialogContent>
-      </Dialog>
+     <Dialog
+  open={showDocModal}
+  onOpenChange={(open) => {
+    setShowDocModal(open);
+    if (!open) {
+      // reset preview state when closing
+      setDocToView(null);
+      setDocContent(null);
+      setPreviewError(null);
+      setIsDocx(false);
+    }
+  }}
+>
+  <DialogContent className="w-[95vw] sm:max-w-[95vw] h-[90vh]">
+
+    <DialogHeader>
+      <DialogTitle>Document Preview</DialogTitle>
+    </DialogHeader>
+
+    {/* 🔹 If there is an error, show "not found" message */}
+    {previewError ? (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <p className="text-red-600 font-medium mb-2">Document not found</p>
+        <p className="text-sm text-gray-500 max-w-md">
+          The requested file could not be loaded. It may be missing or the name
+          is incorrect. Please contact HR if you believe this is a mistake.
+        </p>
+      </div>
+    ) : isDocx && docContent ? (
+      // 🔹 Render DOCX as HTML
+      <div
+        className="h-full overflow-auto border rounded p-4 bg-white"
+        dangerouslySetInnerHTML={{ __html: docContent }}
+      />
+    ) : docToView ? (
+      // 🔹 Render PDF in iframe
+      <iframe
+        src={docToView}
+        className="w-full h-full border rounded"
+        title="Document preview"
+      />
+    ) : (
+      // Fallback while loading
+      <div className="flex items-center justify-center h-full text-sm text-gray-500">
+        Loading document…
+      </div>
+    )}
+  </DialogContent>
+</Dialog>
+
 {/* Employee Directory Dialog */}
 {/* Employee Directory Dialog */}
 {/* Employee Directory Dialog */}

@@ -482,81 +482,84 @@ const OrgChart: React.FC = () => {
       {/* Executive Branches - Orange level */}
 
 
-      {/* Executive Branches - Orange level */}
-      <div className="flex flex-row flex-wrap gap-4 mt-8">
-        {branches.map((branch) => (
-          <div key={branch.id} className="space-y-2 w-[260px]">
-            {/* Executive Card - Orange */}
-            <Card
-              className={`p-4 ${
-                branch.color || "bg-orange-500"
-              } text-white shadow-lg rounded-lg cursor-pointer hover:shadow-xl transition-all transform hover:scale-105`}
-              onClick={() => toggleExpansion("branch", branch.id)}
-            >
-              <div className="flex flex-col items-center space-y-3">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-orange-600" />
-                </div>
+            {/* Executive Branches - Orange level (centered) */}
+      <div className="w-full flex justify-center mt-8">
+        <div className="flex flex-row flex-wrap justify-center gap-6">
+          {branches.map((branch) => (
+            <div key={branch.id} className="space-y-2 w-[260px]">
+              {/* Executive Card - Orange */}
+              <Card
+                className={`p-4 ${
+                  branch.color || "bg-orange-500"
+                } text-white shadow-lg rounded-lg cursor-pointer hover:shadow-xl transition-all transform hover:scale-105`}
+                onClick={() => toggleExpansion("branch", branch.id)}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <User className="w-6 h-6 text-orange-600" />
+                  </div>
 
-                <div className="text-center">
-                  <h4 className="font-bold text-sm">
-                    {branch.executive?.name || "Executive"}
-                  </h4>
-                  <p className="text-xs opacity-90">
-                    {branch.executive?.title ||
-                      (branch.executive as any)?.hierarchyTitle ||
-                      "Executive"}
-                  </p>
-                  <p className="text-xs mt-1 opacity-75">
-                    {(branch.departments || []).length} departments
-                  </p>
-                </div>
+                  <div className="text-center">
+                    <h4 className="font-bold text-sm">
+                      {branch.executive?.name || "Executive"}
+                    </h4>
+                    <p className="text-xs opacity-90">
+                      {branch.executive?.title ||
+                        (branch.executive as any)?.hierarchyTitle ||
+                        "Executive"}
+                    </p>
+                    <p className="text-xs mt-1 opacity-75">
+                      {(branch.departments || []).length} departments
+                    </p>
+                  </div>
 
-                <div className="text-white">
-                  {expandedBranches.has(branch.id) ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
+                  <div className="text-white">
+                    {expandedBranches.has(branch.id) ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </div>
+                </div>
+              </Card>
+
+              {/* Departments under this executive - Blue level */}
+              {expandedBranches.has(branch.id) && (
+                <div className="space-y-3 ml-2">
+                  {(branch.departments || []).map((dept) => (
+                    <DepartmentCard
+                      key={dept.id}
+                      department={dept}
+                      isExpanded={expandedDepartments.has(dept.id)}
+                      onToggle={() => toggleExpansion("department", dept.id)}
+                      expandedTeams={expandedTeams}
+                      onTeamToggle={(id) => toggleExpansion("team", id)}
+                    />
+                  ))}
+
+                  {(!branch.departments || branch.departments.length === 0) && (
+                    <Card className="p-3 bg-gray-100 border-l-4 border-l-gray-400 rounded-lg">
+                      <p className="text-sm text-gray-600 text-center">
+                        No departments found
+                      </p>
+                    </Card>
                   )}
                 </div>
-              </div>
-            </Card>
+              )}
+            </div>
+          ))}
 
-            {/* Departments under this executive - Blue level */}
-            {expandedBranches.has(branch.id) && (
-              <div className="space-y-3 ml-2">
-                {(branch.departments || []).map((dept) => (
-                  <DepartmentCard
-                    key={dept.id}
-                    department={dept}
-                    isExpanded={expandedDepartments.has(dept.id)}
-                    onToggle={() => toggleExpansion("department", dept.id)}
-                    expandedTeams={expandedTeams}
-                    onTeamToggle={(id) => toggleExpansion("team", id)}
-                  />
-                ))}
-
-                {(!branch.departments || branch.departments.length === 0) && (
-                  <Card className="p-3 bg-gray-100 border-l-4 border-l-gray-400 rounded-lg">
-                    <p className="text-sm text-gray-600 text-center">
-                      No departments found
-                    </p>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {branches.length === 0 && (
-          <div className="w-full text-center py-8">
-            <p className="text-gray-600">
-              No executive branches found. Please upload employee data.
-            </p>
-          </div>
-        )}
+          {branches.length === 0 && (
+            <div className="w-full text-center py-8">
+              <p className="text-gray-600">
+                No executive branches found. Please upload employee data.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      </div>
+
   );
 };
 
