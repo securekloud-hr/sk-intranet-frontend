@@ -843,7 +843,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
               {/* ✅ Submit */}
               {/* ❌ Hide Submit button for Onboarding tab */}
-{tabName == "onboarding" && (
+{tabName !== "onboarding" && (
   <button
     onClick={() => handleUniversalSubmit(form.fileName)}
     disabled={isSubmitting}
