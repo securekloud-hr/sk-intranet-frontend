@@ -195,7 +195,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
           email,
           subject,
           message,
-          type: "query", // 🔹 Goes to HR + CC to user (handled in backend)
+          type: "ld-skill", // 🔹 Goes to HR + CC to user (handled in backend)
         }),
       });
     } catch (err) {
