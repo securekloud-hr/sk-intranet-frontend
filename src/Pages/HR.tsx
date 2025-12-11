@@ -842,18 +842,21 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               </a>
 
               {/* ✅ Submit */}
-              <button
-                onClick={() => handleUniversalSubmit(form.fileName)}
-                disabled={isSubmitting}
-                className={`text-sm px-2 py-1 rounded-md ${
-                  isSubmitting
-                    ? "bg-green-200 text-green-800 cursor-not-allowed"
-                    : "bg-green-100 text-green-800"
-                }`}
-              >
-                Submit
+              {/* ❌ Hide Submit button for Onboarding tab */}
+{tabName == "onboarding" && (
+  <button
+    onClick={() => handleUniversalSubmit(form.fileName)}
+    disabled={isSubmitting}
+    className={`text-sm px-2 py-1 rounded-md ${
+      isSubmitting
+        ? "bg-green-200 text-green-800 cursor-not-allowed"
+        : "bg-green-100 text-green-800"
+    }`}
+  >
+    Submit
+  </button>
+)}
 
-              </button>
             </div>
 
             {/* Optional status message */}
@@ -4251,42 +4254,49 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
     }
   }}
 >
-  <DialogContent className="w-[95vw] sm:max-w-[95vw] h-[90vh]">
-
-    <DialogHeader>
+  <DialogContent
+    className="w-[95vw] sm:max-w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col"
+  >
+    {/* header takes only small height */}
+    <DialogHeader className="px-4 pt-4 pb-2 shrink-0">
       <DialogTitle>Document Preview</DialogTitle>
     </DialogHeader>
 
-    {/* 🔹 If there is an error, show "not found" message */}
-    {previewError ? (
-      <div className="flex flex-col items-center justify-center h-full text-center">
-        <p className="text-red-600 font-medium mb-2">Document not found</p>
-        <p className="text-sm text-gray-500 max-w-md">
-          The requested file could not be loaded. It may be missing or the name
-          is incorrect. Please contact HR if you believe this is a mistake.
-        </p>
-      </div>
-    ) : isDocx && docContent ? (
-      // 🔹 Render DOCX as HTML
-      <div
-        className="h-full overflow-auto border rounded p-4 bg-white"
-        dangerouslySetInnerHTML={{ __html: docContent }}
-      />
-    ) : docToView ? (
-      // 🔹 Render PDF in iframe
-      <iframe
-        src={docToView}
-        className="w-full h-full border rounded"
-        title="Document preview"
-      />
-    ) : (
-      // Fallback while loading
-      <div className="flex items-center justify-center h-full text-sm text-gray-500">
-        Loading document…
-      </div>
-    )}
+    {/* viewer area fills the rest */}
+    <div className="flex-1 min-h-0">
+      {/* 🔹 If there is an error, show "not found" message */}
+      {previewError ? (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <p className="text-red-600 font-medium mb-2">Document not found</p>
+          <p className="text-sm text-gray-500 max-w-md">
+            The requested file could not be loaded. It may be missing or the
+            name is incorrect. Please contact HR if you believe this is a
+            mistake.
+          </p>
+        </div>
+      ) : isDocx && docContent ? (
+        // 🔹 Render DOCX as HTML
+        <div
+          className="h-full overflow-auto border-t bg-white p-4"
+          dangerouslySetInnerHTML={{ __html: docContent }}
+        />
+      ) : docToView ? (
+        // 🔹 Render PDF in iframe – now always fills the modal height
+        <iframe
+          src={docToView}
+          title="Document preview"
+          className="w-full h-full border-t"
+        />
+      ) : (
+        // Fallback while loading
+        <div className="flex items-center justify-center h-full text-sm text-gray-500">
+          Loading document…
+        </div>
+      )}
+    </div>
   </DialogContent>
 </Dialog>
+
 
 {/* Employee Directory Dialog */}
 {/* Employee Directory Dialog */}
