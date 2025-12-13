@@ -59,7 +59,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     { title: "HR", href: "/hr", icon: Users },
     { title: "IT", href: "/it", icon: Computer },
     { title: "Finance", href: "/finance", icon: Banknote },
-    { title: "Policies", href: "/policies", icon: FileText },
+    
     { title: "Holidays", href: "/holidays", icon: Calendar },
     { title: "Employee Engagement", href: "/engagement", icon: Trophy },
     { title: "Learning & Development", href: "/learning", icon: GraduationCap },
