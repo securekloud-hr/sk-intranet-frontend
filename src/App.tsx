@@ -10,6 +10,8 @@ import RequireAuth from "@/components/RequireAuth";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 import Index from "./Pages/Index";
+import Admin from "./Pages/Admin";
+import IT from "./Pages/IT";
 import HR from "./Pages/HR";
 import Policies from "./Pages/Policies";
 import FAQs from "./Pages/FAQs";
@@ -46,7 +48,9 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Index />} />
                 <Route path="/home" element={<Index />} />
-                <Route path="/hr" element={<HR />} />
+                <Route path="/Admin" element={<Admin />} />                
+                <Route path="/IT" element={<IT />} />
+                <Route path="/hr" element={<HR />} />                
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/holidays" element={<Holidays />} />
                 <Route path="/faqs" element={<FAQs />} />
