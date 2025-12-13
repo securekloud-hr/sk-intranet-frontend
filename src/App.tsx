@@ -48,7 +48,7 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Index />} />
                 <Route path="/home" element={<Index />} />
-                <Route path="/Admin" element={<Admin />} />                
+                <Route path="/admin" element={<Admin />} />                
                 <Route path="/IT" element={<IT />} />
                 <Route path="/hr" element={<HR />} />                
                 <Route path="/policies" element={<Policies />} />
@@ -64,7 +64,7 @@ export default function App() {
                 <Route path="/performance" element={<Performance />} />
                 <Route path="/my-skills" element={<MySkills />} />
                 <Route path="/my-certifications" element={<MyCertifications />} />
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admindashboard" element={<AdminDashboard />} />
               </Route>
             </Route>
 
