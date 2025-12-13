@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import {
   Home,
   FileText,
+  Handshake,
+  Banknote,
+  Computer,
   Users,
   Trophy,
   Target,
@@ -52,10 +55,11 @@ export function AppSidebar({ user }: { user?: UserLike }) {
 
   // ✅ Sidebar navigation items
   const mainNavItems: NavItem[] = [
-    { title: "Admin", href: "/admin", icon: Users },
-   { title: "HR", href: "/hr", icon: Users },
+    { title: "Admin", href: "/admin", icon: Handshake },
+    { title: "HR", href: "/hr", icon: Users },
+    { title: "IT", href: "/it", icon: Computer },
+    { title: "Finance", href: "/finance", icon: Banknote },
     { title: "Policies", href: "/policies", icon: FileText },
-
     { title: "Holidays", href: "/holidays", icon: Calendar },
     { title: "Employee Engagement", href: "/engagement", icon: Trophy },
     { title: "Learning & Development", href: "/learning", icon: GraduationCap },
@@ -63,11 +67,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     { title: "Talent Acquisition", href: "/talent", icon: Target },
     { title: "Performance", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },
-    
-     
-      { title: "IT", href: "/it", icon: HelpCircle },
-       { title: "Finance", href: "/finance", icon: HelpCircle },
-       { title: "Support", href: "/faqs", icon: HelpCircle },
+    { title: "Support", href: "/faqs", icon: HelpCircle },
   ];
 
   // ✅ Add "Admin Dashboard" only for admin users
@@ -101,7 +101,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
           onClick={() => setCollapsed((prev) => !prev)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {collapsed ? <Home size={18} /> : <ChevronLeft size={18} />}
         </Button>
       </div>
 
