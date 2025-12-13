@@ -199,7 +199,8 @@ const OrgChart: React.FC = () => {
       setUploadStatus("Loading organization data...");
 
       // 🔹 Fetch saved organization data from backend
-      const response = await fetch(`${API}/api/org/structure`);
+      const response = await fetch(`${API}/api/org/from-employees`);
+
 
       if (response.ok) {
         const data = await response.json();
