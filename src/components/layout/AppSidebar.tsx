@@ -52,7 +52,9 @@ export function AppSidebar({ user }: { user?: UserLike }) {
 
   // ✅ Sidebar navigation items
   const mainNavItems: NavItem[] = [
+    { title: "Admin", href: "/admin", icon: Users },
     { title: "HR", href: "/hr", icon: Users },
+    { title: "IT", href: "/it", icon: Users },
     { title: "Policies", href: "/policies", icon: FileText },
 
     { title: "Holidays", href: "/holidays", icon: Calendar },

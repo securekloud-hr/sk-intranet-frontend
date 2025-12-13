@@ -512,7 +512,8 @@ const TalentAcquisition = () => {
           </div>
         </TabsContent>
 
-   {/* 2️⃣ TA Team tab */}
+
+ {/* 2️⃣ TA Team tab */}
 <TabsContent value="details" className="space-y-6">
   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     {taTeamMembers.map((member) => (
@@ -526,15 +527,15 @@ const TalentAcquisition = () => {
             {getInitials(member.name)}
           </span>
         </div>
-
+ 
         {/* Name */}
         <CardTitle className="text-lg">{member.name}</CardTitle>
-
+ 
         {/* Designation */}
         <CardDescription className="mb-4">
           {member.designation}
         </CardDescription>
-
+ 
         {/* Contact info */}
         <div className="text-sm space-y-1">
           <p>
@@ -560,6 +561,7 @@ const TalentAcquisition = () => {
     ))}
   </div>
 </TabsContent>
+
 
         {/* 3️⃣ Jobs tab */}
         <TabsContent value="jobs" className="space-y-6">
