@@ -71,7 +71,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
   if (isAdmin) {
     mainNavItems.push({
       title: "Admin Dashboard",
-      href: "/admin",
+      href: "/admindashboard",
       icon: Shield,
     });
   }
