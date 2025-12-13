@@ -488,6 +488,8 @@ const OrgChart: React.FC = () => {
           {branches.map((branch) => (
             <div key={branch.id} className="space-y-2 w-[260px]">
               {/* Executive Card - Orange */}
+              
+             
               <Card
                 className={`p-4 ${
                   branch.color || "bg-orange-500"
@@ -512,6 +514,8 @@ const OrgChart: React.FC = () => {
                       {(branch.departments || []).length} departments
                     </p>
                   </div>
+              
+
 
                   <div className="text-white">
                     {expandedBranches.has(branch.id) ? (
