@@ -29,6 +29,8 @@ import mammoth from "mammoth"; // Add this import for .docx rendering
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import SignaturePad from "signature_pad";
+import PolicySection from "@/components/PolicySection";
+
 import API from "@/config";
 
 
@@ -876,6 +878,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
         <TabsTrigger value="rewards">Rewards & Recognition</TabsTrigger>
         <TabsTrigger value="others">Others</TabsTrigger>
         <TabsTrigger value="separation">Exit Forms</TabsTrigger>
+
       </TabsList>
       <TabsContent value="onboarding" className="pt-6">
         {renderFormTabContent(formsData.onboarding, "onboarding")}
@@ -903,11 +906,12 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full sm:w-[600px] grid-cols-3">
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="team">HR Team</TabsTrigger>
-          <TabsTrigger value="forms">HR Forms</TabsTrigger>
-        </TabsList>
+        <TabsList className="grid w-full sm:w-[800px] grid-cols-4">
+  <TabsTrigger value="resources">Resources</TabsTrigger>
+  <TabsTrigger value="team">HR Team</TabsTrigger>
+  <TabsTrigger value="forms">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy">HR Policy</TabsTrigger>
+</TabsList>
 
        <TabsContent value="resources" className="mt-6">
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -985,6 +989,13 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
     ))}
   </div>
 </TabsContent>
+<TabsContent value="policy">
+  <PolicySection
+    category="HR Policies"
+    title="HR Policies"
+  />
+</TabsContent>
+
 
 
         <TabsContent value="team" className="mt-6">

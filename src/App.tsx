@@ -28,6 +28,7 @@ import MySkills from "./Pages/MySkills";
 import MyCertifications from "./Pages/MyCertifications";
 import AdminDashboard from "./Pages/AdminDashboard";
 import MyCourses from "./Pages/MyCourses";
+import Finance from "./Pages/Finance";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +50,7 @@ export default function App() {
                 <Route index element={<Index />} />
                 <Route path="/home" element={<Index />} />
                 <Route path="/admin" element={<Admin />} />                
-                <Route path="/IT" element={<IT />} />
+                <Route path="/it" element={<IT />} />
                 <Route path="/hr" element={<HR />} />                
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/holidays" element={<Holidays />} />
@@ -65,6 +66,7 @@ export default function App() {
                 <Route path="/my-skills" element={<MySkills />} />
                 <Route path="/my-certifications" element={<MyCertifications />} />
                 <Route path="/admindashboard" element={<AdminDashboard />} />
+                 <Route path="/finance" element={<Finance />} />
               </Route>
             </Route>
 

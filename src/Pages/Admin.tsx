@@ -41,6 +41,62 @@ interface Policy {
 }
 
 type CategoriesResponse = { [category: string]: Policy[] };
+type AdminTeamMember = {
+  name: string;
+  designation: string;
+  email?: string;
+  phone?: string;
+};
+
+const adminTeamMembers: AdminTeamMember[] = [
+  {
+    name: "Kamatchi M",
+    designation: "Lead - Front Office",
+    email: "kamatchi.mohan@securekloud.com",
+    phone: "8807975792",
+  },
+ 
+  {
+    name: "Rajakumari S",
+    designation: "House Keeping",
+    email: "N/A",
+    phone: "9176652191",
+  },
+  {
+    name: "Selvaraj",
+    designation: "Driver",
+    email: "N/A",
+    phone: "N/A",
+  },
+  {
+    name: "Senthil",
+    designation: "Admin Assistant",
+    email: "N/A",
+    phone: "9790270100",
+  },
+  {
+    name: "Valarmathy",
+    designation: "House Keeping",
+    email: "N/A",
+    phone: "N/A",
+  },
+  {
+    name: "Vishnu Mohan",
+    designation: "Lead - Administration",
+    email: "vishnu.m@securekloud.com",
+    phone: "9710199742",
+  },
+];
+
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
 
 /* ================= Constants ================= */
 
@@ -256,9 +312,63 @@ const Admin = () => {
         </TabsContent>
 
         {/* Admin Team (optional placeholder) */}
-        <TabsContent value="team">
-          <p className="text-muted-foreground">Admin team content…</p>
-        </TabsContent>
+       <TabsContent value="team" className="mt-6">
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {adminTeamMembers.map((member, idx) => {
+      const emailOk = member.email && member.email !== "N/A" && member.email !== "NA";
+      const phoneOk = member.phone && member.phone !== "N/A" && member.phone !== "NA";
+
+      return (
+        <Card
+          key={`${member.name}-${idx}`}
+          className="flex flex-col items-center text-center py-8 px-6"
+        >
+          <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
+            <span className="text-purple-700 font-semibold text-xl">
+              {getInitials(member.name)}
+            </span>
+          </div>
+
+          <CardTitle className="text-lg">{member.name}</CardTitle>
+
+          <CardDescription className="mb-6">
+            {member.designation}
+          </CardDescription>
+
+          <div className="text-sm space-y-2">
+            <p>
+              <strong>Email:</strong>{" "}
+              {emailOk ? (
+                <a
+                  href={`mailto:${member.email}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {member.email}
+                </a>
+              ) : (
+                <span className="text-muted-foreground">N/A</span>
+              )}
+            </p>
+
+            <p>
+              <strong>Phone:</strong>{" "}
+              {phoneOk ? (
+                <a
+                  href={`tel:${member.phone}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {member.phone}
+                </a>
+              ) : (
+                <span className="text-muted-foreground">N/A</span>
+              )}
+            </p>
+          </div>
+        </Card>
+      );
+    })}
+  </div>
+</TabsContent>
 
         {/* ================= Admin policy tab ================= */}
         <TabsContent value="policy" className="space-y-4">
