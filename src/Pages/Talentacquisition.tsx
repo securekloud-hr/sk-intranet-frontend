@@ -512,6 +512,55 @@ const TalentAcquisition = () => {
           </div>
         </TabsContent>
 
+   {/* 2️⃣ TA Team tab */}
+<TabsContent value="details" className="space-y-6">
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {taTeamMembers.map((member) => (
+      <Card
+        key={member.empId}
+        className="flex flex-col items-center text-center py-6"
+      >
+        {/* Avatar */}
+        <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
+          <span className="text-purple-700 font-semibold text-xl">
+            {getInitials(member.name)}
+          </span>
+        </div>
+
+        {/* Name */}
+        <CardTitle className="text-lg">{member.name}</CardTitle>
+
+        {/* Designation */}
+        <CardDescription className="mb-4">
+          {member.designation}
+        </CardDescription>
+
+        {/* Contact info */}
+        <div className="text-sm space-y-1">
+          <p>
+            <strong>Email:</strong>{" "}
+            <a
+              href={`mailto:${member.email}`}
+              className="text-blue-600 hover:underline"
+            >
+              {member.email}
+            </a>
+          </p>
+          <p>
+            <strong>Phone:</strong>{" "}
+            <a
+              href={`tel:${member.phone}`}
+              className="text-blue-600 hover:underline"
+            >
+              {member.phone}
+            </a>
+          </p>
+        </div>
+      </Card>
+    ))}
+  </div>
+</TabsContent>
+
         {/* 3️⃣ Jobs tab */}
         <TabsContent value="jobs" className="space-y-6">
           {/* Upload Excel – only for Admin */}

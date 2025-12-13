@@ -63,13 +63,17 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     { title: "Performance", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },
     { title: "Support", href: "/faqs", icon: HelpCircle },
+     { title: "Admin", href: "/admin", icon: HelpCircle },
+      { title: "IT", href: "/it", icon: HelpCircle },
+       { title: "Finance", href: "/finance", icon: HelpCircle },
+       { title: "Support", href: "/faqs", icon: HelpCircle },
   ];
 
   // ✅ Add "Admin Dashboard" only for admin users
   if (isAdmin) {
     mainNavItems.push({
       title: "Admin Dashboard",
-      href: "/admin",
+      href: "/admindashboard",
       icon: Shield,
     });
   }
