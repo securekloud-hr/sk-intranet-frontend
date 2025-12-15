@@ -498,7 +498,7 @@ const OrgChart: React.FC = () => {
                 onClick={() => toggleExpansion("branch", branch.id)}
               >
                 <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                     <User className="w-6 h-6 text-orange-600" />
                   </div>
 
