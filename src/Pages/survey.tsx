@@ -320,7 +320,7 @@ const TalentAcquisition = () => {
       </div>
 
       {/* Tabs wrapper */}
-      <Tabs defaultValue="referral" className="space-y-6">
+      <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="active"  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Active Surveys</TabsTrigger>
           <TabsTrigger value="completed"  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Past Surveys</TabsTrigger>

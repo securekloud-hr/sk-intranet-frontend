@@ -363,17 +363,17 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
   if (loading) return <div className="p-5 text-lg">Loading your profile…</div>;
   if (loadError) return <div className="p-5 text-red-600">{loadError}</div>;
 
-  const displayName = employee?.name || userName || userEmail;
+ const displayName = employee?.name || userName || userEmail;
 
   // ========================================================================================
   return (
-    <div className="space-y-8 p-6">
-      <h1 className="text-4xl font-bold">Learning & Development</h1>
-      <h1 className="text-2xl font-bold">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Learning & Development</h1>
+      <p className="text-muted-foreground">
         Add your Skills, Certifications, and Courses
-      </h1>
+      </p>
 
-      <p className="opacity-60 -mt-2">Welcome {displayName} 👋</p>
+{/*} <p className="opacity-60 -mt-2">Welcome {displayName} 👋</p> */}
 
       <div className="grid md:grid-cols-3 gap-6">
         {/* ================= Primary Skills ================= */}
