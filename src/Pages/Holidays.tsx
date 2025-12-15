@@ -17,6 +17,23 @@ interface Holiday {
   description?: string;
 }
 
+// ✅ Leave fields from Employee Directory
+type LeaveBalance = {
+  EarnedLeave?: number | null;
+  CasualLeave?: number | null;
+  SickLeave?: number | null;
+  MarriageLeave?: number | null;
+  PaternityLeave?: number | null;
+};
+
+type UserLike = {
+  email?: string;
+  mail?: string; // Azure AD
+  name?: string;
+  fullName?: string;
+  role?: "admin" | "user";
+};
+
 const Holidays = () => {
   const today = new Date();
 
@@ -35,9 +52,83 @@ const Holidays = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
+  // ✅ Leave balance state
+  const [leaveLoading, setLeaveLoading] = useState(false);
+  const [leaveError, setLeaveError] = useState("");
+  const [leave, setLeave] = useState<LeaveBalance>({
+    EarnedLeave: 0,
+    CasualLeave: 0,
+    SickLeave: 0,
+    MarriageLeave: 0,
+    PaternityLeave: 0,
+  });
+
+  // ✅ Logged in user (same style as LearningDevelopment.tsx)
+  const currentUser = useMemo<UserLike | null>(() => {
+    try {
+      const r = localStorage.getItem("user");
+      return r && r !== "undefined" ? JSON.parse(r) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const userEmail: string | undefined = (
+    currentUser?.email || currentUser?.mail
+  )
+    ?.toString()
+    .trim()
+    .toLowerCase();
+
   // 🔹 Get weekday name
   const getDayName = (d: Date) =>
     d.toLocaleDateString("en-US", { weekday: "long" });
+
+  // ✅ helper: null -> 0
+  const n0 = (v: number | null | undefined) => (v == null ? 0 : Number(v));
+
+  // ✅ Fetch leave balance for logged-in user
+  useEffect(() => {
+    const loadLeave = async () => {
+      if (!userEmail) {
+        setLeaveError("⚠️ User email missing from session");
+        return;
+      }
+
+      try {
+        setLeaveLoading(true);
+        setLeaveError("");
+
+        const res = await fetch(
+          `${API}/api/employee-directory/by-email/${encodeURIComponent(
+            userEmail
+          )}`
+        );
+        const data = await res.json();
+
+        if (!data.success || !data.employee) {
+          setLeaveError("⚠️ Employee not found in Employee Directory");
+          return;
+        }
+
+        const emp = data.employee;
+
+        setLeave({
+          EarnedLeave: n0(emp.EarnedLeave),
+          CasualLeave: n0(emp.CasualLeave),
+          SickLeave: n0(emp.SickLeave),
+          MarriageLeave: n0(emp.MarriageLeave),
+          PaternityLeave: n0(emp.PaternityLeave),
+        });
+      } catch (e) {
+        setLeaveError("❌ Failed to load leave balance");
+      } finally {
+        setLeaveLoading(false);
+      }
+    };
+
+    loadLeave();
+  }, [userEmail]);
 
   // 🔹 Fetch years
   useEffect(() => {
@@ -173,20 +264,28 @@ const Holidays = () => {
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Leave Balance */}
+        {/* ✅ Leave Balance (Dynamic) */}
         <Card>
           <CardHeader>
             <CardTitle>Leave Balance</CardTitle>
             <CardDescription>
-              Your leave balance as of beginning of the week
+              Your leave balance as per Employee Directory
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-1">
-              <li>Earned Leave: 5</li>
-              <li>Sick Leave: 10</li>
-              <li>Casual Leave: 5</li>
-            </ul>
+            {leaveLoading ? (
+              <div className="text-sm">Loading your leave balance…</div>
+            ) : leaveError ? (
+              <div className="text-sm text-red-600">{leaveError}</div>
+            ) : (
+              <ul className="space-y-1">
+                <li>Earned Leave: {leave.EarnedLeave}</li>
+                <li>Casual Leave: {leave.CasualLeave}</li>
+                <li>Sick Leave: {leave.SickLeave}</li>
+                <li>Marriage Leave: {leave.MarriageLeave}</li>
+                <li>Paternity Leave: {leave.PaternityLeave}</li>
+              </ul>
+            )}
 
             <div className="flex items-center gap-2 mt-4">
               <CalendarIcon className="h-5 w-5" />
@@ -199,9 +298,7 @@ const Holidays = () => {
         <Card>
           <CardHeader>
             <CardTitle>Holiday Calendar</CardTitle>
-            <CardDescription>
-              Calendar view of all company holidays
-            </CardDescription>
+            <CardDescription>Calendar view of all company holidays</CardDescription>
           </CardHeader>
           <CardContent>
             <Calendar
@@ -235,27 +332,16 @@ const Holidays = () => {
                     <table className="w-full text-sm border-collapse">
                       <thead>
                         <tr className="border-b bg-muted/40">
-                          <th className="text-left px-2 py-1 w-[60px]">
-                            Date
-                          </th>
-                          <th className="text-left px-2 py-1 w-[120px]">
-                            Day
-                          </th>
-                          <th className="text-left px-2 py-1">
-                            Holiday
-                          </th>
+                          <th className="text-left px-2 py-1 w-[60px]">Date</th>
+                          <th className="text-left px-2 py-1 w-[120px]">Day</th>
+                          <th className="text-left px-2 py-1">Holiday</th>
                         </tr>
                       </thead>
 
                       <tbody>
                         {list.map((h) => (
-                          <tr
-                            key={h.id}
-                            className="border-b hover:bg-muted/30"
-                          >
-                            <td className="px-2 py-1 font-medium">
-                              {h.date.getDate()}
-                            </td>
+                          <tr key={h.id} className="border-b hover:bg-muted/30">
+                            <td className="px-2 py-1 font-medium">{h.date.getDate()}</td>
                             <td className="px-2 py-1 text-muted-foreground">
                               {getDayName(h.date)}
                             </td>
