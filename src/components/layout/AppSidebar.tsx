@@ -29,6 +29,7 @@ type NavItem = {
   title: string;
   href: string;
   icon: React.ElementType;
+  tooltip: string;
 };
 
 type UserLike = {
@@ -57,24 +58,24 @@ export function AppSidebar({ user }: { user?: UserLike }) {
 
   // ✅ Sidebar navigation items
   const mainNavItems: NavItem[] = [
-    { title: "Admin", href: "/admin", icon: Handshake },
-    { title: "HR", href: "/hr", icon: Users },
-    { title: "IT", href: "/it", icon: Computer },
-    { title: "Finance", href: "/finance", icon: Banknote },
+    { title: "Admin", href: "/admin", icon: Handshake, tooltip: "Admin Dashboard"},
+    { title: "HR", href: "/hr", icon: Users, tooltip: "" },
+    { title: "IT", href: "/it", icon: Computer, tooltip: "" },
+    { title: "Finance", href: "/finance", icon: Banknote, tooltip: "" },
     
-    { title: "Holidays", href: "/holidays", icon: Calendar },
-    { title: "Employee Engagement", href: "/engagement", icon: Trophy },
+    { title: "Holidays", href: "/holidays", icon: Calendar, tooltip: "" },
+    { title: "Employee Engagement", href: "/engagement", icon: Trophy, tooltip: "" },
 
-    { title: "Learning & Development", href: "/learning", icon: GraduationCap },
+    { title: "Learning & Development", href: "/learning", icon: GraduationCap, tooltip: "" },
 
-    { title: "Talent Acquisition", href: "/talent", icon: Target },
-    { title: "Time Entry", href: "/timeentry", icon: Clock },   
-    { title: "Notice Board", href: "/noticeboard", icon: Building },
-    { title: "Survey", href: "/survey", icon: Binoculars },    
+    { title: "Talent Acquisition", href: "/talent", icon: Target, tooltip: "" },
+    { title: "Time Entry", href: "/timeentry", icon: Clock, tooltip: "" },   
+    { title: "Notice Board", href: "/noticeboard", icon: Building, tooltip: "" },
+    { title: "Survey", href: "/survey", icon: Binoculars, tooltip: "" },    
     
-    { title: "Performance", href: "/performance", icon: BarChart3 },
-    { title: "Org Structure", href: "/org", icon: Network },
-    { title: "Support", href: "/faqs", icon: HelpCircle },
+    { title: "Performance", href: "/performance", icon: BarChart3, tooltip: "" },
+    { title: "Org Structure", href: "/org", icon: Network, tooltip: "" },
+    { title: "Support", href: "/faqs", icon: HelpCircle, tooltip: "" },
   ];
 
   // ✅ Add "Admin Dashboard" only for admin users
@@ -82,7 +83,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     mainNavItems.push({
       title: "Admin Dashboard",
       href: "/admindashboard",
-      icon: Shield,
+      icon: Shield, tooltip: "",
     });
   }
 
