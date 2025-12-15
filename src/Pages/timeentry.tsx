@@ -61,36 +61,7 @@ const taTeamMembers: TaTeamMember[] = [
     designation: "Associate - Talent Acquisition",
     email: "riswana.mohammed@securekloud.com",
     phone: "7395972828",
-  },
-  {
-    name: "Senthamizhselvan P",
-    empId: "B25005",
-    designation: "Trainee - Talent Acquisition",
-    email: "senthamizhselvan.pooranachandiran@securekloud.com",
-    phone: "9566618781",
-  },
-  {
-    name: "Sriram R",
-    empId: "B22131",
-    designation: "Associate - Talent Acquisition",
-    email: "sriram.ravirajan@securekloud.com",
-    phone: "8072446248",
-  },
-  {
-    name: "Sruthi S",
-    empId: "B21104",
-    designation: "Senior Associate - Talent Acquisition",
-    email: "sruthi.sankaranarayanan@securekloud.com",
-    phone: "7010639532",
-  },
-  {
-    name: "Valarmathi V",
-    empId: "B22152",
-    designation: "Associate - Talent Acquisition",
-    email: "valarmathi.venkatesan@securekloud.com",
-    phone: "8056140918",
-  },
-];
+  }];
 
 const getInitials = (name: string) =>
   name
@@ -100,6 +71,7 @@ const getInitials = (name: string) =>
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
 
 /* ----------------------- MODAL COMPONENT ----------------------- */
 
@@ -341,19 +313,15 @@ const TalentAcquisition = () => {
     <div className="space-y-6">
       {/* Page title */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Talent Acquisition</h1>
+        <h1 className="text-3xl font-bold mb-2">Time Entry</h1>
         <p className="text-muted-foreground">
-          Help grow our team by referring talented candidates
+        Enter time spent on various tasks/projects
         </p>
       </div>
 
       {/* Tabs wrapper */}
       <Tabs defaultValue="referral" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="referral"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Referral Program</TabsTrigger>
-          <TabsTrigger value="details"  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">TA Team</TabsTrigger>
-          <TabsTrigger value="jobs" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Job Openings</TabsTrigger>
-        </TabsList>
+
 
         {/* 1️⃣ Referral Program tab */}
         <TabsContent value="referral" className="space-y-6">
@@ -362,34 +330,19 @@ const TalentAcquisition = () => {
             {/* LEFT CARD: Employee Referral Program + Incentive Structure */}
             <Card>
               <CardHeader>
-                <CardTitle>Employee Referral Program</CardTitle>
-                <CardDescription>
-                  Earn bonuses for successful candidate referrals
-                </CardDescription>
+                <CardTitle>Project Assignment</CardTitle>
+
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* How the Referral Program Works */}
                 <div>
-                  <h3 className="font-semibold">How the Referral Program Works</h3>
+                  <h3 className="font-semibold">Project Assignment:</h3>
                   <ul className="list-disc pl-6 space-y-1 text-sm text-muted-foreground">
                     <li>
-                      Refer qualified candidates for open positions at SecureKloud.
+                      DocuGenie (70%)
                     </li>
                     <li>
-                      If your referral is hired and completes 90 days, you earn a
-                      bonus.
-                    </li>
-                    <li>
-                      Bonus amounts vary by position, with high-priority roles
-                      offering higher incentives.
-                    </li>
-                    <li>
-                      Submit referrals through the form below or email{" "}
-                      recruiting@securekloud.com.
-                    </li>
-                    <li>
-                      No limit to the number of referrals you can submit or
-                      bonuses you can earn.
+                      Readabl (30%)
                     </li>
                   </ul>
                 </div>
@@ -397,56 +350,12 @@ const TalentAcquisition = () => {
                 {/* Referral Incentive Structure INSIDE the same card */}
                 <div className="border-t pt-4">
                   <h3 className="font-semibold mb-1">
-                    Referral Incentive Structure
+                    Timesheet Approver:
                   </h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Bonus amounts by role and band
+                    Chandrakanth Selvakumar
                   </p>
-
-                  {/* compact table */}
-                  <table className="w-full max-w-md text-xs border-collapse border rounded-md">
-                    <thead className="bg-muted">
-                      <tr>
-                        <th className="border px-2 py-1 text-left">Roles</th>
-                        <th className="border px-2 py-1 text-left">Band</th>
-                        <th className="border px-2 py-1 text-left">Incentive</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="border px-2 py-1">Fresher</td>
-                        <td className="border px-2 py-1">B1</td>
-                        <td className="border px-2 py-1">Rs. 2,500/-</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1">Team Member</td>
-                        <td className="border px-2 py-1">B2</td>
-                        <td className="border px-2 py-1">Rs. 10,000/-</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1">Senior Team Member</td>
-                        <td className="border px-2 py-1">B3</td>
-                        <td className="border px-2 py-1">Rs. 25,000/-</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1">Middle Management</td>
-                        <td className="border px-2 py-1">B4 - B5</td>
-                        <td className="border px-2 py-1">Rs. 50,000/-</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1">Management</td>
-                        <td className="border px-2 py-1">B6 - B7</td>
-                        <td className="border px-2 py-1">Rs. 75,000/-</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1">
-                          Senior Management and above
-                        </td>
-                        <td className="border px-2 py-1">B8 &amp; Above</td>
-                        <td className="border px-2 py-1">Rs. 1,00,000/-</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                 
                 </div>{" "}
                 {/* ✅ closes border-t div */}
               </CardContent>{" "}
@@ -457,56 +366,48 @@ const TalentAcquisition = () => {
             {/* RIGHT CARD: Submit a Referral */}
             <Card>
               <CardHeader>
-                <CardTitle>Submit a Referral</CardTitle>
-                <CardDescription>
-                  Refer a candidate and help us grow
-                </CardDescription>
+                <CardTitle>Submit a Timsheet</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Input
-                  name="candidateName"
-                  placeholder="Candidate Name"
+                  name="Client"
+                  placeholder="Client:"
                   value={referral.candidateName}
                   onChange={handleReferralChange}
                   required
                 />
                 <Input
-                  name="email"
-                  type="email"
-                  placeholder="Email Address"
+                  name="Project"
+                  type="string"
+                  placeholder="Project: "
                   value={referral.email}
                   onChange={handleReferralChange}
                   required
                 />
                 <Input
-                  name="phone"
+                  name="Task"
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder="Task:"
                   value={referral.phone}
                   onChange={handleReferralChange}
                   required
                 />
                 <Input
-                  name="position"
-                  placeholder="Position Referred For"
+                  name="Week"
+                  placeholder="Time for the Week of:"
                   value={referral.position}
                   onChange={handleReferralChange}
                   required
-                />
-                <Input type="file" accept=".pdf" onChange={handleResumeChange} />
-                <Input
-                  name="notes"
-                  placeholder="Additional Notes"
-                  value={referral.notes}
-                  onChange={handleReferralChange}
                 />
                 <Button
                   className="w-full"
                   onClick={submitReferral}
                   disabled={isSubmitting}
                 >
-                  <UserPlus className="mr-2 h-4 w-4" /> Submit Referral
+                  <UserPlus className="mr-2 h-4 w-4" /> Submit
                 </Button>
+
+
               </CardContent>
             </Card>
           </div>

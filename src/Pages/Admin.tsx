@@ -282,7 +282,7 @@ const Admin = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="policy" className="space-y-6">
+      <Tabs defaultValue="key" className="space-y-6">
         <TabsList className="flex w-fit gap-2 bg-transparent p-0">
           <TabsTrigger
             value="key"
@@ -302,7 +302,7 @@ const Admin = () => {
             value="policy"
             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
-            Admin policy
+            Admin policies
           </TabsTrigger>
         </TabsList>
 

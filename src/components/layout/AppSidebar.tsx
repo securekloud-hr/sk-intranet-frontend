@@ -10,6 +10,7 @@ import {
   Trophy,
   Target,
   Calendar,
+  Binoculars,
   HelpCircle,
   Briefcase,
   ChevronLeft,
@@ -19,6 +20,7 @@ import {
   BarChart3,
   Network,
   Shield,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -62,9 +64,14 @@ export function AppSidebar({ user }: { user?: UserLike }) {
     
     { title: "Holidays", href: "/holidays", icon: Calendar },
     { title: "Employee Engagement", href: "/engagement", icon: Trophy },
+
     { title: "Learning & Development", href: "/learning", icon: GraduationCap },
-   //{ title: "Internal Jobs", href: "/jobs", icon: Building },
+
     { title: "Talent Acquisition", href: "/talent", icon: Target },
+    { title: "Time Entry", href: "/timeentry", icon: Clock },   
+    { title: "Notice Board", href: "/noticeboard", icon: Building },
+    { title: "Survey", href: "/survey", icon: Binoculars },    
+    
     { title: "Performance", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },
     { title: "Support", href: "/faqs", icon: HelpCircle },

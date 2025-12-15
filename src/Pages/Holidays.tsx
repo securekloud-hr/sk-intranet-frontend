@@ -189,7 +189,39 @@ const Holidays = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Leave Balance</CardTitle>
+            <CardDescription>
+              Your leave balance as of beginning of the week
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+<li>Earned Leave: 5 </li>
+<li>Sick Leave  : 10</li>
+<li> Casual Leave: 5</li>
+
+            <div className="flex items-center gap-2 mb-2 mt-4">
+              <CalendarIcon className="h-5 w-5 text-securekloud-700" />
+              <h3 className="font-medium">Time Off Requests</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              For time off requests, please submit your request through the{" "}
+              <a
+                href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline font-medium hover:text-blue-800 cursor-pointer"
+              >
+                ADP Portal
+              </a>
+              .
+            </p>
+          </CardContent>
+        </Card>
+
+
         <Card>
           <CardHeader>
             <CardTitle>Holiday Calendar</CardTitle>
@@ -242,10 +274,10 @@ const Holidays = () => {
               if (!monthHolidays || monthHolidays.length === 0) return null;
 
               return (
-                <div key={monthName} className="mb-6 last:mb-0">
+                <div key={monthName} className="mb-3 last:mb-0">
                   <h3 className="font-semibold text-lg mb-3">{monthName}</h3>
 
-                  <div className="space-y-3">
+                  <div className="space-y-0">
                     {monthHolidays.map((holiday) => (
                       <div
                         key={holiday.id}
@@ -257,12 +289,14 @@ const Holidays = () => {
                         <div>
                           <div className="font-medium flex items-center gap-2">
                             {holiday.name}
+            {/*
                             <Badge
                               variant="outline"
                               className="bg-red-50 text-red-800 hover:bg-red-100"
                             >
                               Holiday
                             </Badge>
+          */}
                           </div>
                           {holiday.description && (
                             <div className="text-sm text-muted-foreground">

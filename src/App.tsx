@@ -24,6 +24,9 @@ import Holidays from "./Pages/Holidays";
 import NotFound from "./Pages/NotFound";
 import OrgStructure from "./Pages/orgstructure";
 import Performance from "./Pages/Performance";
+import NoticeBoard from "./Pages/noticeboard";
+import TimeEntry from "./Pages/timeentry";
+import Survey from "./Pages/survey";
 import MySkills from "./Pages/MySkills";
 import MyCertifications from "./Pages/MyCertifications";
 import AdminDashboard from "./Pages/AdminDashboard";
@@ -62,11 +65,14 @@ export default function App() {
                 <Route path="/jobs" element={<InternalJobs />} />
                 <Route path="/talent" element={<Talentacquisition />} />
                 <Route path="/org" element={<OrgStructure />} />
+                <Route path="/noticeboard" element={<NoticeBoard />} />
+                <Route path="/timeentry" element={<TimeEntry />} />     
+                <Route path="/survey" element={<Survey />} />                                       
                 <Route path="/performance" element={<Performance />} />
                 <Route path="/my-skills" element={<MySkills />} />
                 <Route path="/my-certifications" element={<MyCertifications />} />
                 <Route path="/admindashboard" element={<AdminDashboard />} />
-                 <Route path="/finance" element={<Finance />} />
+                <Route path="/finance" element={<Finance />} />
               </Route>
             </Route>
 

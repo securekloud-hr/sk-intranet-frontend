@@ -317,6 +317,12 @@ const EmployeeEngagement: React.FC = () => {
 
     const month = selectedBomEvent.month;
 
+    // added code to convert month text to number - Siva 14/12
+    const mthnum = new Date(`${month} 1, 2000`);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const mthnumber = months.findIndex( month);
+    const mthnumber1 = getdate(mthnum)+1;
+
     setBomLoading(true);
     setBomError(null);
     setBomBirthdays([]);
@@ -354,20 +360,24 @@ const EmployeeEngagement: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
+
         <h1 className="text-3xl font-bold mb-2">Employee Engagement</h1>
         <p className="text-muted-foreground">
           Connect, participate, and grow with your colleagues
         </p>
+ 
+
       </div>
 
       <div>
+        {/*
         <div className="grid w-full grid-cols-5 max-w-[600px]">
           <div className="h-10 w-10 rounded-full bg-securekloud-100 flex items-center justify-center">
             <Calendar className="h-5 w-5 text-securekloud-700" />
           </div>
           <h2 className="text-2xl font-bold">Events</h2>
         </div>
-
+      */}
         {/* Section toggle */}
         <div className="flex gap-4 mt-4">
           <Button
@@ -549,7 +559,7 @@ const EmployeeEngagement: React.FC = () => {
 
                   {!bomLoading && !bomError && bomBirthdays.length === 0 && (
                     <p className="text-sm text-muted-foreground">
-                      No birthdays found for this month.
+                      No birthdays found for this month. {mthnumber}  //siva 14/12
                     </p>
                   )}
 
@@ -760,6 +770,9 @@ const EventCard = ({
 };
 
 export default EmployeeEngagement;
+
+
+
 
 // ---------------------- Dynamic BOM Events ----------------------
 

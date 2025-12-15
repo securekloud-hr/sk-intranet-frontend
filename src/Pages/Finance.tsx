@@ -300,7 +300,7 @@ const Finance = () => {
             value="policy"
             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
-            Finance policy
+            Finance policies
           </TabsTrigger>
         </TabsList>
 

@@ -467,7 +467,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             <DialogTitle>Add Primary Skill</DialogTitle>
           </DialogHeader>
 
-          <label>Provider</label>
+          <label>Type</label>
           <Select
             value={primarySkillProvider}
             onValueChange={async (v) => {
@@ -481,7 +481,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             <SelectTrigger>
               <SelectValue
                 placeholder={
-                  skillsLoading ? "Loading providers..." : "Select Provider"
+                  skillsLoading ? "Loading skills..." : "Select Type"
                 }
               />
             </SelectTrigger>
@@ -512,7 +512,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
               <SelectValue
                 placeholder={
                   !primarySkillProvider
-                    ? "Select provider first"
+                    ? "Select type of skill first"
                     : "Choose Skill"
                 }
               />
@@ -559,7 +559,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             <DialogTitle>Add Secondary Skill</DialogTitle>
           </DialogHeader>
 
-          <label>Provider</label>
+          <label>Type</label>
           <Select
             value={secondarySkillProvider}
             onValueChange={async (v) => {
@@ -573,7 +573,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
             <SelectTrigger>
               <SelectValue
                 placeholder={
-                  skillsLoading ? "Loading providers..." : "Select Provider"
+                  skillsLoading ? "Loading skill types..." : "Select Type"
                 }
               />
             </SelectTrigger>
@@ -604,7 +604,7 @@ Source: Learning & Development → Add your Skills, Certifications, and Courses
               <SelectValue
                 placeholder={
                   !secondarySkillProvider
-                    ? "Select provider first"
+                    ? "Select skill type first"
                     : "Choose Skill"
                 }
               />

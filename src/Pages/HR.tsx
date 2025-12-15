@@ -55,6 +55,7 @@ interface Employee {
   [key: string]: any;
 }
 
+const skillsseparated = "--";
 
 const formsData = {
   onboarding: [
@@ -907,10 +908,10 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full sm:w-[800px] grid-cols-4">
-  <TabsTrigger value="resources">Resources</TabsTrigger>
-  <TabsTrigger value="team">HR Team</TabsTrigger>
-  <TabsTrigger value="forms">HR Forms</TabsTrigger>
-  <TabsTrigger value="policy">HR Policy</TabsTrigger>
+  <TabsTrigger value="resources"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
+  <TabsTrigger value="team"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
+  <TabsTrigger value="forms"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy"            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
 </TabsList>
 
        <TabsContent value="resources" className="mt-6">
@@ -4520,12 +4521,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
 <CollapsibleSkillLine
   label="Certifications"
-  value={emp.SpecialSkill || "N/A"}
+  value={emp.SpecialSkill|| "N/A"}
   limit={2}
 />
-
-
-
                       {/* 🔐 Only admins see sensitive info */}
                       {isAdmin && (
                         <>
