@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Calendar, Users, Trophy, Heart } from "lucide-react";
 
 import {
@@ -29,9 +29,7 @@ interface EventPhotoGalleryProps {
 interface Event {
   id: string;
   title: string;
-  // raw date (ISO or backend format) – used for sorting
   date: string;
-  // formatted date for display (e.g. "Dec 11, 2025")
   displayDate?: string;
   location: string;
   description: string;
@@ -45,21 +43,18 @@ interface Event {
   folder?: string;
   imageCount?: number;
   details?: { name: string; date: string; employeeId?: string }[];
-  // 👇 used for dynamic BOM API
   month?: number; // 1–12
 }
 
 interface BirthdayEmployee {
   empId: string;
   name: string;
-  birthday?: string; // "21/06"
+  birthday?: string;
 }
 
 interface EventCardProps {
   event: Event;
   onViewDetails: (event: Event) => void;
-
-  // NEW: registration status
   registeredEventIds: string[];
   onRegistered: (eventId: string) => void;
 }
@@ -72,13 +67,8 @@ function normalizeName(s?: string | null) {
 
 function getEmployeeImage(empId?: string, name?: string) {
   if (!empId) return "/employee-images/default-avatar.jpg";
-
   const cleanName = normalizeName(name);
-
-  if (cleanName) {
-    return `/employee-images/${empId}-${cleanName}.jpg`;
-  }
-
+  if (cleanName) return `/employee-images/${empId}-${cleanName}.jpg`;
   return `/employee-images/${empId}.jpg`;
 }
 
@@ -107,7 +97,6 @@ const EventPhotoGallery = ({ photos, eventName }: EventPhotoGalleryProps) => {
         ))}
       </div>
 
-      {/* Lightbox Modal */}
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl">
           {selectedPhoto && (
@@ -123,7 +112,7 @@ const EventPhotoGallery = ({ photos, eventName }: EventPhotoGalleryProps) => {
   );
 };
 
-// 🔹 Fetch logged-in user from localStorage (same as Support page)
+// 🔹 Fetch logged-in user from localStorage
 const getCurrentUser = () => {
   try {
     const raw = localStorage.getItem("user");
@@ -135,7 +124,6 @@ const getCurrentUser = () => {
 };
 
 const EmployeeEngagement: React.FC = () => {
-  // ---------- State ----------
   const [activeSection, setActiveSection] = useState<"upcoming" | "past">(
     "upcoming"
   );
@@ -147,8 +135,9 @@ const EmployeeEngagement: React.FC = () => {
     | "BOM-Birthdays of the Month"
   >("all");
 
-  const [dynamicPastEvents, setDynamicPastEvents] =
-    useState<Partial<Event>[]>([]);
+  const [dynamicPastEvents, setDynamicPastEvents] = useState<Partial<Event>[]>(
+    []
+  );
   const [selectedPastEvent, setSelectedPastEvent] =
     useState<Partial<Event> | null>(null);
 
@@ -157,15 +146,11 @@ const EmployeeEngagement: React.FC = () => {
   const [bomLoading, setBomLoading] = useState(false);
   const [bomError, setBomError] = useState<string | null>(null);
 
-  // events created from Admin Dashboard (DB)
   const [adminEvents, setAdminEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventsError, setEventsError] = useState<string | null>(null);
 
-  // 🔹 NEW: events this user already registered for
   const [registeredEventIds, setRegisteredEventIds] = useState<string[]>([]);
-
-  // ---------- Derived ----------
 
   // Helper to sort events by date (oldest ➜ newest)
   const sortByDate = (events: Event[]): Event[] => {
@@ -181,14 +166,11 @@ const EmployeeEngagement: React.FC = () => {
       if (isNaN(da.getTime())) return 1;
       if (isNaN(db.getTime())) return -1;
 
-      // ascending: earlier dates first
       return da.getTime() - db.getTime();
     });
   };
 
   const bomEvents = generateDynamicBomEvents();
-
-  // Combine BOM + admin-created events and sort by date
   const upcomingEvents: Event[] = sortByDate([...bomEvents, ...adminEvents]);
 
   const filteredEvents =
@@ -198,9 +180,7 @@ const EmployeeEngagement: React.FC = () => {
         : upcomingEvents.filter((event) => event.type === activeCategory)
       : [];
 
-  // ---------- Effects ----------
-
-  // Fetch events created in Admin Dashboard
+  // ✅ Fetch events created in Admin Dashboard
   useEffect(() => {
     const fetchEvents = async () => {
       setEventsLoading(true);
@@ -208,16 +188,13 @@ const EmployeeEngagement: React.FC = () => {
 
       try {
         const res = await fetch(`${API}/api/admin/events`);
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || `HTTP ${res.status}`);
-        }
-        const data = await res.json();
+        if (!res.ok) throw new Error(await res.text());
 
+        const data = await res.json();
         const today = new Date();
 
         const mapped: Event[] = (data as any[])
-          .filter((ev) => !ev.date || new Date(ev.date) >= today) // only upcoming
+          .filter((ev) => !ev.date || new Date(ev.date) >= today)
           .map((ev) => {
             const rawDate = ev.date || "";
             const displayDate = rawDate
@@ -241,7 +218,7 @@ const EmployeeEngagement: React.FC = () => {
           });
 
         setAdminEvents(mapped);
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching admin events:", err);
         setEventsError("Failed to load events.");
         setAdminEvents([]);
@@ -253,7 +230,7 @@ const EmployeeEngagement: React.FC = () => {
     fetchEvents();
   }, []);
 
-  // 🔹 Fetch events user already registered for (used to disable button)
+  // ✅ Fetch user registrations
   useEffect(() => {
     const user = getCurrentUser();
     const email = user?.email || user?.mail;
@@ -264,14 +241,9 @@ const EmployeeEngagement: React.FC = () => {
         const res = await fetch(
           `${API}/api/registerEvent/user/${encodeURIComponent(email)}`
         );
-        if (!res.ok) {
-          console.error("User registrations fetch failed:", res.status);
-          return;
-        }
+        if (!res.ok) return;
 
         const data = await res.json();
-        console.log("User registrations response:", data);
-
         let regs: any[] = [];
         if (Array.isArray(data)) regs = data;
         else if (Array.isArray(data.data)) regs = data.data;
@@ -287,52 +259,35 @@ const EmployeeEngagement: React.FC = () => {
     fetchRegs();
   }, []);
 
-  // Past events (photos) — from /api/past-events
+  // ✅ Past events photos
   useEffect(() => {
-    if (activeSection === "past") {
-      fetch(`${API}/api/past-events`)
-        .then((res) => res.json())
-        .then((data) => setDynamicPastEvents(data))
-        .catch((err) => {
-          console.error("Error fetching past events:", err);
-          setDynamicPastEvents([]);
-        });
-    }
+    if (activeSection !== "past") return;
+
+    fetch(`${API}/api/past-events`)
+      .then((res) => res.json())
+      .then((data) => setDynamicPastEvents(data))
+      .catch((err) => {
+        console.error("Error fetching past events:", err);
+        setDynamicPastEvents([]);
+      });
   }, [activeSection]);
 
-  // Load BOM birthdays dynamically when a BOM event is selected
+  // ✅ BOM birthdays fetch (ONLY ONE useEffect, NOT nested)
   useEffect(() => {
-    if (
-      !selectedBomEvent ||
-      selectedBomEvent.type !== "BOM-Birthdays of the Month"
-    ) {
-      return;
-    }
+    if (!selectedBomEvent || selectedBomEvent.type !== "BOM-Birthdays of the Month") return;
 
-    if (!selectedBomEvent.month) {
-      setBomBirthdays([]);
-      setBomError("No month configured for this BOM event.");
-      return;
-    }
-
-    const month = selectedBomEvent.month;
-
-    // added code to convert month text to number - Siva 14/12
-    const mthnum = new Date(`${month} 1, 2000`);
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const mthnumber = months.findIndex( month);
-    const mthnumber1 = getdate(mthnum)+1;
+    const monthNumber =
+      selectedBomEvent.month ?? new Date(selectedBomEvent.date).getMonth() + 1;
 
     setBomLoading(true);
     setBomError(null);
     setBomBirthdays([]);
 
-    fetch(`${API}/api/birthdays/bom?month=${month}`)
+    console.log("Fetching BOM birthdays month:", monthNumber);
+
+    fetch(`${API}/api/birthdays/bom?month=${monthNumber}`)
       .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`HTTP ${res.status}: ${text}`);
-        }
+        if (!res.ok) throw new Error(await res.text());
         return res.json();
       })
       .then((data: any[]) => {
@@ -355,30 +310,16 @@ const EmployeeEngagement: React.FC = () => {
       .finally(() => setBomLoading(false));
   }, [selectedBomEvent]);
 
-  // ---------- Render ----------
-
   return (
     <div className="space-y-8">
       <div>
-
         <h1 className="text-3xl font-bold mb-2">Employee Engagement</h1>
         <p className="text-muted-foreground">
           Connect, participate, and grow with your colleagues
         </p>
- 
-
       </div>
 
       <div>
-        {/*
-        <div className="grid w-full grid-cols-5 max-w-[600px]">
-          <div className="h-10 w-10 rounded-full bg-securekloud-100 flex items-center justify-center">
-            <Calendar className="h-5 w-5 text-securekloud-700" />
-          </div>
-          <h2 className="text-2xl font-bold">Events</h2>
-        </div>
-      */}
-        {/* Section toggle */}
         <div className="flex gap-4 mt-4">
           <Button
             variant={activeSection === "upcoming" ? "default" : "outline"}
@@ -400,7 +341,6 @@ const EmployeeEngagement: React.FC = () => {
           </Button>
         </div>
 
-        {/* Category filters for upcoming */}
         {activeSection === "upcoming" && (
           <div className="flex gap-4 mt-4 flex-wrap">
             <Button
@@ -425,9 +365,7 @@ const EmployeeEngagement: React.FC = () => {
             </Button>
             <Button
               variant={
-                activeCategory === "Sports/Entertainment"
-                  ? "default"
-                  : "outline"
+                activeCategory === "Sports/Entertainment" ? "default" : "outline"
               }
               onClick={() => setActiveCategory("Sports/Entertainment")}
             >
@@ -439,16 +377,13 @@ const EmployeeEngagement: React.FC = () => {
                   ? "default"
                   : "outline"
               }
-              onClick={() =>
-                setActiveCategory("BOM-Birthdays of the Month")
-              }
+              onClick={() => setActiveCategory("BOM-Birthdays of the Month")}
             >
               BOM-Birthdays
             </Button>
           </div>
         )}
 
-        {/* Past events with photo gallery */}
         {activeSection === "past" ? (
           <div className="mt-6">
             <label htmlFor="past-events" className="block font-medium mb-2">
@@ -478,8 +413,7 @@ const EmployeeEngagement: React.FC = () => {
                 <h3 className="text-xl font-semibold mb-2">
                   {selectedPastEvent.title} Photos
                 </h3>
-                {selectedPastEvent.images &&
-                selectedPastEvent.images.length > 0 ? (
+                {selectedPastEvent.images && selectedPastEvent.images.length > 0 ? (
                   <EventPhotoGallery
                     photos={selectedPastEvent.images as string[]}
                     eventName={selectedPastEvent.title as string}
@@ -493,7 +427,6 @@ const EmployeeEngagement: React.FC = () => {
             )}
           </div>
         ) : (
-          // Upcoming events grid
           <div className="mt-6">
             {eventsLoading && <p>Loading events…</p>}
             {!eventsLoading && eventsError && (
@@ -522,7 +455,7 @@ const EmployeeEngagement: React.FC = () => {
         )}
       </div>
 
-      {/* BOM / Event Details Dialog */}
+      {/* BOM Dialog */}
       <Dialog
         open={!!selectedBomEvent}
         onOpenChange={(open) => {
@@ -540,7 +473,6 @@ const EmployeeEngagement: React.FC = () => {
               {selectedBomEvent?.title || "Event Details"}
             </DialogTitle>
             <DialogDescription>
-              {/* If not BOM, just show description */}
               {selectedBomEvent?.type !== "BOM-Birthdays of the Month" && (
                 <p className="mt-2 text-sm text-muted-foreground">
                   {selectedBomEvent?.description ||
@@ -548,7 +480,6 @@ const EmployeeEngagement: React.FC = () => {
                 </p>
               )}
 
-              {/* BOM: Birthdays of the Month */}
               {selectedBomEvent?.type === "BOM-Birthdays of the Month" && (
                 <div className="mt-4">
                   {bomLoading && <p>Loading birthdays…</p>}
@@ -559,7 +490,7 @@ const EmployeeEngagement: React.FC = () => {
 
                   {!bomLoading && !bomError && bomBirthdays.length === 0 && (
                     <p className="text-sm text-muted-foreground">
-                      No birthdays found for this month. {mthnumber}  //siva 14/12
+                      No birthdays found for this month.
                     </p>
                   )}
 
@@ -583,11 +514,11 @@ const EmployeeEngagement: React.FC = () => {
                             <p className="text-sm font-medium text-center">
                               {bd.name}
                             </p>
-                              {bd.birthday && (
-                                <p className="text-xs text-gray-500">
-                                  {bd.birthday}
-                                </p>
-                              )}
+                            {bd.birthday && (
+                              <p className="text-xs text-gray-500">
+                                {bd.birthday}
+                              </p>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -725,9 +656,7 @@ const EventCard = ({
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          {event.description}
-        </p>
+        <p className="text-sm text-muted-foreground mb-4">{event.description}</p>
 
         <div className="flex flex-col gap-2 mt-4">
           {event.registrationOpen && (
@@ -746,22 +675,18 @@ const EventCard = ({
             </Button>
           )}
 
-       {/* Show View Details ONLY for BOM-Birthdays events */}
-{event.type === "BOM-Birthdays of the Month" && (
-  <Button
-    className="flex-1"
-    variant="outline"
-    onClick={() => onViewDetails(event)}
-  >
-    View Details
-  </Button>
-)}
-
+          {event.type === "BOM-Birthdays of the Month" && (
+            <Button
+              className="flex-1"
+              variant="outline"
+              onClick={() => onViewDetails(event)}
+            >
+              View Details
+            </Button>
+          )}
 
           {statusMsg && (
-            <p className="text-center text-sm text-gray-600 mt-1">
-              {statusMsg}
-            </p>
+            <p className="text-center text-sm text-gray-600 mt-1">{statusMsg}</p>
           )}
         </div>
       </CardContent>
@@ -770,9 +695,6 @@ const EventCard = ({
 };
 
 export default EmployeeEngagement;
-
-
-
 
 // ---------------------- Dynamic BOM Events ----------------------
 
@@ -800,10 +722,8 @@ function generateDynamicBomEvents(): Event[] {
 
     bomEvents.push({
       id: `bom-${year}-${month}`,
-      title: `BOM: ${monthName} Birthdays`,
-      // raw ISO date for sorting
+      title: ` ${monthName} Birthdays`,
       date: lastDayOfMonth.toISOString(),
-      // display date for UI
       displayDate: formattedDate,
       location: "",
       description: `Celebrating all ${monthName} birthdays.`,
