@@ -288,7 +288,7 @@ const Admin = () => {
             value="key"
             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
-            Key Information
+            Key Functions
           </TabsTrigger>
 
           <TabsTrigger
@@ -306,11 +306,161 @@ const Admin = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Key info */}
-        <TabsContent value="key">
-          <p className="text-muted-foreground">Key information content…</p>
-        </TabsContent>
 
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+        {/* Key info */}
+          <p className="text-muted-foreground"></p>
+        <Card >
+         <CardTitle className="text-lg">1️⃣ Office Administration </CardTitle>
+          <CardDescription>
+            <ul>
+            <li>•	Maintain office infrastructure and supplies</li>
+            <li>•	Manage stationery, consumables, and assets</li>
+            <li>•	Vendor coordination for office services</li>
+            <li>•	Front-desk & reception management</li>
+            <li>•	Meeting room and resource scheduling</li>
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg">3️⃣ Procurement & Vendor Management </CardTitle>
+          <CardDescription>
+            <ul>
+            <li> • Raise purchase requests and orders</li>
+            <li> • Vendor onboarding and evaluation</li>
+            <li> • Contract management and renewals</li>
+            <li> • Invoice verification and payment coordination</li>
+            <li> • Cost optimization and negotiation</li>
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg">4️⃣ Travel & Logistics </CardTitle>
+          <CardDescription>
+            <ul>
+            <li>  • Employee travel booking (air, rail, hotel)</li>
+            <li>  • Travel policy compliance</li>
+            <li>  • Visa and passport coordination</li>
+            <li>  • Transport and logistics arrangement</li>
+            <li>  • Reimbursement processing support</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg">5️⃣ Communication & Coordination  </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Internal communication support</li>
+            <li> Circulars, notices, and announcements</li>
+            <li> Coordination between departments</li>
+            <li> Event coordination (town halls, meetings) </li>
+            <li> Visitor management</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg"> 6️⃣ Compliance & Governance </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Statutory and regulatory compliance tracking</li>
+            <li> Audit coordination (internal/external) </li>
+            <li> Policy implementation monitoring</li>
+            <li> ISO / SOC / internal audit support</li>
+            <li> Risk and control documentation</li> 
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg"> 1️⃣ Infrastructure & Building Management </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Office space planning and utilization</li>
+            <li> Building maintenance (civil, electrical, plumbing) </li>
+            <li> HVAC systems management</li>
+            <li> Power backup (DG sets, UPS) </li>
+            <li> Energy management</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+        
+        <Card>
+         <CardTitle className="text-lg"> 2️⃣ Safety, Security & Access Control </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Physical security management</li>
+            <li> CCTV surveillance systems</li>
+            <li> Access cards and biometric systems</li>
+            <li> Visitor security protocols</li>
+            <li> Emergency preparedness & evacuation drills</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg"> 3️⃣ Housekeeping & Hygiene </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Cleaning services management</li>
+            <li> Pantry and cafeteria hygiene</li>
+            <li> Waste management & disposal</li>
+            <li> Pest control</li>
+            <li> Sanitization and hygiene audits</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg"> 4️⃣ Equipment & Asset Maintenance </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Furniture and fixture maintenance</li>
+            <li> Office equipment upkeep</li>
+            <li> Preventive maintenance schedules</li>
+            <li> Asset tagging and tracking</li>
+            <li> AMC management</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+        
+        <Card>
+         <CardTitle className="text-lg"> 5️⃣ Health, Safety & Environment (HSE) </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Workplace safety compliance</li>
+            <li> Fire safety systems and drills</li>
+            <li> First-aid and medical room management</li>
+            <li> Environmental sustainability initiatives</li>
+            <li> Ergonomic assessments</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+
+        <Card>
+         <CardTitle className="text-lg"> 6️⃣ Utilities & Services Management </CardTitle>
+          <CardDescription className="mb-6">
+            <ul>
+            <li> Water supply and treatment</li>
+            <li> Electricity usage monitoring</li>
+            <li> Internet and telecom infrastructure</li>
+            <li> Cafeteria and food services</li>
+            <li> Parking management</li>
+
+            </ul>
+          </CardDescription>
+        </Card>
+</div>
         {/* Admin Team (optional placeholder) */}
        <TabsContent value="team" className="mt-6">
   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

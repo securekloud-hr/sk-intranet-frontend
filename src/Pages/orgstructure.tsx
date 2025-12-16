@@ -386,6 +386,7 @@ const OrgChart: React.FC = () => {
     <div className="w-full flex justify-end items-center gap-4 mb-6">
 
       {/* 🔐 Upload Excel – only for admins */}
+      {/*
       {isAdmin && (
         <>
           <label
@@ -405,15 +406,15 @@ const OrgChart: React.FC = () => {
             disabled={isLoading}
           />
         </>
-      )}
-
+      )} 
+*/}
       {/* Expand all */}
       <button
         onClick={expandAll}
         className="p-2 rounded-lg bg-gray-800 hover:bg-gray-900 shadow"
         aria-label="Expand all"
       >
-        <img src="/expand.png" alt="Expand" className="w-6 h-6" />
+        <img src="/expand.png" title="Expand All" className="w-6 h-6" />
       </button>
 
       {/* Collapse all */}
@@ -422,7 +423,7 @@ const OrgChart: React.FC = () => {
         className="p-2 rounded-lg bg-gray-800 hover:bg-gray-900 shadow"
         aria-label="Collapse all"
       >
-        <img src="/collapse.png" alt="Collapse" className="w-6 h-6" />
+        <img src="/collapse.png" title="Collapse All" className="w-6 h-6" />
       </button>
     </div>
 

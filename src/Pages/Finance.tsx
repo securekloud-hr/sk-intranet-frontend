@@ -305,9 +305,9 @@ const Finance = () => {
         </TabsList>
 
         {/* Key info */}
+  <TabsContent value="key" className="mt-6">
 
-
-          <p className="text-muted-foreground">Key information content…</p>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
   <Card>
  <CardTitle className="text-lg">
 1️⃣ Financial Accounting
@@ -466,11 +466,8 @@ const Finance = () => {
 </ul>
 </CardDescription>
 </Card>
-
-
-
-
-
+</div>
+</TabsContent>
 
         {/* Finance Team */}
         <TabsContent value="team" className="mt-6">
