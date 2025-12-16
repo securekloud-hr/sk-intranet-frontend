@@ -356,20 +356,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">5️⃣ Compliance & Governance</CardTitle>
-  <CardDescription className="mt-2">
-    <ul className="list-disc pl-5 space-y-1">
-      <li>Statutory and regulatory compliance tracking</li>
-      <li>Audit coordination (internal/external)</li>
-      <li>Policy implementation monitoring</li>
-      <li>ISO / SOC / internal audit support</li>
-      <li>Risk and control documentation</li>
-    </ul>
-  </CardDescription>
-</Card>
-
-<Card className="p-4">
-  <CardTitle className="text-lg">6️⃣ Infrastructure & Building Management</CardTitle>
+  <CardTitle className="text-lg">5️⃣ Infrastructure & Building Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Office space planning and utilization</li>
@@ -382,7 +369,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">7️⃣ Safety, Security & Access Control</CardTitle>
+  <CardTitle className="text-lg">6️⃣ Safety, Security & Access Control</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Physical security management</li>
@@ -395,7 +382,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">8️⃣ Housekeeping & Hygiene</CardTitle>
+  <CardTitle className="text-lg">7️⃣ Housekeeping & Hygiene</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Cleaning services management</li>
@@ -408,7 +395,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">9️⃣ Equipment & Asset Maintenance</CardTitle>
+  <CardTitle className="text-lg">8️⃣ Equipment & Asset Maintenance</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Furniture and fixture maintenance</li>
@@ -421,7 +408,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">🔟 Health, Safety & Environment (HSE)</CardTitle>
+  <CardTitle className="text-lg">9️⃣ Health, Safety & Environment (HSE)</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Workplace safety compliance</li>
@@ -434,7 +421,7 @@ const Admin = () => {
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">1️⃣1️⃣ Utilities & Services Management</CardTitle>
+  <CardTitle className="text-lg">🔟 Utilities & Services Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
       <li>Water supply and treatment</li>

@@ -94,12 +94,7 @@ const formsData = {
 };
 
 const team = [
-  {
-    name: "Sivakumar Natarajan",
-    role: "Head - People & Culture",
-    email: "siva.kumar@securekloud.com",
-    phone: "9940103400",
-  },
+
   {
     name: "Cynthia V",
     role: "Manager - H.R.",

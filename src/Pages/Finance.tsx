@@ -72,13 +72,8 @@ const financeTeamMembers: TeamMember[] = [
     email: "mohana.b@securekloud.com",
     phone: "9841151232",
   },
-  {
-    name: "Ramachandran S",
-    empId: "B24005",
-    designation: "Chief Financial Officer",
-    email: "ram.s@securekloud.com",
-    phone: "8754414135",
-  },
+
+
   {
     name: "Velayutham G",
     empId: "B1971",
@@ -313,13 +308,13 @@ const Finance = () => {
 1️⃣ Financial Accounting
 </CardTitle>
  <CardDescription className="mb-6">
-<ul>
-<li>Bookkeeping and journal entries</li>
-<li>General ledger maintenance</li>
-<li>Accounts finalization</li>
-<li>Month-end and year-end closing</li>
-<li>Fixed asset accounting & depreciation</li>
-</ul>
+<ol>
+<li>🔹 Bookkeeping and journal entries</li>
+<li>🔹General ledger maintenance</li>
+<li>🔹Accounts finalization</li>
+<li>🔹Month-end and year-end closing</li>
+<li>🔹Fixed asset accounting & depreciation</li>
+</ol>
 </CardDescription>
 </Card>
 
@@ -329,11 +324,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Vendor invoice processing</li>
-<li>Expense verification and approvals</li>
-<li>Vendor payments & scheduling</li>
-<li>TDS deduction and compliance</li>
-<li>Vendor reconciliation</li>
+<li>🔹Vendor invoice processing</li>
+<li>🔹Expense verification and approvals</li>
+<li>🔹Vendor payments & scheduling</li>
+<li>🔹TDS deduction and compliance</li>
+<li>🔹Vendor reconciliation</li>
 </ul>
 </CardDescription>
 </Card>
@@ -344,11 +339,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Customer invoicing</li>
-<li>Collection follow-ups</li>
-<li>Receipts accounting</li>
-<li>Credit control & aging analysis</li>
-<li>Customer reconciliation</li>
+<li>🔹Customer invoicing</li>
+<li>🔹Collection follow-ups</li>
+<li>🔹Receipts accounting</li>
+<li>🔹Credit control & aging analysis</li>
+<li>🔹Customer reconciliation</li>
 </ul>
 </CardDescription>
 </Card>
@@ -359,11 +354,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Salary processing</li>
-<li>Payroll statutory deductions</li>
-<li>Reimbursements processing</li>
-<li>Bonus and incentive payments</li>
-<li>Payroll compliance & reporting</li>
+<li>🔹Salary processing</li>
+<li>🔹Payroll statutory deductions</li>
+<li>🔹Reimbursements processing</li>
+<li>🔹Bonus and incentive payments</li>
+<li>🔹Payroll compliance & reporting</li>
 </ul>
 </CardDescription>
 </Card>
@@ -373,11 +368,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Annual budgeting & forecasting</li>
-<li>Variance analysis</li>
-<li>Cost control and optimization</li>
-<li>Financial modeling</li>
-<li>Management reporting</li>
+<li>🔹Annual budgeting & forecasting</li>
+<li>🔹Variance analysis</li>
+<li>🔹Cost control and optimization</li>
+<li>🔹Financial modeling</li>
+<li>🔹Management reporting</li>
 </ul>
 </CardDescription>
 </Card>
@@ -387,11 +382,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Direct taxes (Income Tax, TDS)</li>
-<li>Indirect taxes (GST) </li>
-<li>Tax filings & returns</li>
-<li>Tax assessments & notices</li>
-<li>Tax planning and advisory</li>
+<li>🔹Direct taxes (Income Tax, TDS)</li>
+<li>🔹Indirect taxes (GST) </li>
+<li>🔹Tax filings & returns</li>
+<li>🔹Tax assessments & notices</li>
+<li>🔹Tax planning and advisory</li>
 </ul>
 </CardDescription>
 </Card>
@@ -401,11 +396,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Cash flow management</li>
-<li>Bank account operations</li>
-<li>Fund planning & utilization</li>
-<li>Investment management</li>
-<li>Foreign exchange (FX) management</li>
+<li>🔹Cash flow management</li>
+<li>🔹Bank account operations</li>
+<li>🔹Fund planning & utilization</li>
+<li>🔹Investment management</li>
+<li>🔹Foreign exchange (FX) management</li>
 </ul>
 </CardDescription>
 </Card>
@@ -415,11 +410,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Internal control framework</li>
-<li>Statutory audit coordination</li>
-<li>Internal and tax audits</li>
-<li>Audit observations & closures</li>
-<li>Fraud prevention & detection</li>
+<li>🔹Internal control framework</li>
+<li>🔹Statutory audit coordination</li>
+<li>🔹Internal and tax audits</li>
+<li>🔹Audit observations & closures</li>
+<li>🔹Fraud prevention & detection</li>
 </ul>
 </CardDescription>
 </Card>
@@ -429,11 +424,11 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Financial statements preparation</li>
-<li>MIS and dashboards</li>
-<li>Regulatory reporting</li>
-<li>Board and management reports</li>
-<li>Ratio and performance analysis</li>
+<li>🔹Financial statements preparation</li>
+<li>🔹MIS and dashboards</li>
+<li>🔹Regulatory reporting</li>
+<li>🔹Board and management reports</li>
+<li>🔹Ratio and performance analysis</li>
 </ul>
 </CardDescription>
 </Card>
@@ -443,29 +438,15 @@ const Finance = () => {
 </CardTitle>
  <CardDescription className="mb-6">
 <ul>
-<li>Companies Act compliance</li>
-<li>Policy implementation </li>
-<li>SOX / internal control compliance </li>
-<li>Documentation & record retention</li>
-<li>Risk management support</li>
+<li>🔹Companies Act compliance</li>
+<li>🔹Policy implementation </li>
+<li>🔹SOX / internal control compliance </li>
+<li>🔹Documentation & record retention</li>
+<li>🔹Risk management support</li>
 </ul>
 </CardDescription>
 </Card>
 
-  <Card>
- <CardTitle className="text-lg">
-1️⃣1️⃣ Costing & Profitability Analysis
-</CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>Cost allocation and analysis</li>
-<li>Product / project costing</li>
-<li>Margin analysis</li>
-<li>Break-even analysis</li>
-<li>Pricing support</li>
-</ul>
-</CardDescription>
-</Card>
 </div>
 </TabsContent>
 
