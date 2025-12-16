@@ -1,12 +1,7 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import API from "@/config";
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import {
   Card,
@@ -41,6 +36,7 @@ interface Policy {
 }
 
 type CategoriesResponse = { [category: string]: Policy[] };
+
 type AdminTeamMember = {
   name: string;
   designation: string;
@@ -55,7 +51,6 @@ const adminTeamMembers: AdminTeamMember[] = [
     email: "kamatchi.mohan@securekloud.com",
     phone: "8807975792",
   },
- 
   {
     name: "Rajakumari S",
     designation: "House Keeping",
@@ -96,7 +91,6 @@ const getInitials = (name: string) =>
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
 
 /* ================= Constants ================= */
 
@@ -171,9 +165,9 @@ const Admin = () => {
       formData.append("file", file);
 
       const res = await fetch(
-        `${API}/api/policies/upload/${encodeURIComponent(
-          ADMIN_CATEGORY
-        )}/${encodeURIComponent(policyName)}`,
+        `${API}/api/policies/upload/${encodeURIComponent(ADMIN_CATEGORY)}/${encodeURIComponent(
+          policyName
+        )}`,
         {
           method: "POST",
           body: formData,
@@ -187,7 +181,7 @@ const Admin = () => {
         return;
       }
 
-      // update UI immediately (like Policies.tsx)
+      // update UI immediately
       setCategories((prev) => {
         const updated = { ...prev };
         const list = updated[ADMIN_CATEGORY] ? [...updated[ADMIN_CATEGORY]] : [];
@@ -241,9 +235,9 @@ const Admin = () => {
     setDeleting(true);
     try {
       const res = await fetch(
-        `${API}/api/policies/${encodeURIComponent(
-          ADMIN_CATEGORY
-        )}/${encodeURIComponent(deleteTarget.name)}`,
+        `${API}/api/policies/${encodeURIComponent(ADMIN_CATEGORY)}/${encodeURIComponent(
+          deleteTarget.name
+        )}`,
         { method: "DELETE" }
       );
 
@@ -306,227 +300,211 @@ const Admin = () => {
           </TabsTrigger>
         </TabsList>
 
+        {/* ✅ KEY TAB (THIS WAS MISSING IN YOUR CODE) */}
+        <TabsContent value="key" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="p-4">
+      <CardTitle className="text-lg">1️⃣ Office Administration</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Maintain office infrastructure and supplies</li>
+          <li>Manage stationery, consumables, and assets</li>
+          <li>Vendor coordination for office services</li>
+          <li>Front-desk & reception management</li>
+          <li>Meeting room and resource scheduling</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-        {/* Key info */}
-          <p className="text-muted-foreground"></p>
-        <Card >
-         <CardTitle className="text-lg">1️⃣ Office Administration </CardTitle>
-          <CardDescription>
-            <ul>
-            <li>•	Maintain office infrastructure and supplies</li>
-            <li>•	Manage stationery, consumables, and assets</li>
-            <li>•	Vendor coordination for office services</li>
-            <li>•	Front-desk & reception management</li>
-            <li>•	Meeting room and resource scheduling</li>
-            </ul>
-          </CardDescription>
-        </Card>
+    <Card className="p-4">
+      <CardTitle className="text-lg">3️⃣ Procurement & Vendor Management</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Raise purchase requests and orders</li>
+          <li>Vendor onboarding and evaluation</li>
+          <li>Contract management and renewals</li>
+          <li>Invoice verification and payment coordination</li>
+          <li>Cost optimization and negotiation</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-        <Card>
-         <CardTitle className="text-lg">3️⃣ Procurement & Vendor Management </CardTitle>
-          <CardDescription>
-            <ul>
-            <li> • Raise purchase requests and orders</li>
-            <li> • Vendor onboarding and evaluation</li>
-            <li> • Contract management and renewals</li>
-            <li> • Invoice verification and payment coordination</li>
-            <li> • Cost optimization and negotiation</li>
-            </ul>
-          </CardDescription>
-        </Card>
+    <Card className="p-4">
+      <CardTitle className="text-lg">4️⃣ Travel & Logistics</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Employee travel booking (air, rail, hotel)</li>
+          <li>Travel policy compliance</li>
+          <li>Visa and passport coordination</li>
+          <li>Transport and logistics arrangement</li>
+          <li>Reimbursement processing support</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-        <Card>
-         <CardTitle className="text-lg">4️⃣ Travel & Logistics </CardTitle>
-          <CardDescription>
-            <ul>
-            <li>  • Employee travel booking (air, rail, hotel)</li>
-            <li>  • Travel policy compliance</li>
-            <li>  • Visa and passport coordination</li>
-            <li>  • Transport and logistics arrangement</li>
-            <li>  • Reimbursement processing support</li>
+    <Card className="p-4">
+      <CardTitle className="text-lg">5️⃣ Communication & Coordination</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Internal communication support</li>
+          <li>Circulars, notices, and announcements</li>
+          <li>Coordination between departments</li>
+          <li>Event coordination (town halls, meetings)</li>
+          <li>Visitor management</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-            </ul>
-          </CardDescription>
-        </Card>
+    <Card className="p-4">
+      <CardTitle className="text-lg">6️⃣ Compliance & Governance</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Statutory and regulatory compliance tracking</li>
+          <li>Audit coordination (internal/external)</li>
+          <li>Policy implementation monitoring</li>
+          <li>ISO / SOC / internal audit support</li>
+          <li>Risk and control documentation</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-        <Card>
-         <CardTitle className="text-lg">5️⃣ Communication & Coordination  </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Internal communication support</li>
-            <li> Circulars, notices, and announcements</li>
-            <li> Coordination between departments</li>
-            <li> Event coordination (town halls, meetings) </li>
-            <li> Visitor management</li>
+    <Card className="p-4">
+      <CardTitle className="text-lg">1️⃣ Infrastructure & Building Management</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Office space planning and utilization</li>
+          <li>Building maintenance (civil, electrical, plumbing)</li>
+          <li>HVAC systems management</li>
+          <li>Power backup (DG sets, UPS)</li>
+          <li>Energy management</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-            </ul>
-          </CardDescription>
-        </Card>
+    <Card className="p-4">
+      <CardTitle className="text-lg">2️⃣ Safety, Security & Access Control</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Physical security management</li>
+          <li>CCTV surveillance systems</li>
+          <li>Access cards and biometric systems</li>
+          <li>Visitor security protocols</li>
+          <li>Emergency preparedness & evacuation drills</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-        <Card>
-         <CardTitle className="text-lg"> 6️⃣ Compliance & Governance </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Statutory and regulatory compliance tracking</li>
-            <li> Audit coordination (internal/external) </li>
-            <li> Policy implementation monitoring</li>
-            <li> ISO / SOC / internal audit support</li>
-            <li> Risk and control documentation</li> 
-            </ul>
-          </CardDescription>
-        </Card>
+    <Card className="p-4">
+      <CardTitle className="text-lg">3️⃣ Housekeeping & Hygiene</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Cleaning services management</li>
+          <li>Pantry and cafeteria hygiene</li>
+          <li>Waste management & disposal</li>
+          <li>Pest control</li>
+          <li>Sanitization and hygiene audits</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-        <Card>
-         <CardTitle className="text-lg"> 1️⃣ Infrastructure & Building Management </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Office space planning and utilization</li>
-            <li> Building maintenance (civil, electrical, plumbing) </li>
-            <li> HVAC systems management</li>
-            <li> Power backup (DG sets, UPS) </li>
-            <li> Energy management</li>
+    <Card className="p-4">
+      <CardTitle className="text-lg">4️⃣ Equipment & Asset Maintenance</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Furniture and fixture maintenance</li>
+          <li>Office equipment upkeep</li>
+          <li>Preventive maintenance schedules</li>
+          <li>Asset tagging and tracking</li>
+          <li>AMC management</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-            </ul>
-          </CardDescription>
-        </Card>
-        
-        <Card>
-         <CardTitle className="text-lg"> 2️⃣ Safety, Security & Access Control </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Physical security management</li>
-            <li> CCTV surveillance systems</li>
-            <li> Access cards and biometric systems</li>
-            <li> Visitor security protocols</li>
-            <li> Emergency preparedness & evacuation drills</li>
+    <Card className="p-4">
+      <CardTitle className="text-lg">5️⃣ Health, Safety & Environment (HSE)</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Workplace safety compliance</li>
+          <li>Fire safety systems and drills</li>
+          <li>First-aid and medical room management</li>
+          <li>Environmental sustainability initiatives</li>
+          <li>Ergonomic assessments</li>
+        </ul>
+      </CardDescription>
+    </Card>
 
-            </ul>
-          </CardDescription>
-        </Card>
-
-        <Card>
-         <CardTitle className="text-lg"> 3️⃣ Housekeeping & Hygiene </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Cleaning services management</li>
-            <li> Pantry and cafeteria hygiene</li>
-            <li> Waste management & disposal</li>
-            <li> Pest control</li>
-            <li> Sanitization and hygiene audits</li>
-
-            </ul>
-          </CardDescription>
-        </Card>
-
-        <Card>
-         <CardTitle className="text-lg"> 4️⃣ Equipment & Asset Maintenance </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Furniture and fixture maintenance</li>
-            <li> Office equipment upkeep</li>
-            <li> Preventive maintenance schedules</li>
-            <li> Asset tagging and tracking</li>
-            <li> AMC management</li>
-
-            </ul>
-          </CardDescription>
-        </Card>
-        
-        <Card>
-         <CardTitle className="text-lg"> 5️⃣ Health, Safety & Environment (HSE) </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Workplace safety compliance</li>
-            <li> Fire safety systems and drills</li>
-            <li> First-aid and medical room management</li>
-            <li> Environmental sustainability initiatives</li>
-            <li> Ergonomic assessments</li>
-
-            </ul>
-          </CardDescription>
-        </Card>
-
-        <Card>
-         <CardTitle className="text-lg"> 6️⃣ Utilities & Services Management </CardTitle>
-          <CardDescription className="mb-6">
-            <ul>
-            <li> Water supply and treatment</li>
-            <li> Electricity usage monitoring</li>
-            <li> Internet and telecom infrastructure</li>
-            <li> Cafeteria and food services</li>
-            <li> Parking management</li>
-
-            </ul>
-          </CardDescription>
-        </Card>
-</div>
-        {/* Admin Team (optional placeholder) */}
-       <TabsContent value="team" className="mt-6">
-  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    {adminTeamMembers.map((member, idx) => {
-      const emailOk = member.email && member.email !== "N/A" && member.email !== "NA";
-      const phoneOk = member.phone && member.phone !== "N/A" && member.phone !== "NA";
-
-      return (
-        <Card
-          key={`${member.name}-${idx}`}
-          className="flex flex-col items-center text-center py-8 px-6"
-        >
-          <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
-            <span className="text-purple-700 font-semibold text-xl">
-              {getInitials(member.name)}
-            </span>
+    <Card className="p-4">
+      <CardTitle className="text-lg">6️⃣ Utilities & Services Management</CardTitle>
+      <CardDescription className="mt-2">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Water supply and treatment</li>
+          <li>Electricity usage monitoring</li>
+          <li>Internet and telecom infrastructure</li>
+          <li>Cafeteria and food services</li>
+          <li>Parking management</li>
+        </ul>
+      </CardDescription>
+    </Card>
           </div>
+        </TabsContent>
 
-          <CardTitle className="text-lg">{member.name}</CardTitle>
+        {/* TEAM TAB */}
+        <TabsContent value="team" className="mt-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {adminTeamMembers.map((member, idx) => {
+              const emailOk = member.email && member.email !== "N/A" && member.email !== "NA";
+              const phoneOk = member.phone && member.phone !== "N/A" && member.phone !== "NA";
 
-          <CardDescription className="mb-6">
-            {member.designation}
-          </CardDescription>
-
-          <div className="text-sm space-y-2">
-            <p>
-              <strong>Email:</strong>{" "}
-              {emailOk ? (
-                <a
-                  href={`mailto:${member.email}`}
-                  className="text-blue-600 hover:underline"
+              return (
+                <Card
+                  key={`${member.name}-${idx}`}
+                  className="flex flex-col items-center text-center py-8 px-6"
                 >
-                  {member.email}
-                </a>
-              ) : (
-                <span className="text-muted-foreground">N/A</span>
-              )}
-            </p>
+                  <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
+                    <span className="text-purple-700 font-semibold text-xl">
+                      {getInitials(member.name)}
+                    </span>
+                  </div>
 
-            <p>
-              <strong>Phone:</strong>{" "}
-              {phoneOk ? (
-                <a
-                  href={`tel:${member.phone}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {member.phone}
-                </a>
-              ) : (
-                <span className="text-muted-foreground">N/A</span>
-              )}
-            </p>
+                  <CardTitle className="text-lg">{member.name}</CardTitle>
+
+                  <CardDescription className="mb-6">{member.designation}</CardDescription>
+
+                  <div className="text-sm space-y-2">
+                    <p>
+                      <strong>Email:</strong>{" "}
+                      {emailOk ? (
+                        <a href={`mailto:${member.email}`} className="text-blue-600 hover:underline">
+                          {member.email}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </p>
+
+                    <p>
+                      <strong>Phone:</strong>{" "}
+                      {phoneOk ? (
+                        <a href={`tel:${member.phone}`} className="text-blue-600 hover:underline">
+                          {member.phone}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </p>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
-        </Card>
-      );
-    })}
-  </div>
-</TabsContent>
+        </TabsContent>
 
-        {/* ================= Admin policy tab ================= */}
+        {/* POLICY TAB */}
         <TabsContent value="policy" className="space-y-4">
           {loading ? (
             <p className="text-gray-500">Loading Admin policies...</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Policy cards */}
               {adminPolicies.map((policy, index) => (
                 <Card
                   key={`${policy.name}-${index}`}
@@ -534,9 +512,7 @@ const Admin = () => {
                 >
                   <CardHeader className="pb-2 flex-grow">
                     <CardTitle>{policy.name}</CardTitle>
-                    <CardDescription>
-                      Last updated: {policy.updated}
-                    </CardDescription>
+                    <CardDescription>Last updated: {policy.updated}</CardDescription>
 
                     {policy.description && (
                       <p className="mt-2 text-[11px] text-gray-600 line-clamp-3">
@@ -547,7 +523,6 @@ const Admin = () => {
 
                   <CardContent className="flex-shrink-0 pt-0">
                     <div className="flex justify-center space-x-2">
-                      {/* VIEW */}
                       <button
                         onClick={() => {
                           setDocToView(`${API}${policy.fileUrl}`);
@@ -559,7 +534,6 @@ const Admin = () => {
                         <FiEye className="w-4 h-4" />
                       </button>
 
-                      {/* DOWNLOAD */}
                       <a
                         href={`${API}/api/policies/download/${encodeURIComponent(
                           ADMIN_CATEGORY
@@ -570,7 +544,6 @@ const Admin = () => {
                         <FiDownload className="w-4 h-4" />
                       </a>
 
-                      {/* UPLOAD (admin only) */}
                       {isAdmin && (
                         <>
                           <input
@@ -598,7 +571,6 @@ const Admin = () => {
                             Upload
                           </label>
 
-                          {/* DELETE (admin only) */}
                           <button
                             onClick={() => {
                               setDeleteTarget({ name: policy.name });
@@ -616,17 +588,12 @@ const Admin = () => {
                 </Card>
               ))}
 
-              
-
-              {/* + Add Policy card (admin only) */}
               {isAdmin && (
                 <Card
                   className="p-4 border-dashed border-2 border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50"
                   onClick={() => setShowAddModal(true)}
                 >
-                  <span className="text-sm font-medium text-gray-600">
-                    + Add Policy
-                  </span>
+                  <span className="text-sm font-medium text-gray-600">+ Add Policy</span>
                 </Card>
               )}
             </div>
@@ -634,7 +601,7 @@ const Admin = () => {
         </TabsContent>
       </Tabs>
 
-      {/* ===== PDF Preview ===== */}
+      {/* PDF Preview */}
       <Dialog open={showDocModal} onOpenChange={setShowDocModal}>
         <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
           <DialogHeader className="px-6 pt-6">
@@ -648,14 +615,12 @@ const Admin = () => {
               className="w-full h-[90vh]"
             />
           ) : (
-            <p className="text-sm text-muted-foreground px-6 pb-6">
-              No document selected
-            </p>
+            <p className="text-sm text-muted-foreground px-6 pb-6">No document selected</p>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* ===== Add Policy Modal ===== */}
+      {/* Add Policy Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -687,7 +652,7 @@ const Admin = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ===== Delete Confirm Modal ===== */}
+      {/* Delete Confirm Modal */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -695,8 +660,7 @@ const Admin = () => {
           </DialogHeader>
 
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete{" "}
-            <b>{deleteTarget?.name}</b>?
+            Are you sure you want to delete <b>{deleteTarget?.name}</b>?
           </p>
 
           <div className="flex justify-end gap-2 mt-4">

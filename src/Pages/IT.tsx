@@ -46,9 +46,10 @@ type CategoriesResponse = { [category: string]: Policy[] };
 
 /* ================= Constants ================= */
 
-const IT_CATEGORY = "IT Policies"; // must match your Policies page tab/category name exactly
+const IT_CATEGORY = "IT Policies"; // must match your backend category name exactly
 
-/* ================= IT TEAM DATA (replace with real) ================= */
+/* ================= IT TEAM DATA ================= */
+
 const itTeamMembers: TeamMember[] = [
   {
     name: "Balaji S",
@@ -264,9 +265,7 @@ const IT = () => {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold mb-1">IT</h1>
-        <p className="text-muted-foreground">
-          IT information, team details and policies
-        </p>
+        <p className="text-muted-foreground">IT information, team details and policies</p>
       </div>
 
       <Tabs defaultValue="key" className="space-y-6">
@@ -293,139 +292,127 @@ const IT = () => {
           </TabsTrigger>
         </TabsList>
 
-  <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-3">
-        {/* Key info */}
-          <p className="text-muted-foreground"></p>
+        {/* ✅ KEY TAB (FIX) */}
+        <TabsContent value="key" className="mt-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Card className="p-4">
+              <CardTitle className="text-lg">1️⃣ IT Infrastructure Management</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Servers (physical & virtual) management</li>
+                  <li>Data center / cloud infrastructure</li>
+                  <li>Network devices (routers, switches, firewalls)</li>
+                  <li>LAN, WAN, Wi-Fi management</li>
+                  <li>Backup power & redundancy planning</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-        <Card>
-         <CardTitle className="text-lg">
-            1️⃣ IT Infrastructure Management</CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Servers (physical & virtual) management</li>
-            <li>Data center / cloud infrastructure</li>
-            <li>Network devices (routers, switches, firewalls) </li>
-            <li>LAN, WAN, Wi-Fi management</li>
-            <li>Backup power & redundancy planning</li>
-            </ul>
-          </CardDescription>
-        </Card>
- 
-        <Card>
-         <CardTitle className="text-lg">
-            2️⃣ Network & Connectivity</CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Internet and MPLS management</li>
-            <li>VPN and remote access setup</li>
-            <li>Bandwidth monitoring and optimization</li>
-            <li>Network security controls</li>
-            <li>Network troubleshooting</li>
-            </ul>
-          </CardDescription>
-        </Card>
- 
-        <Card>
-         <CardTitle className="text-lg">
-            3️⃣ End-User Computing (EUC) </CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Desktop, laptop, and mobile device support</li>
-            <li>OS installation and patching</li>
-            <li>Software installation and upgrades</li>
-            <li>Asset allocation and tracking</li>
-            <li>IT helpdesk & ticket management</li>
-            </ul>
-          </CardDescription>
-        </Card>
- 
-        <Card>
-         <CardTitle className="text-lg">
-            4️⃣ Application Management</CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Business application support (ERP, CRM, HRMS) </li>
-            <li>Application deployment and upgrades</li>
-            <li>License management</li>
-            <li>Vendor coordination</li>
-            <li>Application performance monitoring</li> 
-            </ul>
-          </CardDescription>
-        </Card>
+            <Card className="p-4">
+              <CardTitle className="text-lg">2️⃣ Network & Connectivity</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Internet and MPLS management</li>
+                  <li>VPN and remote access setup</li>
+                  <li>Bandwidth monitoring and optimization</li>
+                  <li>Network security controls</li>
+                  <li>Network troubleshooting</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-        <Card>
-         <CardTitle className="text-lg">
-            5️⃣ Information Security (Cybersecurity) </CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Security policies and enforcement</li>
-            <li>Endpoint protection (AV, EDR) </li>
-            <li>Firewalls and intrusion detection</li>
-            <li>Identity and access management (IAM) </li>
-            <li>Vulnerability management & patching</li>
-            </ul>
-          </CardDescription>
-        </Card>
+            <Card className="p-4">
+              <CardTitle className="text-lg">3️⃣ End-User Computing (EUC)</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Desktop, laptop, and mobile device support</li>
+                  <li>OS installation and patching</li>
+                  <li>Software installation and upgrades</li>
+                  <li>Asset allocation and tracking</li>
+                  <li>IT helpdesk & ticket management</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-        <Card>
-         <CardTitle className="text-lg">
-            6️⃣ Data Management & Backup</CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Data storage management</li>
-            <li>Backup & restore operations</li>
-            <li>Disaster recovery planning</li>
-            <li>Data retention policies</li>
-            <li>Database administration</li>
-            </ul>
-          </CardDescription>
-        </Card>
-        <Card>
-         <CardTitle className="text-lg">
-          7️⃣ IT Service Management (ITSM)</CardTitle>
-                      <CardDescription className="mb-6">
-          <ul>
-          <li>Incident management</li>
-          <li>Problem management</li>
-          <li>Change management</li>
-          <li>Configuration management (CMDB) </li>
-          <li>SLA & KPI tracking</li>
-          </ul>
-          </CardDescription>
-        </Card>
+            <Card className="p-4">
+              <CardTitle className="text-lg">4️⃣ Application Management</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Business application support (ERP, CRM, HRMS)</li>
+                  <li>Application deployment and upgrades</li>
+                  <li>License management</li>
+                  <li>Vendor coordination</li>
+                  <li>Application performance monitoring</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-        <Card>
-         <CardTitle className="text-lg">
-          8️⃣ Compliance, Risk & Audit</CardTitle>
-                    <CardDescription className="mb-6">
-          <ul>
-          <li>IT policy creation & updates</li>
-          <li>ISO 27001 / SOC / GDPR support</li>
-          <li>Risk assessment & mitigation</li>
-          <li>Audit coordination</li>
-          <li>Access review & controls</li>
-            </ul>
-          </CardDescription>
-        </Card>
+            <Card className="p-4">
+              <CardTitle className="text-lg">5️⃣ Information Security (Cybersecurity)</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Security policies and enforcement</li>
+                  <li>Endpoint protection (AV, EDR)</li>
+                  <li>Firewalls and intrusion detection</li>
+                  <li>Identity and access management (IAM)</li>
+                  <li>Vulnerability management & patching</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-        <Card>
-         <CardTitle className="text-lg">
-            9️⃣🔟 Business Continuity & DR</CardTitle>
-                      <CardDescription className="mb-6">
-            <ul>
-            <li>Business continuity planning (BCP) </li>
-            <li>Disaster recovery (DR) drills</li>
-            <li>System failover planning</li>
-            <li>High availability design</li>
-            <li>Incident response planning</li>
-            </ul>
-          </CardDescription>
-        </Card>
+            <Card className="p-4">
+              <CardTitle className="text-lg">6️⃣ Data Management & Backup</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Data storage management</li>
+                  <li>Backup & restore operations</li>
+                  <li>Disaster recovery planning</li>
+                  <li>Data retention policies</li>
+                  <li>Database administration</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-</div>
+            <Card className="p-4">
+              <CardTitle className="text-lg">7️⃣ IT Service Management (ITSM)</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Incident management</li>
+                  <li>Problem management</li>
+                  <li>Change management</li>
+                  <li>Configuration management (CMDB)</li>
+                  <li>SLA & KPI tracking</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
+            <Card className="p-4">
+              <CardTitle className="text-lg">8️⃣ Compliance, Risk & Audit</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>IT policy creation & updates</li>
+                  <li>ISO 27001 / SOC / GDPR support</li>
+                  <li>Risk assessment & mitigation</li>
+                  <li>Audit coordination</li>
+                  <li>Access review & controls</li>
+                </ul>
+              </CardDescription>
+            </Card>
 
-
+            <Card className="p-4">
+              <CardTitle className="text-lg">9️⃣ Business Continuity & DR</CardTitle>
+              <CardDescription className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Business continuity planning (BCP)</li>
+                  <li>Disaster recovery (DR) drills</li>
+                  <li>System failover planning</li>
+                  <li>High availability design</li>
+                  <li>Incident response planning</li>
+                </ul>
+              </CardDescription>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* IT Team */}
         <TabsContent value="team" className="mt-6">
@@ -437,7 +424,7 @@ const IT = () => {
               return (
                 <Card
                   key={member.empId}
-                  className="flex flex-col items-center text-center py-6"
+                  className="flex flex-col items-center text-center py-6 px-6"
                 >
                   <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
                     <span className="text-purple-700 font-semibold text-xl">
@@ -447,9 +434,7 @@ const IT = () => {
 
                   <CardTitle className="text-lg">{member.name}</CardTitle>
 
-                  <CardDescription className="mb-4">
-                    {member.designation}
-                  </CardDescription>
+                  <CardDescription className="mb-4">{member.designation}</CardDescription>
 
                   <div className="text-sm space-y-1">
                     <p>
@@ -574,9 +559,7 @@ const IT = () => {
                   className="p-4 border-dashed border-2 border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50"
                   onClick={() => setShowAddModal(true)}
                 >
-                  <span className="text-sm font-medium text-gray-600">
-                    + Add Policy
-                  </span>
+                  <span className="text-sm font-medium text-gray-600">+ Add Policy</span>
                 </Card>
               )}
             </div>
