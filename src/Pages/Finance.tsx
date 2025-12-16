@@ -305,9 +305,172 @@ const Finance = () => {
         </TabsList>
 
         {/* Key info */}
-        <TabsContent value="key">
+
+
           <p className="text-muted-foreground">Key information content…</p>
-        </TabsContent>
+  <Card>
+ <CardTitle className="text-lg">
+1️⃣ Financial Accounting
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Bookkeeping and journal entries</li>
+<li>General ledger maintenance</li>
+<li>Accounts finalization</li>
+<li>Month-end and year-end closing</li>
+<li>Fixed asset accounting & depreciation</li>
+</ul>
+</CardDescription>
+</Card>
+
+  <Card>
+ <CardTitle className="text-lg">
+2️⃣ Accounts Payable (AP)
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Vendor invoice processing</li>
+<li>Expense verification and approvals</li>
+<li>Vendor payments & scheduling</li>
+<li>TDS deduction and compliance</li>
+<li>Vendor reconciliation</li>
+</ul>
+</CardDescription>
+</Card>
+
+  <Card>
+ <CardTitle className="text-lg">
+3️⃣ Accounts Receivable (AR)
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Customer invoicing</li>
+<li>Collection follow-ups</li>
+<li>Receipts accounting</li>
+<li>Credit control & aging analysis</li>
+<li>Customer reconciliation</li>
+</ul>
+</CardDescription>
+</Card>
+
+  <Card>
+ <CardTitle className="text-lg">
+4️⃣ Payroll & Employee Payments
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Salary processing</li>
+<li>Payroll statutory deductions</li>
+<li>Reimbursements processing</li>
+<li>Bonus and incentive payments</li>
+<li>Payroll compliance & reporting</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+5️⃣ Budgeting & Financial Planning (FP&A)
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Annual budgeting & forecasting</li>
+<li>Variance analysis</li>
+<li>Cost control and optimization</li>
+<li>Financial modeling</li>
+<li>Management reporting</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+6️⃣ Taxation & Statutory Compliance
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Direct taxes (Income Tax, TDS)</li>
+<li>Indirect taxes (GST) </li>
+<li>Tax filings & returns</li>
+<li>Tax assessments & notices</li>
+<li>Tax planning and advisory</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+7️⃣ Treasury & Cash Management
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Cash flow management</li>
+<li>Bank account operations</li>
+<li>Fund planning & utilization</li>
+<li>Investment management</li>
+<li>Foreign exchange (FX) management</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+8️⃣ Audit & Internal Controls
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Internal control framework</li>
+<li>Statutory audit coordination</li>
+<li>Internal and tax audits</li>
+<li>Audit observations & closures</li>
+<li>Fraud prevention & detection</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+9️⃣ Financial Reporting & MIS
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Financial statements preparation</li>
+<li>MIS and dashboards</li>
+<li>Regulatory reporting</li>
+<li>Board and management reports</li>
+<li>Ratio and performance analysis</li>
+</ul>
+</CardDescription>
+</Card>
+  <Card>
+ <CardTitle className="text-lg">
+🔟 Compliance & Governance
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Companies Act compliance</li>
+<li>Policy implementation </li>
+<li>SOX / internal control compliance </li>
+<li>Documentation & record retention</li>
+<li>Risk management support</li>
+</ul>
+</CardDescription>
+</Card>
+
+  <Card>
+ <CardTitle className="text-lg">
+1️⃣1️⃣ Costing & Profitability Analysis
+</CardTitle>
+ <CardDescription className="mb-6">
+<ul>
+<li>Cost allocation and analysis</li>
+<li>Product / project costing</li>
+<li>Margin analysis</li>
+<li>Break-even analysis</li>
+<li>Pricing support</li>
+</ul>
+</CardDescription>
+</Card>
+
+
+
+
+
 
         {/* Finance Team */}
         <TabsContent value="team" className="mt-6">

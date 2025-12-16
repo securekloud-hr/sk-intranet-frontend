@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
 import API from "@/config";
 
 interface Holiday {
@@ -63,7 +63,7 @@ const Holidays = () => {
     PaternityLeave: 0,
   });
 
-  // ✅ Logged in user (same style as LearningDevelopment.tsx)
+  // ✅ Logged in user
   const currentUser = useMemo<UserLike | null>(() => {
     try {
       const r = localStorage.getItem("user");
@@ -87,7 +87,7 @@ const Holidays = () => {
   // ✅ helper: null -> 0
   const n0 = (v: number | null | undefined) => (v == null ? 0 : Number(v));
 
-  // ✅ Fetch leave balance for logged-in user
+  // ✅ Fetch leave balance
   useEffect(() => {
     const loadLeave = async () => {
       if (!userEmail) {
@@ -159,6 +159,7 @@ const Holidays = () => {
     };
 
     loadYears();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 🔹 Fetch holidays
@@ -237,19 +238,22 @@ const Holidays = () => {
     return map;
   }, [holidays, ALL_MONTHS]);
 
+  // ✅ all cards same height (change this one value if you want)
+  const CARD_HEIGHT = "h-[430px]";
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Company Holidays</h1>
+        <h1 className="text-2xl font-bold">Company Holidays</h1>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Year:</span>
+          <span className="text-xs text-muted-foreground">Year:</span>
           <select
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
             disabled={yearsLoading}
-            className="border rounded px-2 py-1 text-sm"
+            className="border rounded px-2 py-1 text-xs"
           >
             {availableYears.map((y) => (
               <option key={y} value={y}>
@@ -260,25 +264,26 @@ const Holidays = () => {
         </div>
       </div>
 
-      {loading && <div className="text-sm">Loading holidays…</div>}
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      {loading && <div className="text-xs">Loading holidays…</div>}
+      {error && <div className="text-xs text-red-600">{error}</div>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ✅ Leave Balance (Dynamic) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Leave Balance</CardTitle>
-            <CardDescription>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+        {/* ✅ Leave Balance */}
+        <Card className={`${CARD_HEIGHT} p-3 flex flex-col`}>
+          <CardHeader className="pb-2 space-y-1">
+            <CardTitle className="text-base">Leave Balance</CardTitle>
+            <CardDescription className="text-xs">
               Your leave balance as per Employee Directory
             </CardDescription>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="pt-2 flex-1 overflow-y-auto text-sm pr-2">
             {leaveLoading ? (
-              <div className="text-sm">Loading your leave balance…</div>
+              <div className="text-xs">Loading your leave balance…</div>
             ) : leaveError ? (
-              <div className="text-sm text-red-600">{leaveError}</div>
+              <div className="text-xs text-red-600">{leaveError}</div>
             ) : (
-              <ul className="space-y-1">
+              <ul className="space-y-0.5 text-sm">
                 <li>Earned Leave: {leave.EarnedLeave}</li>
                 <li>Casual Leave: {leave.CasualLeave}</li>
                 <li>Sick Leave: {leave.SickLeave}</li>
@@ -287,53 +292,74 @@ const Holidays = () => {
               </ul>
             )}
 
-            <div className="flex items-center gap-2 mt-4">
-              <CalendarIcon className="h-5 w-5" />
-              <span className="font-medium">Time Off Requests</span>
+            <div className="mt-4 border-t pt-3">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-sm">Time Off Requests</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                For time off requests, please submit your request through the{" "}
+                <a
+                  href="https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-IN&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/in/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/in/ess/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline font-semibold"
+                >
+                  ADP Portal
+                </a>
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Calendar */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Holiday Calendar</CardTitle>
-            <CardDescription>Calendar view of all company holidays</CardDescription>
+        {/* ✅ Calendar */}
+        <Card className={`${CARD_HEIGHT} p-3 flex flex-col`}>
+          <CardHeader className="pb-2 space-y-1">
+            <CardTitle className="text-base">Holiday Calendar</CardTitle>
+            <CardDescription className="text-xs">
+              Calendar view of all company holidays
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Calendar
-              month={month}
-              onMonthChange={setMonth}
-              modifiers={{ holiday: isHoliday }}
-              modifiersClassNames={{
-                holiday: "bg-red-100 text-red-900 font-bold",
-              }}
-            />
+
+          <CardContent className="pt-2 flex-1 overflow-hidden">
+            <div className="h-full flex items-start justify-center">
+              <Calendar
+                className="scale-90 origin-top"
+                month={month}
+                onMonthChange={setMonth}
+                modifiers={{ holiday: isHoliday }}
+                modifiersClassNames={{
+                  holiday: "bg-red-100 text-red-900 font-bold",
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Holiday List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Holiday List</CardTitle>
-            <CardDescription>Holidays for {year}</CardDescription>
+        {/* ✅ Holiday List */}
+        <Card className={`${CARD_HEIGHT} p-3 flex flex-col`}>
+          <CardHeader className="pb-2 space-y-1">
+            <CardTitle className="text-base">Holiday List</CardTitle>
+            <CardDescription className="text-xs">
+              Holidays for {year}
+            </CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="pt-2 flex-1 overflow-y-auto pr-2">
             {ALL_MONTHS.map((monthName) => {
               const list = holidaysByMonth[monthName];
               if (!list.length) return null;
 
               return (
-                <div key={monthName} className="mb-4">
-                  <h3 className="font-semibold text-lg mb-2">{monthName}</h3>
+                <div key={monthName} className="mb-3">
+                  <h3 className="font-semibold text-sm mb-1">{monthName}</h3>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm border-collapse">
+                    <table className="w-full text-xs border-collapse">
                       <thead>
                         <tr className="border-b bg-muted/40">
-                          <th className="text-left px-2 py-1 w-[60px]">Date</th>
-                          <th className="text-left px-2 py-1 w-[120px]">Day</th>
+                          <th className="text-left px-2 py-1 w-[50px]">Date</th>
+                          <th className="text-left px-2 py-1 w-[110px]">Day</th>
                           <th className="text-left px-2 py-1">Holiday</th>
                         </tr>
                       </thead>
@@ -341,14 +367,16 @@ const Holidays = () => {
                       <tbody>
                         {list.map((h) => (
                           <tr key={h.id} className="border-b hover:bg-muted/30">
-                            <td className="px-2 py-1 font-medium">{h.date.getDate()}</td>
+                            <td className="px-2 py-1 font-medium">
+                              {h.date.getDate()}
+                            </td>
                             <td className="px-2 py-1 text-muted-foreground">
                               {getDayName(h.date)}
                             </td>
                             <td className="px-2 py-1">
                               <div className="font-medium">{h.name}</div>
                               {h.description && (
-                                <div className="text-xs text-muted-foreground">
+                                <div className="text-[11px] text-muted-foreground">
                                   {h.description}
                                 </div>
                               )}
@@ -369,4 +397,3 @@ const Holidays = () => {
 };
 
 export default Holidays;
-//

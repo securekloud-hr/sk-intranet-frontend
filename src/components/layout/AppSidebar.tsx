@@ -99,7 +99,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
         {!collapsed && (
           <Link to="/" className="flex items-center space-x-2">
             <Home size={20} className="text-white" />
-            <span className="text-xl font-bold text-white">SecureKloud</span>
+            <span className="text-xl font-bold text-white">Home</span>
           </Link>
         )}
         <Button
