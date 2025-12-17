@@ -265,6 +265,38 @@ export default function AdminDashboard() {
     }
   };
 
+  // ✅ Upload Leave Balance  Excel
+  const handleLeaveBalanceUpload = async () => {
+    if (!selectedFile) {
+      toast({ title: "⚠️ Please select an Excel file first." });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    setUploading(true);
+
+    try {
+      const res = await fetch(`${API}/api/employeedirectory/leavebal`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        toast({ title: "✅ Leave Balance updated successfully!" });
+      } else {
+        toast({ title: "❌ Upload failed", description: data.error });
+      }
+    } catch (err: any) {
+      toast({ title: "❌ Error uploading Excel", description: err.message });
+    } finally {
+      setUploading(false);
+      setSelectedFile(null);
+    }
+  };
+
+
   // 🔹 Upload & Extract Holiday PDF → MongoDB
   const handleHolidayPdfIngest = async () => {
     if (!holidayFile) {
@@ -319,10 +351,11 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="space-y-6">
-        <TabsList className="grid w-full max-w-xl grid-cols-4">
+        <TabsList className="grid  max-w-[45vw] grid-cols-5" >
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="employees">Employee Directory</TabsTrigger>
+          <TabsTrigger value="leave">Leave Balance</TabsTrigger>
           <TabsTrigger value="holidays">Holidays</TabsTrigger>
         </TabsList>
 
@@ -590,6 +623,38 @@ export default function AdminDashboard() {
                   className="border p-2 rounded w-full"
                 />
                 <Button onClick={handleEmployeeUpload} disabled={uploading}>
+                  {uploading ? "Uploading..." : "Upload"}
+                </Button>
+              </div>
+              {selectedFile && (
+                <p className="text-sm text-gray-600">
+                  Selected file: <strong>{selectedFile.name}</strong>
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* === Leave Balance === */}
+        <TabsContent value="leave">
+          <Card>
+            <CardHeader>
+              <CardTitle>Leave BalanceUpload</CardTitle>
+              <CardDescription>
+                Upload an Excel file to upload the leave balance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-col md:flex-row items-center gap-3">
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={(e) =>
+                    setSelectedFile(e.target.files?.[0] || null)
+                  }
+                  className="border p-2 rounded w-full"
+                />
+                <Button onClick={handleLeaveBalanceUpload} disabled={uploading}>
                   {uploading ? "Uploading..." : "Upload"}
                 </Button>
               </div>
