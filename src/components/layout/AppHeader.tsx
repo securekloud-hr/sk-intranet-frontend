@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,31 +25,38 @@ type EmployeeRecord = {
 };
 
 function getEmployeeImage(empID?: string, name?: string) {
-  if (!empID || !name) {
-    return "/employee-images/default-avatar.jpg";
-  }
+  
+  if (!empID || !name) return "/employee-images/default-avatar.jpg";
   const cleanName = name.trim().replace(/\s+/g, " ");
+ 
   return `/employee-images/${empID}-${cleanName}.jpg`;
 }
 
 const normalizeName = (s?: string | null) =>
   s ? s.trim().replace(/\s+/g, " ").toLowerCase() : "";
 
-const normalizeEmail = (s?: string | null) =>
-  s ? s.trim().toLowerCase() : "";
+const normalizeEmail = (s?: string | null) => (s ? s.trim().toLowerCase() : "");
 
 export function AppHeader({ user }: { user?: any }) {
   const [showAccountDialog, setShowAccountDialog] = useState(false);
-  const [employeeRecord, setEmployeeRecord] = useState<EmployeeRecord | null>(
-    null
-  );
 
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  // ✅ Image preview popup
+  const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState<string>("");
+
+  const [employeeRecord, setEmployeeRecord] = useState<EmployeeRecord | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  const storedAvatar = JSON.parse(
-    localStorage.getItem("profile-avatar") || "{}"
-  );
+  // ✅ Keep avatar in state (no reload needed)
+  const [storedAvatar, setStoredAvatar] = useState<{ email?: string; avatarUrl?: string }>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("profile-avatar") || "{}");
+    } catch {
+      return {};
+    }
+  });
 
   const mongoUser = useMemo(() => {
     if (user) return user;
@@ -63,12 +70,9 @@ export function AppHeader({ user }: { user?: any }) {
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
-  const rawEmail = mongoUser?.email || "";
   const role = mongoUser?.role || "user";
   const jobTitle = mongoUser?.jobTitle || "";
-  const createdAt = mongoUser?.createdAt
-    ? new Date(mongoUser.createdAt).toLocaleDateString()
-    : "";
+  const createdAt = mongoUser?.createdAt ? new Date(mongoUser.createdAt).toLocaleDateString() : "";
   const initial = displayName.charAt(0).toUpperCase();
 
   // Derive email from multiple possible fields
@@ -79,10 +83,7 @@ export function AppHeader({ user }: { user?: any }) {
     (mongoUser as any)?.username ||
     "";
 
-  console.log("🔎 mongoUser:", mongoUser);
-  console.log("🔎 rawEmail:", rawEmail, "effectiveEmail:", effectiveEmail);
-
-  // Match with Employee Directory
+  // Match with Employee Directory (only to fetch EmpID + name for default employee image)
   useEffect(() => {
     if (!mongoUser) return;
 
@@ -94,7 +95,7 @@ export function AppHeader({ user }: { user?: any }) {
           try {
             const parsed = JSON.parse(storedUser);
             if (parsed?.role) userRole = parsed.role;
-          } catch (e) {}
+          } catch {}
         }
 
         const res = await fetch(`${API}/api/employeedirectory`, {
@@ -127,9 +128,12 @@ export function AppHeader({ user }: { user?: any }) {
     fetchAndMatchEmployee();
   }, [mongoUser]);
 
-  // Final avatar image priority
+  // ✅ Final avatar priority
+  // 1) uploaded profile avatar (/profile-images)
+  // 2) employee directory photo (/employee-images)
+  // 3) default
   const avatarSrc =
-    storedAvatar.email === effectiveEmail && storedAvatar.avatarUrl
+    storedAvatar.email?.toLowerCase() === effectiveEmail.toLowerCase() && storedAvatar.avatarUrl
       ? storedAvatar.avatarUrl
       : employeeRecord
       ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
@@ -140,51 +144,57 @@ export function AppHeader({ user }: { user?: any }) {
     fileInputRef.current?.click();
   };
 
-  // Upload handler
-  const handleAvatarUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  // ✅ Open large preview
+  const openPreview = (src: string) => {
+    setPreviewSrc(src);
+    setShowAvatarPreview(true);
+  };
+
+  // ✅ Upload handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    console.log("📤 Trying to upload avatar for:", effectiveEmail);
-
     if (!effectiveEmail || effectiveEmail.toLowerCase() === "user") {
-      alert(
-        "No valid email found for this user – cannot upload profile image. Please check login user data."
-      );
-      console.error(
-        "Profile upload attempted with invalid email:",
-        effectiveEmail
-      );
+      alert("No valid email found for this user – cannot upload profile image.");
       return;
     }
 
     const formData = new FormData();
     formData.append("email", effectiveEmail);
-    formData.append("avatar", file);
+    formData.append("avatar", file); // ✅ matches upload.single("avatar")
 
     try {
       setAvatarUploading(true);
 
+      // ✅ FIXED ENDPOINT
       const res = await fetch(`${API}/api/profile/upload`, {
         method: "POST",
         body: formData,
       });
 
-      const data = await res.json();
+      // ✅ Safer parsing (prevents Unexpected token '<')
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Non-JSON response:", text);
+        alert("Upload failed (server returned HTML / wrong API URL).");
+        return;
+      }
 
-      if (!data.success) {
+      if (!res.ok || !data.success) {
         alert(data.error || "Upload failed");
         return;
       }
 
-      localStorage.setItem(
-        "profile-avatar",
-        JSON.stringify({ email: effectiveEmail, avatarUrl: data.avatarUrl })
-      );
+      const newObj = { email: effectiveEmail, avatarUrl: data.avatarUrl };
+      localStorage.setItem("profile-avatar", JSON.stringify(newObj));
+      setStoredAvatar(newObj); // ✅ update UI immediately
 
-      window.location.reload();
+      // reset input so same file can be selected again
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
       console.error(err);
       alert("Error uploading image");
@@ -211,9 +221,7 @@ export function AppHeader({ user }: { user?: any }) {
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel>Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <div className="p-2 text-sm text-gray-500">
-                No new notifications
-              </div>
+              <div className="p-2 text-sm text-gray-500">No new notifications</div>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -224,7 +232,7 @@ export function AppHeader({ user }: { user?: any }) {
                 variant="ghost"
                 size="sm"
                 className="flex items-center space-x-2"
-                onClick={() => setShowAccountDialog(true)} // only open dialog
+                onClick={() => setShowAccountDialog(true)}
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
@@ -233,8 +241,7 @@ export function AppHeader({ user }: { user?: any }) {
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "/employee-images/default-avatar.jpg";
+                      e.currentTarget.src = "/employee-images/default-avatar.jpg";
                     }}
                   />
                   <AvatarFallback className="bg-skcloud-purple text-white">
@@ -242,7 +249,6 @@ export function AppHeader({ user }: { user?: any }) {
                   </AvatarFallback>
                 </Avatar>
 
-                {/* Name + role text */}
                 <div className="flex flex-col items-start text-left leading-tight">
                   <span className="font-medium">{displayName}</span>
                   <span className="text-sm text-muted-foreground">
@@ -253,7 +259,7 @@ export function AppHeader({ user }: { user?: any }) {
             </DropdownMenuTrigger>
           </DropdownMenu>
 
-          {/* Hidden file input for avatar upload */}
+          {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -269,30 +275,35 @@ export function AppHeader({ user }: { user?: any }) {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>My Account</DialogTitle>
-            <DialogDescription>
-              Your profile information from SecureKloud directory.
-            </DialogDescription>
+            <DialogDescription>Your profile information from SecureKloud directory.</DialogDescription>
           </DialogHeader>
 
           {mongoUser ? (
             <div className="mt-2 space-y-3 text-sm">
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <Avatar className="h-12 w-12 border shadow-sm">
-                    <AvatarImage
-                      src={avatarSrc}
-                      alt={displayName}
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src =
-                          "/employee-images/default-avatar.jpg";
-                      }}
-                    />
-                    <AvatarFallback className="bg-skcloud-purple text-white">
-                      {initial}
-                    </AvatarFallback>
-                  </Avatar>
+                  {/* Click avatar to preview */}
+                  <button
+                    type="button"
+                    className="rounded-full"
+                    onClick={() => openPreview(avatarSrc)}
+                    title="Click to view"
+                  >
+                    <Avatar className="h-12 w-12 border shadow-sm cursor-pointer">
+                      <AvatarImage
+                        src={avatarSrc}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/employee-images/default-avatar.jpg";
+                        }}
+                      />
+                      <AvatarFallback className="bg-skcloud-purple text-white">
+                        {initial}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
 
                   {avatarUploading && (
                     <div className="absolute inset-0 bg-black/40 text-white flex items-center justify-center text-xs rounded-full">
@@ -303,37 +314,52 @@ export function AppHeader({ user }: { user?: any }) {
 
                 <div className="flex flex-col items-start">
                   <div className="font-semibold text-base">{displayName}</div>
+
                   {effectiveEmail && (
-                    <div className="text-muted-foreground text-xs">
-                      {effectiveEmail}
-                    </div>
+                    <div className="text-muted-foreground text-xs">{effectiveEmail}</div>
                   )}
 
-                  {/* ✏️ Edit profile picture link */}
                   <button
                     type="button"
                     className="mt-1 text-xs text-blue-600 hover:underline"
                     onClick={handleAvatarClick}
+                    disabled={avatarUploading}
                   >
-                    Edit profile picture
+                    {avatarUploading ? "Uploading..." : "Edit profile picture"}
                   </button>
                 </div>
               </div>
 
               <div className="border-t pt-3 space-y-2">
-                <InfoRow
-                  label="Role"
-                  value={role === "admin" ? "Admin" : "User"}
-                />
+                <InfoRow label="Role" value={role === "admin" ? "Admin" : "User"} />
                 <InfoRow label="Job Title" value={jobTitle} />
                 <InfoRow label="Joined On" value={createdAt} />
               </div>
             </div>
           ) : (
-            <div className="mt-4 text-sm text-red-500">
-              No profile details found.
-            </div>
+            <div className="mt-4 text-sm text-red-500">No profile details found.</div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ✅ Large Image Preview Popup */}
+      <Dialog open={showAvatarPreview} onOpenChange={setShowAvatarPreview}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Profile Picture</DialogTitle>
+            <DialogDescription>Preview</DialogDescription>
+          </DialogHeader>
+
+          <div className="w-full flex justify-center">
+            <img
+              src={previewSrc || avatarSrc}
+              alt="Profile Preview"
+              className="max-h-[70vh] w-auto rounded-lg border object-contain"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/employee-images/default-avatar.jpg";
+              }}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </>
