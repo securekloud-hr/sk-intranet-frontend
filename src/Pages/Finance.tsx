@@ -408,8 +408,8 @@ const Finance = () => {
  <CardTitle className="text-lg">
 8️⃣ Audit & Internal Controls
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
+ <CardDescription className="mt-2">
+<ul className="pl-5 space-y-1">
 <li>🔹Internal control framework</li>
 <li>🔹Statutory audit coordination</li>
 <li>🔹Internal and tax audits</li>
