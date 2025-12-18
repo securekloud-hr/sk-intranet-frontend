@@ -35,8 +35,6 @@ import API from "@/config";
 
 
 
-
-
 // Full employee directory data from the provided Excel file
 // (Optional) define an interface for clarity (TS)
 interface Employee {
@@ -55,6 +53,7 @@ interface Employee {
   SpecialSkill?: string;
   [key: string]: any;
 }
+
 
 const skillsseparated = "--";
 
@@ -109,6 +108,11 @@ const team = [
     phone: "8610841056",
   },
 ];
+
+
+
+
+
 // 🔍 Employee Directory Filters
  // 🧩 Employee Directory state
  
@@ -621,15 +625,6 @@ const [pipData, setPipData] = useState({
   hrDate: ""
 });
 
-
-
-
-
-
-
-
-
-
   const [showPayrollModal, setShowPayrollModal] = useState(false);
   const [showBenefitsModal, setShowBenefitsModal] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -907,13 +902,14 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
         <p className="text-muted-foreground mt-1">Access HR resources, tools, and information</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full sm:w-[800px] grid-cols-4">
- <TabsTrigger value="key"            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Key Functions</TabsTrigger>
-  <TabsTrigger value="resources"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
-  <TabsTrigger value="team"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
-  <TabsTrigger value="forms"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
-  <TabsTrigger value="policy"            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
+      <Tabs defaultValue="key"  onValueChange={setActiveTab}>
+        <TabsList className="grid w-full sm:w-[600px] grid-cols-6">
+ <TabsTrigger value="key" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Key Functions</TabsTrigger>
+  <TabsTrigger value="resources" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
+  <TabsTrigger value="team" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
+  <TabsTrigger value="forms" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
+  <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Dashboard</TabsTrigger>
  </TabsList>
 
 {/* ✅ KEY TAB (THIS WAS MISSING IN YOUR CODE) */}
@@ -1134,7 +1130,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 <TabsContent value="policy">
   <PolicySection
     category="HR Policies"
-    title="HR Policies"
+    //title="HR Policies"
   />
 </TabsContent>
 
