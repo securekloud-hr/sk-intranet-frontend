@@ -25,10 +25,8 @@ type EmployeeRecord = {
 };
 
 function getEmployeeImage(empID?: string, name?: string) {
-  
   if (!empID || !name) return "/employee-images/default-avatar.jpg";
   const cleanName = name.trim().replace(/\s+/g, " ");
- 
   return `/employee-images/${empID}-${cleanName}.jpg`;
 }
 
@@ -135,8 +133,8 @@ export function AppHeader({ user }: { user?: any }) {
   const avatarSrc =
     storedAvatar.email?.toLowerCase() === effectiveEmail.toLowerCase() && storedAvatar.avatarUrl
       ? storedAvatar.avatarUrl
-      : employeeRecord
-      ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
+     // : employeeRecord
+     // ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
       : "/employee-images/default-avatar.jpg";
 
   // Click handler to trigger file input

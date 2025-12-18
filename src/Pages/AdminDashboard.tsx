@@ -590,38 +590,6 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        {/* === Leave Balance === */}
-        <TabsContent value="leave">
-          <Card>
-            <CardHeader>
-              <CardTitle>Leave BalanceUpload</CardTitle>
-              <CardDescription>
-                Upload an Excel file to upload the leave balance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-col md:flex-row items-center gap-3">
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={(e) =>
-                    setSelectedFile(e.target.files?.[0] || null)
-                  }
-                  className="border p-2 rounded w-full"
-                />
-                <Button onClick={handleLeaveBalanceUpload} disabled={uploading}>
-                  {uploading ? "Uploading..." : "Upload"}
-                </Button>
-              </div>
-              {selectedFile && (
-                <p className="text-sm text-gray-600">
-                  Selected file: <strong>{selectedFile.name}</strong>
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         {/* === Holidays === */}
         <TabsContent value="holidays">
           <Card>
