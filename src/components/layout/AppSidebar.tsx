@@ -56,11 +56,14 @@ export function AppSidebar({ user }: { user?: UserLike }) {
   // ✅ Determine role — prefer explicit `role` from MongoDB
   const role = user?.role || cachedUser?.role || "user";
   const isAdmin = role === "admin";
+//   const isMsr = role === "admin";
 
   // ✅ Sidebar navigation items
   const mainNavItems: NavItem[] = [
-    { title: "Admin", href: "/admin", icon: Handshake, tooltip: "Admin Dashboard"},
+    {title: "Admin", href: "/admin", icon: Handshake, tooltip: "Admin Dashboard"},
     { title: "HR", href: "/hr", icon: Users, tooltip: "" },
+    { title: "HR Dashboard", href: "/HRDashboard", icon: Binoculars, tooltip: "" },    
+
     { title: "IT", href: "/it", icon: Computer, tooltip: "" },
     { title: "Finance", href: "/finance", icon: Banknote, tooltip: "" },
     
