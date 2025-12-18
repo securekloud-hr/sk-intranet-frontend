@@ -1,4 +1,4 @@
-﻿﻿﻿﻿import React, { useState, useEffect } from "react";
+﻿﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
 
 import {
@@ -35,8 +35,6 @@ import API from "@/config";
 
 
 
-
-
 // Full employee directory data from the provided Excel file
 // (Optional) define an interface for clarity (TS)
 interface Employee {
@@ -55,6 +53,7 @@ interface Employee {
   SpecialSkill?: string;
   [key: string]: any;
 }
+
 
 const skillsseparated = "--";
 
@@ -109,6 +108,11 @@ const team = [
     phone: "8610841056",
   },
 ];
+
+
+
+
+
 // 🔍 Employee Directory Filters
  // 🧩 Employee Directory state
  
@@ -621,15 +625,6 @@ const [pipData, setPipData] = useState({
   hrDate: ""
 });
 
-
-
-
-
-
-
-
-
-
   const [showPayrollModal, setShowPayrollModal] = useState(false);
   const [showBenefitsModal, setShowBenefitsModal] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -907,13 +902,154 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
         <p className="text-muted-foreground mt-1">Access HR resources, tools, and information</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full sm:w-[800px] grid-cols-4">
-  <TabsTrigger value="resources"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
-  <TabsTrigger value="team"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
-  <TabsTrigger value="forms"             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
-  <TabsTrigger value="policy"            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
-</TabsList>
+      <Tabs defaultValue="key"  onValueChange={setActiveTab}>
+        <TabsList className="grid w-full sm:w-[600px] grid-cols-6">
+ <TabsTrigger value="key" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Key Functions</TabsTrigger>
+  <TabsTrigger value="resources" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
+  <TabsTrigger value="team" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
+  <TabsTrigger value="forms" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
+  <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Dashboard</TabsTrigger>
+ </TabsList>
+
+{/* ✅ KEY TAB (THIS WAS MISSING IN YOUR CODE) */}
+<TabsContent value="key" className="mt-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<Card className="p-4">
+<CardTitle className="text-lg">1️⃣ Employee Onboarding & Offboarding</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Maintain office infrastructure and supplies</li>
+      <li>Manage stationery, consumables, and assets</li>
+      <li>Vendor coordination for office services</li>
+      <li>Front-desk & reception management</li>
+      <li>Meeting room and resource scheduling</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">2️⃣ Procurement & Vendor Management</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Raise purchase requests and orders</li>
+      <li>Vendor onboarding and evaluation</li>
+      <li>Contract management and renewals</li>
+      <li>Invoice verification and payment coordination</li>
+      <li>Cost optimization and negotiation</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">3️⃣ Travel & Logistics</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Employee travel booking (air, rail, hotel)</li>
+      <li>Travel policy compliance</li>
+      <li>Visa and passport coordination</li>
+      <li>Transport and logistics arrangement</li>
+      <li>Reimbursement processing support</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">4️⃣ Communication & Coordination</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Internal communication support</li>
+      <li>Circulars, notices, and announcements</li>
+      <li>Coordination between departments</li>
+      <li>Event coordination (town halls, meetings)</li>
+      <li>Visitor management</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">5️⃣ Infrastructure & Building Management</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Office space planning and utilization</li>
+      <li>Building maintenance (civil, electrical, plumbing)</li>
+      <li>HVAC systems management</li>
+      <li>Power backup (DG sets, UPS)</li>
+      <li>Energy management</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">6️⃣ Safety, Security & Access Control</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Physical security management</li>
+      <li>CCTV surveillance systems</li>
+      <li>Access cards and biometric systems</li>
+      <li>Visitor security protocols</li>
+      <li>Emergency preparedness & evacuation drills</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">7️⃣ Housekeeping & Hygiene</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Cleaning services management</li>
+      <li>Pantry and cafeteria hygiene</li>
+      <li>Waste management & disposal</li>
+      <li>Pest control</li>
+      <li>Sanitization and hygiene audits</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">8️⃣ Equipment & Asset Maintenance</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Furniture and fixture maintenance</li>
+      <li>Office equipment upkeep</li>
+      <li>Preventive maintenance schedules</li>
+      <li>Asset tagging and tracking</li>
+      <li>AMC management</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">9️⃣ Health, Safety & Environment (HSE)</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Workplace safety compliance</li>
+      <li>Fire safety systems and drills</li>
+      <li>First-aid and medical room management</li>
+      <li>Environmental sustainability initiatives</li>
+      <li>Ergonomic assessments</li>
+    </ul>
+  </CardDescription>
+</Card>
+
+<Card className="p-4">
+  <CardTitle className="text-lg">🔟 Utilities & Services Management</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+      <li>Water supply and treatment</li>
+      <li>Electricity usage monitoring</li>
+      <li>Internet and telecom infrastructure</li>
+      <li>Cafeteria and food services</li>
+      <li>Parking management</li>
+    </ul>
+  </CardDescription>
+</Card>
+          </div>
+        </TabsContent>
+
+
+
+
 
        <TabsContent value="resources" className="mt-6">
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -994,7 +1130,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 <TabsContent value="policy">
   <PolicySection
     category="HR Policies"
-    title="HR Policies"
+    //title="HR Policies"
   />
 </TabsContent>
 
