@@ -273,7 +273,7 @@ const Holidays = () => {
           <CardHeader className="pb-2 space-y-1">
             <CardTitle className="text-base">Leave Balance</CardTitle>
             <CardDescription className="text-xs">
-              Your leave balance as per Employee Directory
+              Your leave balance as of last Friday
             </CardDescription>
           </CardHeader>
 
@@ -283,13 +283,40 @@ const Holidays = () => {
             ) : leaveError ? (
               <div className="text-xs text-red-600">{leaveError}</div>
             ) : (
-              <ul className="space-y-0.5 text-sm">
-                <li>Earned Leave: {leave.EarnedLeave}</li>
-                <li>Casual Leave: {leave.CasualLeave}</li>
-                <li>Sick Leave: {leave.SickLeave}</li>
-                <li>Marriage Leave: {leave.MarriageLeave}</li>
-                <li>Paternity Leave: {leave.PaternityLeave}</li>
-              </ul>
+
+                  <table className="w-full max-w-md text-xs border-collapse border rounded-md">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="border px-2 py-1 text-left">Leave Type</th>
+                        <th className="border px-2 py-1 text-left">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border px-2 py-1">Earned Leave</td>
+                        <td className="border px-2 py-1">{leave.EarnedLeave}</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1">Casual Leave </td>
+                        <td className="border px-2 py-1">{leave.CasualLeave}</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1">Sick Leave</td>
+                        <td className="border px-2 py-1">{leave.SickLeave}</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1">Marriage Leave</td>
+                        <td className="border px-2 py-1">{leave.MarriageLeave}</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1">Paternity Leave</td>
+                        <td className="border px-2 py-1">{leave.PaternityLeave}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+
+
             )}
 
             <div className="mt-4 border-t pt-3">
