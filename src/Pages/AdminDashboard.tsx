@@ -4,12 +4,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import API from "@/config";
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
   CardHeader,
@@ -17,12 +12,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // ✅ Reusable fetch API wrapper
 const api = async (url: string, options?: RequestInit) => {
@@ -49,16 +39,16 @@ interface Event {
   description?: string;
   registrationOpen?: boolean;
 }
+
 interface Registration {
   _id: string;
   user: string;
   email: string;
-  empId?: string;      // ✅ new
+  empId?: string;
   eventId: string;
   eventName: string;
   createdAt?: string;
 }
-
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -79,19 +69,21 @@ export default function AdminDashboard() {
 
   const [newEvent, setNewEvent] = useState(initialEventState);
 
-  // Employee Directory Upload
+  // ✅ Leave upload
+  const [leaveFile, setLeaveFile] = useState<File | null>(null);
+  const [leaveUploading, setLeaveUploading] = useState(false);
+
+  // ✅ Employee Directory Upload
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Holiday PDF → Mongo states
+  // ✅ Holiday PDF → Mongo states
   const [holidayFile, setHolidayFile] = useState<File | null>(null);
-  const [holidayYear, setHolidayYear] = useState<number>(
-    new Date().getFullYear()
-  );
+  const [holidayYear, setHolidayYear] = useState<number>(new Date().getFullYear());
   const [holidayRegion, setHolidayRegion] = useState<string>("IN");
   const [holidayBusy, setHolidayBusy] = useState<boolean>(false);
 
-  // 🔹 Registrations dialog state
+  // ✅ Registrations dialog state
   const [regDialogOpen, setRegDialogOpen] = useState(false);
   const [regLoading, setRegLoading] = useState(false);
   const [regError, setRegError] = useState<string | null>(null);
@@ -110,19 +102,51 @@ export default function AdminDashboard() {
     queryFn: () => api(`${API}/api/admin/events`),
   });
 
-  // ✅ Add announcement (with optional image)
+  // ✅ Leave upload handler
+  const handleLeaveUpload = async () => {
+    if (!leaveFile) {
+      toast({ title: "⚠️ Please select a leave Excel file" });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", leaveFile);
+
+    try {
+      setLeaveUploading(true);
+
+      const res = await fetch(`${API}/api/employeedirectory/upload-leaves`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      toast({
+        title: "✅ Leave balances updated",
+        description: `Updated: ${data.updated}, Not found: ${data.notFound}`,
+      });
+
+      setLeaveFile(null);
+    } catch (err: any) {
+      toast({
+        title: "❌ Leave upload failed",
+        description: err.message,
+      });
+    } finally {
+      setLeaveUploading(false);
+    }
+  };
+
+  // ✅ Add announcement
   const addAnnouncement = useMutation({
-    mutationFn: (payload: {
-      title: string;
-      content: string;
-      imageFile?: File | null;
-    }) => {
+    mutationFn: (payload: { title: string; content: string; imageFile?: File | null }) => {
       const formData = new FormData();
       formData.append("title", payload.title);
       formData.append("content", payload.content);
-      if (payload.imageFile) {
-        formData.append("image", payload.imageFile);
-      }
+      if (payload.imageFile) formData.append("image", payload.imageFile);
 
       return fetch(`${API}/api/admin/announcements`, {
         method: "POST",
@@ -139,32 +163,24 @@ export default function AdminDashboard() {
       toast({ title: "✅ Announcement added successfully" });
     },
     onError: (err: any) => {
-      toast({
-        title: "❌ Failed to add announcement",
-        description: err.message,
-      });
+      toast({ title: "❌ Failed to add announcement", description: err.message });
     },
   });
 
   // ✅ Delete announcement
   const deleteAnnouncement = useMutation({
     mutationFn: (id: string) =>
-      api(`${API}/api/admin/announcements/${id}`, {
-        method: "DELETE",
-      }),
+      api(`${API}/api/admin/announcements/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast({ title: "🗑️ Announcement deleted" });
     },
     onError: (err: any) => {
-      toast({
-        title: "❌ Failed to delete announcement",
-        description: err.message,
-      });
+      toast({ title: "❌ Failed to delete announcement", description: err.message });
     },
   });
 
-  // ✅ Add event (now with type, description, registrationOpen)
+  // ✅ Add event
   const addEvent = useMutation({
     mutationFn: (event: {
       title: string;
@@ -190,10 +206,7 @@ export default function AdminDashboard() {
 
   // ✅ Delete event
   const deleteEvent = useMutation({
-    mutationFn: (id: string) =>
-      api(`${API}/api/admin/events/${id}`, {
-        method: "DELETE",
-      }),
+    mutationFn: (id: string) => api(`${API}/api/admin/events/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ title: "🗑️ Event deleted" });
@@ -203,36 +216,31 @@ export default function AdminDashboard() {
     },
   });
 
-  // 🔹 View registrations for an event
-      const handleViewRegistrations = async (ev: Event) => {
-  if (!ev._id) return;
+  // ✅ View registrations
+  const handleViewRegistrations = async (ev: Event) => {
+    if (!ev._id) return;
 
-  setRegDialogOpen(true);
-  setRegLoading(true);
-  setRegError(null);
-  setRegistrations([]);
-  setRegEventTitle(ev.title);
+    setRegDialogOpen(true);
+    setRegLoading(true);
+    setRegError(null);
+    setRegistrations([]);
+    setRegEventTitle(ev.title);
 
-  try {
-    // ✅ correct backend URL
-    const res = await fetch(`${API}/api/registerEvent/event/${ev._id}`);
+    try {
+      const res = await fetch(`${API}/api/registerEvent/event/${ev._id}`);
+      if (!res.ok) throw new Error(await res.text());
 
-    if (!res.ok) throw new Error(await res.text());
+      const json = await res.json();
+      const list: Registration[] = Array.isArray(json) ? json : (json.data as Registration[]) || [];
 
-    // ✅ backend returns { success, count, data }
-    const json = await res.json();
-    const list: Registration[] = Array.isArray(json)
-      ? json
-      : (json.data as Registration[]) || [];
-
-    setRegistrations(list);
-  } catch (err: any) {
-    console.error("Error fetching registrations:", err);
-    setRegError(err.message || "Failed to load registrations");
-  } finally {
-    setRegLoading(false);
-  }
-};
+      setRegistrations(list);
+    } catch (err: any) {
+      console.error("Error fetching registrations:", err);
+      setRegError(err.message || "Failed to load registrations");
+    } finally {
+      setRegLoading(false);
+    }
+  };
 
   // ✅ Upload Employee Directory Excel
   const handleEmployeeUpload = async () => {
@@ -250,13 +258,11 @@ export default function AdminDashboard() {
         method: "POST",
         body: formData,
       });
+
       const data = await res.json();
 
-      if (data.success) {
-        toast({ title: "✅ Employee Directory updated successfully!" });
-      } else {
-        toast({ title: "❌ Upload failed", description: data.error });
-      }
+      if (data.success) toast({ title: "✅ Employee Directory updated successfully!" });
+      else toast({ title: "❌ Upload failed", description: data.error });
     } catch (err: any) {
       toast({ title: "❌ Error uploading Excel", description: err.message });
     } finally {
@@ -265,46 +271,10 @@ export default function AdminDashboard() {
     }
   };
 
-  // ✅ Upload Leave Balance  Excel
-  const handleLeaveBalanceUpload = async () => {
-    if (!selectedFile) {
-      toast({ title: "⚠️ Please select an Excel file first." });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    setUploading(true);
-
-    try {
-      const res = await fetch(`${API}/api/employeedirectory/leavebal`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        toast({ title: "✅ Leave Balance updated successfully!" });
-      } else {
-        toast({ title: "❌ Upload failed", description: data.error });
-      }
-    } catch (err: any) {
-      toast({ title: "❌ Error uploading Excel", description: err.message });
-    } finally {
-      setUploading(false);
-      setSelectedFile(null);
-    }
-  };
-
-
-  // 🔹 Upload & Extract Holiday PDF → MongoDB
+  // ✅ Upload Holiday PDF
   const handleHolidayPdfIngest = async () => {
     if (!holidayFile) {
       toast({ title: "⚠️ Please select a Holiday PDF first." });
-      return;
-    }
-    if (!holidayYear) {
-      toast({ title: "⚠️ Please enter a valid Year." });
       return;
     }
 
@@ -321,10 +291,7 @@ export default function AdminDashboard() {
         credentials: "include",
       });
 
-      if (!res.ok) {
-        const t = await res.text();
-        throw new Error(t);
-      }
+      if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
 
       toast({
@@ -341,7 +308,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header – same style as HR page */}
       <div className="space-y-1">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground">
@@ -349,15 +315,50 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* Tabs */}
+      {/* ✅ Tabs wrapper (THIS WAS MISSING IN YOUR CODE) */}
       <Tabs defaultValue="announcements" className="space-y-6">
-        <TabsList className="grid  max-w-[45vw] grid-cols-5" >
+        <TabsList className="grid w-full max-w-2xl grid-cols-5">
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="employees">Employee Directory</TabsTrigger>
-          <TabsTrigger value="leave">Leave Balance</TabsTrigger>
+          <TabsTrigger value="leaves">Leave Upload</TabsTrigger>
           <TabsTrigger value="holidays">Holidays</TabsTrigger>
         </TabsList>
+
+        {/* ✅ Leave Upload */}
+        <TabsContent value="leaves">
+          <Card>
+            <CardHeader>
+              <CardTitle>Leave Balance Upload</CardTitle>
+              <CardDescription>
+                Upload Excel to update employee leave balances (EmpID based).
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-3">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={(e) => setLeaveFile(e.target.files?.[0] || null)}
+                className="border p-2 rounded w-full"
+              />
+
+              <Button onClick={handleLeaveUpload} disabled={leaveUploading}>
+                {leaveUploading ? "Uploading..." : "Upload Leave Excel"}
+              </Button>
+
+              {leaveFile && (
+                <p className="text-sm text-gray-600">
+                  Selected file: <strong>{leaveFile.name}</strong>
+                </p>
+              )}
+
+              <p className="text-xs text-muted-foreground">
+                Required columns: EmpID, EarnedLeave, CasualLeave, SickLeave, MarriageLeave, PaternityLeave
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* === Announcements === */}
         <TabsContent value="announcements">
@@ -369,17 +370,13 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Inputs */}
               <div className="flex flex-col md:flex-row gap-2">
                 <input
                   className="border p-2 rounded w-full"
                   placeholder="Title"
                   value={newAnnouncement.title}
                   onChange={(e) =>
-                    setNewAnnouncement({
-                      ...newAnnouncement,
-                      title: e.target.value,
-                    })
+                    setNewAnnouncement({ ...newAnnouncement, title: e.target.value })
                   }
                 />
                 <input
@@ -387,23 +384,17 @@ export default function AdminDashboard() {
                   placeholder="Content"
                   value={newAnnouncement.content}
                   onChange={(e) =>
-                    setNewAnnouncement({
-                      ...newAnnouncement,
-                      content: e.target.value,
-                    })
+                    setNewAnnouncement({ ...newAnnouncement, content: e.target.value })
                   }
                 />
               </div>
 
-              {/* Image + Add button */}
               <div className="flex flex-col md:flex-row items-center gap-2">
                 <input
                   type="file"
                   accept="image/*"
                   className="border p-2 rounded w-full md:w-64"
-                  onChange={(e) =>
-                    setAnnouncementImage(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => setAnnouncementImage(e.target.files?.[0] || null)}
                 />
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md"
@@ -424,7 +415,6 @@ export default function AdminDashboard() {
                 </p>
               )}
 
-              {/* List */}
               <ul className="space-y-2">
                 {announcements.map((a) => (
                   <li
@@ -441,11 +431,10 @@ export default function AdminDashboard() {
                       )}
                       <div>
                         <div className="font-semibold">{a.title}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {a.content}
-                        </div>
+                        <div className="text-sm text-muted-foreground">{a.content}</div>
                       </div>
                     </div>
+
                     <Button
                       variant="destructive"
                       onClick={() => deleteAnnouncement.mutate(a._id)}
@@ -455,9 +444,7 @@ export default function AdminDashboard() {
                   </li>
                 ))}
                 {announcements.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No announcements yet.
-                  </p>
+                  <p className="text-sm text-muted-foreground">No announcements yet.</p>
                 )}
               </ul>
             </CardContent>
@@ -474,49 +461,36 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Form */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <input
                   className="border p-2 rounded w-full"
                   placeholder="Event Title"
                   value={newEvent.title}
-                  onChange={(e) =>
-                    setNewEvent({ ...newEvent, title: e.target.value })
-                  }
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 />
                 <input
                   type="date"
                   className="border p-2 rounded"
                   value={newEvent.date}
-                  onChange={(e) =>
-                    setNewEvent({ ...newEvent, date: e.target.value })
-                  }
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                 />
                 <select
                   className="border p-2 rounded"
                   value={newEvent.type}
                   onChange={(e) =>
-                    setNewEvent({
-                      ...newEvent,
-                      type: e.target.value as EventType,
-                    })
+                    setNewEvent({ ...newEvent, type: e.target.value as EventType })
                   }
                 >
                   <option value="Wellness">Wellness</option>
                   <option value="Holidays/Festivals">Holidays/Festivals</option>
-                  <option value="Sports/Entertainment">
-                    Sports/Entertainment
-                  </option>
+                  <option value="Sports/Entertainment">Sports/Entertainment</option>
                 </select>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={newEvent.registrationOpen}
                     onChange={(e) =>
-                      setNewEvent({
-                        ...newEvent,
-                        registrationOpen: e.target.checked,
-                      })
+                      setNewEvent({ ...newEvent, registrationOpen: e.target.checked })
                     }
                   />
                   Registration
@@ -528,12 +502,7 @@ export default function AdminDashboard() {
                 placeholder="Event Description"
                 rows={2}
                 value={newEvent.description}
-                onChange={(e) =>
-                  setNewEvent({
-                    ...newEvent,
-                    description: e.target.value,
-                  })
-                }
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
               />
 
               <Button
@@ -551,7 +520,6 @@ export default function AdminDashboard() {
                 Add
               </Button>
 
-              {/* List */}
               <ul className="space-y-2">
                 {events.map((ev) => (
                   <li
@@ -570,33 +538,22 @@ export default function AdminDashboard() {
                         {ev.registrationOpen ? " • Registration Open" : ""}
                       </div>
                       {ev.description && (
-                        <div className="text-xs text-gray-600">
-                          {ev.description}
-                        </div>
+                        <div className="text-xs text-gray-600">{ev.description}</div>
                       )}
                     </div>
+
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewRegistrations(ev)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleViewRegistrations(ev)}>
                         View Registrations
                       </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => deleteEvent.mutate(ev._id)}
-                      >
+                      <Button variant="destructive" size="sm" onClick={() => deleteEvent.mutate(ev._id)}>
                         Delete
                       </Button>
                     </div>
                   </li>
                 ))}
                 {events.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No events configured.
-                  </p>
+                  <p className="text-sm text-muted-foreground">No events configured.</p>
                 )}
               </ul>
             </CardContent>
@@ -617,44 +574,10 @@ export default function AdminDashboard() {
                 <input
                   type="file"
                   accept=".xlsx, .xls"
-                  onChange={(e) =>
-                    setSelectedFile(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                   className="border p-2 rounded w-full"
                 />
                 <Button onClick={handleEmployeeUpload} disabled={uploading}>
-                  {uploading ? "Uploading..." : "Upload"}
-                </Button>
-              </div>
-              {selectedFile && (
-                <p className="text-sm text-gray-600">
-                  Selected file: <strong>{selectedFile.name}</strong>
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* === Leave Balance === */}
-        <TabsContent value="leave">
-          <Card>
-            <CardHeader>
-              <CardTitle>Leave BalanceUpload</CardTitle>
-              <CardDescription>
-                Upload an Excel file to upload the leave balance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-col md:flex-row items-center gap-3">
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={(e) =>
-                    setSelectedFile(e.target.files?.[0] || null)
-                  }
-                  className="border p-2 rounded w-full"
-                />
-                <Button onClick={handleLeaveBalanceUpload} disabled={uploading}>
                   {uploading ? "Uploading..." : "Upload"}
                 </Button>
               </div>
@@ -673,8 +596,7 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle>Holiday PDF → MongoDB (Extract)</CardTitle>
               <CardDescription>
-                Upload a holiday calendar PDF. The server will parse and save
-                holidays.
+                Upload a holiday calendar PDF. The server will parse and save holidays.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -689,39 +611,30 @@ export default function AdminDashboard() {
                 <input
                   className="border p-2 rounded w-32"
                   value={holidayRegion}
-                  onChange={(e) =>
-                    setHolidayRegion(e.target.value.toUpperCase())
-                  }
+                  onChange={(e) => setHolidayRegion(e.target.value.toUpperCase())}
                   placeholder="Region (e.g. IN)"
                 />
                 <input
                   type="file"
                   accept="application/pdf"
-                  onChange={(e) =>
-                    setHolidayFile(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => setHolidayFile(e.target.files?.[0] || null)}
                   className="border p-2 rounded w-full"
                 />
                 <Button onClick={handleHolidayPdfIngest} disabled={holidayBusy}>
                   {holidayBusy ? "Processing…" : "Upload & Extract"}
                 </Button>
               </div>
+
               {holidayFile && (
                 <p className="text-sm text-gray-600">
                   Selected file: <strong>{holidayFile.name}</strong>
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Backend route <code>POST /api/holidays/ingest-pdf</code>{" "}
-                parses dates like <code>01 January 2025</code>,{" "}
-                <code>26-01-2025</code>, <code>Jan 26, 2025</code> and stores
-                them in MongoDB.
-              </p>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* 🔹 Registrations Dialog */}
+        {/* ✅ Registrations Dialog */}
         <Dialog open={regDialogOpen} onOpenChange={setRegDialogOpen}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
@@ -730,9 +643,7 @@ export default function AdminDashboard() {
 
             {regLoading && <p>Loading registrations…</p>}
 
-            {!regLoading && regError && (
-              <p className="text-sm text-red-600">{regError}</p>
-            )}
+            {!regLoading && regError && <p className="text-sm text-red-600">{regError}</p>}
 
             {!regLoading && !regError && registrations.length === 0 && (
               <p className="text-sm text-muted-foreground">
@@ -742,28 +653,22 @@ export default function AdminDashboard() {
 
             {!regLoading && !regError && registrations.length > 0 && (
               <ul className="space-y-2 max-h-80 overflow-y-auto">
-               {registrations.map((r) => (
-  <li
-    key={r._id}
-    className="border rounded-md p-2 text-sm space-y-0.5"
-  >
-    <div className="font-medium">
-      {r.user}
-      {r.empId && (
-        <span className="ml-1 text-xs text-muted-foreground">
-          ({r.empId})
-        </span>
-      )}
-    </div>
-    <div className="text-muted-foreground">{r.email}</div>
-    {r.createdAt && (
-      <div className="text-xs text-muted-foreground">
-        Registered on {new Date(r.createdAt).toLocaleString()}
-      </div>
-    )}
-  </li>
-))}
-
+                {registrations.map((r) => (
+                  <li key={r._id} className="border rounded-md p-2 text-sm space-y-0.5">
+                    <div className="font-medium">
+                      {r.user}
+                      {r.empId && (
+                        <span className="ml-1 text-xs text-muted-foreground">({r.empId})</span>
+                      )}
+                    </div>
+                    <div className="text-muted-foreground">{r.email}</div>
+                    {r.createdAt && (
+                      <div className="text-xs text-muted-foreground">
+                        Registered on {new Date(r.createdAt).toLocaleString()}
+                      </div>
+                    )}
+                  </li>
+                ))}
               </ul>
             )}
           </DialogContent>

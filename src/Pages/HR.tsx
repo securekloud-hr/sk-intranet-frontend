@@ -45,6 +45,7 @@ interface Employee {
   EmployeeName?: string;
   PhoneNumber?: string;
   Email?: string;
+  ProfileImage?: string;
   BloodGroup?: string;
   CurrentAddress?: string;
   PermanentAddress?: string;
@@ -233,15 +234,20 @@ useEffect(() => {
     console.error("Failed to read user from localStorage", e);
   }
 }, []);
+const getEmployeeAvatar = (emp: any) => {
+  // ✅ 1) Uploaded profile image (from MongoDB)
+  if (emp.ProfileImage) return emp.ProfileImage;
 
-const getEmployeeImage = (empID: string = "", name: string = "") => {
-  if (!empID || !name) return "/employee-images/default-avatar.jpg";
+  // ✅ 2) Old employee-images convention
+  if (emp.EmpID && emp.EmployeeName) {
+    const cleanName = emp.EmployeeName.trim().replace(/\s+/g, " ");
+    return `/employee-images/${emp.EmpID}-${cleanName}.jpg`;
+  }
 
-  // normalize name → remove extra spaces
-  const cleanName = name.trim().replace(/\s+/g, " ");
-
-  return `/employee-images/${empID}-${cleanName}.jpg`;
+  // ✅ 3) Default
+  return "/employee-images/default-avatar.jpg";
 };
+
 
 
 
@@ -4606,12 +4612,16 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
                     {/* Top section with initials */}
  
                  <div className="flex justify-center w-full pt-6 pb-2">
-  <img
-    src={getEmployeeImage(emp.EmpID, emp.EmployeeName)}
-    alt={emp.EmployeeName}
-    className="w-14 h-14 rounded-full object-fill"
-    onError={(e) => (e.currentTarget.src = "/employee-images/default-avatar.jpg")}
-  />
+ <img
+  src={getEmployeeAvatar(emp)}
+  alt={emp.EmployeeName}
+  className="h-16 w-16 rounded-full object-cover border"
+  onError={(e) => {
+    (e.currentTarget as HTMLImageElement).src =
+      "/employee-images/default-avatar.jpg";
+  }}
+/>
+
 </div>
 
 
