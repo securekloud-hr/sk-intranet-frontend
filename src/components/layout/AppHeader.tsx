@@ -47,8 +47,8 @@ export function AppHeader({ user }: { user?: any }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  // ✅ Keep avatar in state (no reload needed)
-  const [storedAvatar, setStoredAvatar] = useState<{ email?: string; avatarUrl?: string }>(() => {
+  // ✅ Keep avatar in state (no reload needed) - stored by EmpID
+  const [storedAvatar, setStoredAvatar] = useState<{ empId?: string; avatarUrl?: string }>(() => {
     try {
       return JSON.parse(localStorage.getItem("profile-avatar") || "{}");
     } catch {
@@ -73,7 +73,7 @@ export function AppHeader({ user }: { user?: any }) {
   const createdAt = mongoUser?.createdAt ? new Date(mongoUser.createdAt).toLocaleDateString() : "";
   const initial = displayName.charAt(0).toUpperCase();
 
-  // Derive email from multiple possible fields
+  // Derive email from multiple possible fields (used only for matching directory)
   const effectiveEmail =
     (mongoUser as any)?.email ||
     (mongoUser as any)?.upn ||
@@ -81,7 +81,7 @@ export function AppHeader({ user }: { user?: any }) {
     (mongoUser as any)?.username ||
     "";
 
-  // Match with Employee Directory (only to fetch EmpID + name for default employee image)
+  // Match with Employee Directory (fetch EmpID + EmployeeName)
   useEffect(() => {
     if (!mongoUser) return;
 
@@ -126,52 +126,51 @@ export function AppHeader({ user }: { user?: any }) {
     fetchAndMatchEmployee();
   }, [mongoUser]);
 
-  // ✅ Final avatar priority
-  // 1) uploaded profile avatar (/profile-images)
-  // 2) employee directory photo (/employee-images)
-  // 3) default
+  // ✅ Avatar priority:
+  // 1) uploaded avatar (localStorage)
+  // 2) default
   const avatarSrc =
-    storedAvatar.email?.toLowerCase() === effectiveEmail.toLowerCase() && storedAvatar.avatarUrl
+    employeeRecord?.EmpID &&
+    storedAvatar.empId === String(employeeRecord.EmpID) &&
+    storedAvatar.avatarUrl
       ? storedAvatar.avatarUrl
-     // : employeeRecord
-     // ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName)
       : "/employee-images/default-avatar.jpg";
+  // If you want fallback to employee image, use below:
+  // : employeeRecord ? getEmployeeImage(employeeRecord.EmpID, employeeRecord.EmployeeName) : "/employee-images/default-avatar.jpg";
 
-  // Click handler to trigger file input
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
 
-  // ✅ Open large preview
   const openPreview = (src: string) => {
     setPreviewSrc(src);
     setShowAvatarPreview(true);
   };
 
-  // ✅ Upload handler
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!effectiveEmail || effectiveEmail.toLowerCase() === "user") {
-      alert("No valid email found for this user – cannot upload profile image.");
+    // ✅ Must have EmpID + EmployeeName to save as "EmpID-Name.jpg"
+    if (!employeeRecord?.EmpID || !employeeRecord?.EmployeeName) {
+      alert("EmpID / EmployeeName not found for this user. Cannot upload profile image.");
       return;
     }
 
+    
     const formData = new FormData();
-    formData.append("email", effectiveEmail);
-    formData.append("avatar", file); // ✅ matches upload.single("avatar")
+formData.append("empId", String(employeeRecord.EmpID));
+formData.append("employeeName", String(employeeRecord.EmployeeName));
+formData.append("avatar", file); // ✅ file LAST
 
     try {
       setAvatarUploading(true);
 
-      // ✅ FIXED ENDPOINT
       const res = await fetch(`${API}/api/profile/upload`, {
         method: "POST",
         body: formData,
       });
 
-      // ✅ Safer parsing (prevents Unexpected token '<')
       const text = await res.text();
       let data: any;
       try {
@@ -187,11 +186,10 @@ export function AppHeader({ user }: { user?: any }) {
         return;
       }
 
-      const newObj = { email: effectiveEmail, avatarUrl: data.avatarUrl };
+      const newObj = { empId: String(employeeRecord.EmpID), avatarUrl: data.avatarUrl };
       localStorage.setItem("profile-avatar", JSON.stringify(newObj));
-      setStoredAvatar(newObj); // ✅ update UI immediately
+      setStoredAvatar(newObj);
 
-      // reset input so same file can be selected again
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
       console.error(err);
@@ -209,7 +207,6 @@ export function AppHeader({ user }: { user?: any }) {
         </div>
 
         <div className="flex items-center space-x-2">
-          {/* 🔔 Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -223,7 +220,6 @@ export function AppHeader({ user }: { user?: any }) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* 👤 User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -257,7 +253,6 @@ export function AppHeader({ user }: { user?: any }) {
             </DropdownMenuTrigger>
           </DropdownMenu>
 
-          {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -268,19 +263,19 @@ export function AppHeader({ user }: { user?: any }) {
         </div>
       </header>
 
-      {/* 🪟 My Account Popup */}
       <Dialog open={showAccountDialog} onOpenChange={setShowAccountDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>My Account</DialogTitle>
-            <DialogDescription>Your profile information from SecureKloud directory.</DialogDescription>
+            <DialogDescription>
+              Your profile information from SecureKloud directory.
+            </DialogDescription>
           </DialogHeader>
 
           {mongoUser ? (
             <div className="mt-2 space-y-3 text-sm">
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  {/* Click avatar to preview */}
                   <button
                     type="button"
                     className="rounded-full"
@@ -340,7 +335,6 @@ export function AppHeader({ user }: { user?: any }) {
         </DialogContent>
       </Dialog>
 
-      {/* ✅ Large Image Preview Popup */}
       <Dialog open={showAvatarPreview} onOpenChange={setShowAvatarPreview}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
