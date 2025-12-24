@@ -10,7 +10,6 @@ import RequireAuth from "@/components/RequireAuth";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 import Index from "./Pages/Index";
-import HRDashboard from "./Pages/HRDashboard";
 import Admin from "./Pages/Admin";
 import IT from "./Pages/IT";
 import HR from "./Pages/HR";
@@ -53,8 +52,7 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Index />} />
                 <Route path="/home" element={<Index />} />
-                <Route path="/admin" element={<Admin />} />    
-                <Route path="/HRDashboard" element={<HRDashboard />} />                                    
+                <Route path="/admin" element={<Admin />} />                              
                 <Route path="/it" element={<IT />} />
                 <Route path="/hr" element={<HR />} />                
                 <Route path="/policies" element={<Policies />} />

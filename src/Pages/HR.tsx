@@ -919,139 +919,282 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 <CardTitle className="text-lg">1️⃣ Employee Onboarding & Offboarding</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Maintain office infrastructure and supplies</li>
-      <li>Manage stationery, consumables, and assets</li>
-      <li>Vendor coordination for office services</li>
-      <li>Front-desk & reception management</li>
-      <li>Meeting room and resource scheduling</li>
+    <li>New hire orientation</li>
+    <li>Policy briefing & documentation</li>
+    <li>Exit interviews</li>
+    <li>Final settlements & access revocation</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">2️⃣ Procurement & Vendor Management</CardTitle>
+  <CardTitle className="text-lg">2️⃣  Payroll & Compensation Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Raise purchase requests and orders</li>
-      <li>Vendor onboarding and evaluation</li>
-      <li>Contract management and renewals</li>
-      <li>Invoice verification and payment coordination</li>
-      <li>Cost optimization and negotiation</li>
+    <li>Salary processing</li>
+    <li>Incentives & bonuses</li>
+    <li>Statutory deductions (PF, ESI, TDS)</li>
+    <li>Payslip generation</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">3️⃣ Travel & Logistics</CardTitle>
+  <CardTitle className="text-lg">3️⃣ Attendance & Leave Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Employee travel booking (air, rail, hotel)</li>
-      <li>Travel policy compliance</li>
-      <li>Visa and passport coordination</li>
-      <li>Transport and logistics arrangement</li>
-      <li>Reimbursement processing support</li>
+    <li>Attendance tracking</li>
+    <li>Leave policies & approvals</li>
+    <li>Holiday calendars</li>
+    <li>Shift & overtime tracking</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">4️⃣ Communication & Coordination</CardTitle>
+  <CardTitle className="text-lg">4️⃣ Performance Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Internal communication support</li>
-      <li>Circulars, notices, and announcements</li>
-      <li>Coordination between departments</li>
-      <li>Event coordination (town halls, meetings)</li>
-      <li>Visitor management</li>
+    <li>Goal setting (OKRs/KPIs)</li>
+    <li>Performance appraisals</li>
+    <li>Feedback & reviews</li>
+    <li>Promotion recommendations</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">5️⃣ Infrastructure & Building Management</CardTitle>
+  <CardTitle className="text-lg">5️⃣ Learning & Development (L&D)</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Office space planning and utilization</li>
-      <li>Building maintenance (civil, electrical, plumbing)</li>
-      <li>HVAC systems management</li>
-      <li>Power backup (DG sets, UPS)</li>
-      <li>Energy management</li>
+    <li>Training needs analysis</li>
+    <li>Internal & external training programs</li>
+    <li>Skill development initiatives</li>
+    <li>Certification tracking</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">6️⃣ Safety, Security & Access Control</CardTitle>
+  <CardTitle className="text-lg">6️⃣ Employee Engagement & Relations</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Physical security management</li>
-      <li>CCTV surveillance systems</li>
-      <li>Access cards and biometric systems</li>
-      <li>Visitor security protocols</li>
-      <li>Emergency preparedness & evacuation drills</li>
+    <li>Employee surveys</li>
+    <li>Grievance handling</li>
+    <li>Conflict resolution</li>
+    <li>Engagement activities & events</li>
+ 
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">7️⃣ Housekeeping & Hygiene</CardTitle>
+  <CardTitle className="text-lg">7️⃣ Policy & Compliance Management</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Cleaning services management</li>
-      <li>Pantry and cafeteria hygiene</li>
-      <li>Waste management & disposal</li>
-      <li>Pest control</li>
-      <li>Sanitization and hygiene audits</li>
+    <li>HR policy creation & updates</li>
+    <li>Labour law compliance</li>
+    <li>POSH compliance</li>
+    <li>Audit & documentation</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">8️⃣ Equipment & Asset Maintenance</CardTitle>
+  <CardTitle className="text-lg">8️⃣ Health, Safety & Welfare</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Furniture and fixture maintenance</li>
-      <li>Office equipment upkeep</li>
-      <li>Preventive maintenance schedules</li>
-      <li>Asset tagging and tracking</li>
-      <li>AMC management</li>
+    <li>Workplace safety standards</li>
+    <li>Health insurance & benefits</li>
+    <li>Wellness programs</li>
+    <li>Emergency preparedness</li>
     </ul>
   </CardDescription>
 </Card>
 
 <Card className="p-4">
-  <CardTitle className="text-lg">9️⃣ Health, Safety & Environment (HSE)</CardTitle>
+  <CardTitle className="text-lg">9️⃣ HR Analytics & Reporting</CardTitle>
   <CardDescription className="mt-2">
     <ul className="list-disc pl-5 space-y-1">
-      <li>Workplace safety compliance</li>
-      <li>Fire safety systems and drills</li>
-      <li>First-aid and medical room management</li>
-      <li>Environmental sustainability initiatives</li>
-      <li>Ergonomic assessments</li>
+    <li>Headcount & attrition analysis</li>
+    <li>Salary & cost reports</li>
+    <li>Compliance reports</li>
+    <li>HR dashboards</li>
     </ul>
   </CardDescription>
 </Card>
 
-<Card className="p-4">
-  <CardTitle className="text-lg">🔟 Utilities & Services Management</CardTitle>
-  <CardDescription className="mt-2">
-    <ul className="list-disc pl-5 space-y-1">
-      <li>Water supply and treatment</li>
-      <li>Electricity usage monitoring</li>
-      <li>Internet and telecom infrastructure</li>
-      <li>Cafeteria and food services</li>
-      <li>Parking management</li>
-    </ul>
-  </CardDescription>
-</Card>
           </div>
         </TabsContent>
 
 
+{/*}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<Card className="p-4">
+<CardTitle className="text-lg">1️⃣ Employee Onboarding & Offboarding</CardTitle>
+  <CardDescription className="mt-2"></CardDescription>
+*/}
+
+
+<TabsContent value="dashboard" className="mt-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+<Card key="summary" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+<CardTitle className="text-lg">Key Highlights  </CardTitle>
+<CardDescription className="mt-2">
+ <ul  className="list-disc pl-5">
+  <li> 3 Associates onboarded in November</li>
+  <li> Induction completed for all joiners to date</li>
+  <li> BGV completed for Nov-2025 Joiners</li>
+  <li> Group Mediclaim renewed for FY 25-26 and e-cards shared with associates</li>
+  <li> Group Personal Accident insurance renewed for FY256-26 without any increase in premium</li>
+  <li> Employee engagement activites: BOM, Potluck, Carrom & Chess competition</li>
+  <li> RMG Reports shared with finance team</li>
+ </ul>
+ 
+ </CardDescription> 
+
+</div>
+</CardContent>
+</Card>
+</div>
+ 
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+
+<Card key="totalemployees" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+{/*<p className="text-sm text-muted-foreground">Gender Diversity</p> */}
+<CardTitle className="text-lg">1️⃣ Gender Diversity</CardTitle>
+
+<img
+    src="/dashboard/GenderDiversity.png"
+    className="object-cover mb-1 border-0 outline-none shadow-none"
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+/>
+</div>
+</CardContent>
+</Card>
+
+
+<Card key="additions" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+{/*<p className="text-sm text-muted-foreground">Gender Diversity</p> */}
+<p className="font-bold">Band Distribution</p>
+<img
+    src="/dashboard/BandDist.png"
+    className="object-cover mb-2"
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+/>
+</div>
+</CardContent>
+</Card>
+
+<Card key="resignations" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+{/*<p className="text-sm text-muted-foreground">Gender Diversity</p> */}
+<p className="text-1xl font-bold">Tenure</p>
+<img
+    src="/dashboard/Tenure.png"
+    className="object-cover mb-2"
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+/>
+</div>
+</CardContent>
+</Card>
+
+<Card key="certifications" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+{/*<p className="text-sm text-muted-foreground">Gender Diversity</p> */}
+<p className="text-1xl font-bold">Utilization</p>
+<img
+    src="/dashboard/Utilization.png"
+    className="object-cover mb-2"
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+/>
+</div>
+</CardContent>
+</Card>
+
+<Card key="totalleaves" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+{/*<p className="text-sm text-muted-foreground">Gender Diversity</p> */}
+<p className="text-1xl font-bold">Additions/Deletions</p>
+<img
+    src="/dashboard/AddDel.png"
+    className="object-cover mb-1 border-0 outline-none shadow-none"
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+/>
+</div>
+</CardContent>
+</Card>
+
+
+</div>
+
+
+<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
+<Card key="summary" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+<p className="text-1xl font-bold">Dept. Headcount</p>
+<img
+    src="/dashboard/DeptHC.png"
+    className="object-cover mb-2 border-0 outline-none shadow-none" 
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+    />    
+</div>
+</CardContent>
+</Card>
+
+
+<Card key="summary" className="rounded-2xl shadow-sm">
+<CardContent className="p-4 flex items-center justify-between">
+<div>
+<p className="text-1xl font-bold">Certifications</p>
+<img
+    src="/dashboard/Certification.png"
+    className="object-cover mb-2 border-0 outline-none shadow-none" 
+    onError={(e) => {
+      e.currentTarget.src =
+      "/employee-images/default-avatar.jpg";
+        }}
+    />    
+</div>
+</CardContent>
+</Card>
+
+
+</div>
 
 
 
-       <TabsContent value="resources" className="mt-6">
+</TabsContent>
+
+  <TabsContent value="resources" className="mt-6">
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {[
       {

@@ -300,21 +300,19 @@ const Finance = () => {
         </TabsList>
 
         {/* Key info */}
-  <TabsContent value="key" className="mt-6">
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-  <Card>
- <CardTitle className="text-lg">
-1️⃣ Financial Accounting
-</CardTitle>
- <CardDescription className="mb-6">
-<ol>
-<li>🔹 Bookkeeping and journal entries</li>
-<li>🔹General ledger maintenance</li>
-<li>🔹Accounts finalization</li>
-<li>🔹Month-end and year-end closing</li>
-<li>🔹Fixed asset accounting & depreciation</li>
-</ol>
+<TabsContent value="key" className="mt-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<Card className="p-4">
+<CardTitle className="text-lg">1️⃣ Employee Onboarding & Offboarding</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Bookkeeping and journal entries</li>
+    <li>General ledger maintenance</li>
+    <li>Accounts finalization</li>
+    <li>Month-end and year-end closing</li>
+    <li>Fixed asset accounting & depreciation</li>
+    </ul>
 </CardDescription>
 </Card>
 
@@ -322,85 +320,83 @@ const Finance = () => {
  <CardTitle className="text-lg">
 2️⃣ Accounts Payable (AP)
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Vendor invoice processing</li>
-<li>🔹Expense verification and approvals</li>
-<li>🔹Vendor payments & scheduling</li>
-<li>🔹TDS deduction and compliance</li>
-<li>🔹Vendor reconciliation</li>
-</ul>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Vendor invoice processing</li>
+    <li>Expense verification and approvals</li>
+    <li>Vendor payments & scheduling</li>
+    <li>TDS deduction and compliance</li>
+    <li>Vendor reconciliation</li>
+    </ul>
 </CardDescription>
 </Card>
 
   <Card>
  <CardTitle className="text-lg">
-3️⃣ Accounts Receivable (AR)
-</CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Customer invoicing</li>
-<li>🔹Collection follow-ups</li>
-<li>🔹Receipts accounting</li>
-<li>🔹Credit control & aging analysis</li>
-<li>🔹Customer reconciliation</li>
-</ul>
+3️⃣ Accounts Receivable (AR)</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Customer invoicing</li>
+    <li>Collection follow-ups</li>
+    <li>Receipts accounting</li>
+    <li>Credit control & aging analysis</li>
+    <li>Customer reconciliation</li>
+    </ul>
 </CardDescription>
 </Card>
 
   <Card>
  <CardTitle className="text-lg">
-4️⃣ Payroll & Employee Payments
-</CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Salary processing</li>
-<li>🔹Payroll statutory deductions</li>
-<li>🔹Reimbursements processing</li>
-<li>🔹Bonus and incentive payments</li>
-<li>🔹Payroll compliance & reporting</li>
-</ul>
+4️⃣ Payroll & Employee Payments</CardTitle>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Salary processing</li>
+    <li>Payroll statutory deductions</li>
+    <li>Reimbursements processing</li>
+    <li>Bonus and incentive payments</li>
+    <li>Payroll compliance & reporting</li>
+    </ul>
 </CardDescription>
 </Card>
   <Card>
  <CardTitle className="text-lg">
 5️⃣ Budgeting & Financial Planning (FP&A)
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Annual budgeting & forecasting</li>
-<li>🔹Variance analysis</li>
-<li>🔹Cost control and optimization</li>
-<li>🔹Financial modeling</li>
-<li>🔹Management reporting</li>
-</ul>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Annual budgeting & forecasting</li>
+    <li>Variance analysis</li>
+    <li>Cost control and optimization</li>
+    <li>Financial modeling</li>
+    <li>Management reporting</li>
+    </ul>
 </CardDescription>
 </Card>
   <Card>
  <CardTitle className="text-lg">
 6️⃣ Taxation & Statutory Compliance
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Direct taxes (Income Tax, TDS)</li>
-<li>🔹Indirect taxes (GST) </li>
-<li>🔹Tax filings & returns</li>
-<li>🔹Tax assessments & notices</li>
-<li>🔹Tax planning and advisory</li>
-</ul>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Direct taxes (Income Tax, TDS)</li>
+    <li>Indirect taxes (GST) </li>
+    <li>Tax filings & returns</li>
+    <li>Tax assessments & notices</li>
+    <li>Tax planning and advisory</li>
+    </ul>
 </CardDescription>
 </Card>
   <Card>
  <CardTitle className="text-lg">
 7️⃣ Treasury & Cash Management
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Cash flow management</li>
-<li>🔹Bank account operations</li>
-<li>🔹Fund planning & utilization</li>
-<li>🔹Investment management</li>
-<li>🔹Foreign exchange (FX) management</li>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Cash flow management</li>
+    <li>Bank account operations</li>
+    <li>Fund planning & utilization</li>
+    <li>Investment management</li>
+    <li>Foreign exchange (FX) management</li>
 </ul>
 </CardDescription>
 </Card>
@@ -408,27 +404,13 @@ const Finance = () => {
  <CardTitle className="text-lg">
 8️⃣ Audit & Internal Controls
 </CardTitle>
- <CardDescription className="mt-2">
-<ul className="pl-5 space-y-1">
-<li>🔹Internal control framework</li>
-<li>🔹Statutory audit coordination</li>
-<li>🔹Internal and tax audits</li>
-<li>🔹Audit observations & closures</li>
-<li>🔹Fraud prevention & detection</li>
-</ul>
-</CardDescription>
-</Card>
-  <Card>
- <CardTitle className="text-lg">
-9️⃣ Financial Reporting & MIS
-</CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Financial statements preparation</li>
-<li>🔹MIS and dashboards</li>
-<li>🔹Regulatory reporting</li>
-<li>🔹Board and management reports</li>
-<li>🔹Ratio and performance analysis</li>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Internal control framework</li>
+    <li>Statutory audit coordination</li>
+    <li>Internal and tax audits</li>
+    <li>Audit observations & closures</li>
+    <li>Fraud prevention & detection</li>
 </ul>
 </CardDescription>
 </Card>
@@ -436,13 +418,13 @@ const Finance = () => {
  <CardTitle className="text-lg">
 🔟 Compliance & Governance
 </CardTitle>
- <CardDescription className="mb-6">
-<ul>
-<li>🔹Companies Act compliance</li>
-<li>🔹Policy implementation </li>
-<li>🔹SOX / internal control compliance </li>
-<li>🔹Documentation & record retention</li>
-<li>🔹Risk management support</li>
+  <CardDescription className="mt-2">
+    <ul className="list-disc pl-5 space-y-1">
+    <li>Companies Act compliance</li>
+    <li>Policy implementation </li>
+    <li>SOX / internal control compliance </li>
+    <li>Documentation & record retention</li>
+    <li>Risk management support</li>
 </ul>
 </CardDescription>
 </Card>
@@ -460,8 +442,7 @@ const Finance = () => {
               return (
                 <Card
                   key={member.empId}
-                  className="flex flex-col items-center text-center py-6"
-                >
+                  className="flex flex-col items-center text-center py-6">
                   <div className="h-20 w-20 rounded-full bg-purple-200 flex items-center justify-center mb-4">
                     <span className="text-purple-700 font-semibold text-xl">
                       {getInitials(member.name)}
