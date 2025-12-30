@@ -24,6 +24,7 @@ type LeaveBalance = {
   SickLeave?: number | null;
   MarriageLeave?: number | null;
   PaternityLeave?: number | null;
+  MaternityLeave?: number | null;
 };
 
 type UserLike = {
@@ -119,6 +120,7 @@ const Holidays = () => {
           SickLeave: n0(emp.SickLeave),
           MarriageLeave: n0(emp.MarriageLeave),
           PaternityLeave: n0(emp.PaternityLeave),
+          MaternityLeave: n0(emp.MaternityLeave),
         });
       } catch (e) {
         setLeaveError("❌ Failed to load leave balance");
@@ -312,6 +314,11 @@ const Holidays = () => {
                         <td className="border px-2 py-1">Paternity Leave</td>
                         <td className="border px-2 py-1">{leave.PaternityLeave}</td>
                       </tr>
+                      <tr>
+  <td className="border px-2 py-1">Maternity Leave</td>
+  <td className="border px-2 py-1">{leave.MaternityLeave}</td>
+</tr>
+
                     </tbody>
                   </table>
 

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -16,15 +16,33 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Mail, HelpCircle, Globe } from "lucide-react";
 import API from "@/config";
 
+/* ================= TYPES ================= */
+type Ticket = {
+  _id: string;
+  type: "query" | "ticket" | "payroll";
+  message: string;
+  status?: string;
+  timestamp: string;
+};
+
 const FAQs = () => {
+  /* ================= DIALOG STATES ================= */
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [isTicketDialogOpen, setIsTicketDialogOpen] = useState(false);
   const [isPayrollDialogOpen, setIsPayrollDialogOpen] = useState(false);
 
-  // 🔹 Subject + body for each type
+  /* ================= FORM STATES ================= */
   const [emailSubject, setEmailSubject] = useState("");
   const [emailQuery, setEmailQuery] = useState("");
 
@@ -38,7 +56,12 @@ const FAQs = () => {
   const [isTicketSubmitting, setIsTicketSubmitting] = useState(false);
   const [isPayrollSubmitting, setIsPayrollSubmitting] = useState(false);
 
-  // 🔹 Fetch logged-in user from localStorage
+  /* ================= TABLE STATES ================= */
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(false);
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+
+  /* ================= USER ================= */
   const getUser = () => {
     try {
       const raw = localStorage.getItem("user");
@@ -49,117 +72,133 @@ const FAQs = () => {
     }
   };
 
-  // 🔹 Common function to call backend
+  /* ================= TYPE MAPPER ================= */
+  const getDisplayType = (type: string) => {
+    switch (type) {
+      case "query":
+        return "HR";
+      case "ticket":
+        return "IT";
+      case "payroll":
+        return "Payroll";
+      default:
+        return type.toUpperCase();
+    }
+  };
+
+  /* ================= FETCH TICKETS ================= */
+  const fetchTickets = async () => {
+    setLoadingTickets(true);
+    try {
+      const user = getUser();
+      const email = user?.email || user?.mail;
+
+      if (!email) {
+        setTickets([]);
+        return;
+      }
+
+      const res = await fetch(
+        `${API}/api/queries?email=${encodeURIComponent(email)}`
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch tickets");
+
+      const json = await res.json();
+      setTickets(Array.isArray(json.data) ? json.data : []);
+    } catch (err) {
+      console.error("❌ Failed to fetch tickets", err);
+      setTickets([]);
+    } finally {
+      setLoadingTickets(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  /* ================= SEND EMAIL ================= */
   const sendSupportEmail = async (
     subject: string,
     message: string,
     type: "query" | "ticket" | "payroll"
   ) => {
     const user = getUser();
-
     const name = user?.fullName || user?.name || "Anonymous User";
     const email = user?.email || user?.mail || "anonymous@example.com";
 
     const response = await fetch(`${API}/api/sendEmail`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        subject,
-        message,
-        type,
-      }),
+      body: JSON.stringify({ name, email, subject, message, type }),
     });
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Failed");
+
+    await fetchTickets(); // refresh table
     return data;
   };
 
-  // 🔹 HR submit
+  /* ================= SUBMITS ================= */
   const handleEmailSubmit = async () => {
     if (!emailSubject.trim() || !emailQuery.trim()) return;
     setIsSubmitting(true);
-
     try {
-      const result = await sendSupportEmail(
-        emailSubject.trim(),
-        emailQuery.trim(),
-        "query"
-      );
-      if (result.success) {
-        alert("✅ HR query sent successfully!");
-        setEmailSubject("");
-        setEmailQuery("");
-        setIsEmailDialogOpen(false);
-      }
-    } catch (err: any) {
-      alert("❌ Error: " + err.message);
+      await sendSupportEmail(emailSubject, emailQuery, "query");
+      setEmailSubject("");
+      setEmailQuery("");
+      setIsEmailDialogOpen(false);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  
-  // 🔹 IT Ticket submit
   const handleTicketSubmit = async () => {
     if (!ticketSubject.trim() || !ticketQuery.trim()) return;
     setIsTicketSubmitting(true);
-
     try {
-      const result = await sendSupportEmail(
-        ticketSubject.trim(),
-        ticketQuery.trim(),
-        "ticket"
-      );
-      if (result.success) {
-        alert("🎫 Ticket sent successfully!");
-        setTicketSubject("");
-        setTicketQuery("");
-        setIsTicketDialogOpen(false);
-      }
-    } catch (err: any) {
-      alert("❌ Error: " + err.message);
+      await sendSupportEmail(ticketSubject, ticketQuery, "ticket");
+      setTicketSubject("");
+      setTicketQuery("");
+      setIsTicketDialogOpen(false);
     } finally {
       setIsTicketSubmitting(false);
     }
   };
 
-  // 🔹 Payroll submit
   const handlePayrollSubmit = async () => {
     if (!payrollSubject.trim() || !payrollQuery.trim()) return;
     setIsPayrollSubmitting(true);
-
     try {
-      const result = await sendSupportEmail(
-        payrollSubject.trim(),
-        payrollQuery.trim(),
-        "payroll"
-      );
-      if (result.success) {
-        alert("💰 Payroll query sent successfully!");
-        setPayrollSubject("");
-        setPayrollQuery("");
-        setIsPayrollDialogOpen(false);
-      }
-    } catch (err: any) {
-      alert("❌ Error: " + err.message);
+      await sendSupportEmail(payrollSubject, payrollQuery, "payroll");
+      setPayrollSubject("");
+      setPayrollQuery("");
+      setIsPayrollDialogOpen(false);
     } finally {
       setIsPayrollSubmitting(false);
     }
   };
 
+  /* ================= FILTER LOGIC ================= */
+  const filteredTickets = tickets.filter((ticket) => {
+    if (departmentFilter === "all") return true;
+    return ticket.type === departmentFilter;
+  });
+
   return (
     <div className="space-y-8">
+      {/* ================= 3 CARDS ================= */}
       <Card>
         <CardHeader>
           <CardTitle>Didn't find what you're looking for?</CardTitle>
           <CardDescription>Contact us for more help</CardDescription>
         </CardHeader>
+
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* ========================== HR Email ========================== */}
+            {/* HR */}
             <Dialog
               open={isEmailDialogOpen}
               onOpenChange={setIsEmailDialogOpen}
@@ -216,7 +255,7 @@ const FAQs = () => {
               </DialogContent>
             </Dialog>
 
-            {/* ========================== IT Ticket ========================== */}
+            {/* IT */}
             <Dialog
               open={isTicketDialogOpen}
               onOpenChange={setIsTicketDialogOpen}
@@ -273,7 +312,7 @@ const FAQs = () => {
               </DialogContent>
             </Dialog>
 
-            {/* ========================== Payroll ========================== */}
+            {/* Payroll */}
             <Dialog
               open={isPayrollDialogOpen}
               onOpenChange={setIsPayrollDialogOpen}
@@ -330,6 +369,67 @@ const FAQs = () => {
               </DialogContent>
             </Dialog>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* ================= TABLE ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Submitted Tickets</CardTitle>
+          <CardDescription>
+            <div className="flex items-center gap-2 mt-2">
+              <Label htmlFor="department-filter" className="text-sm font-medium">
+                Filter by Department:
+              </Label>
+              <select
+                id="department-filter"
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
+                className="border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-securekloud-600"
+              >
+                <option value="all">All Departments</option>
+                <option value="query">HR</option>
+                <option value="ticket">IT</option>
+                <option value="payroll">Payroll</option>
+              </select>
+            </div>
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          {loadingTickets ? (
+            <p>Loading tickets...</p>
+          ) : filteredTickets.length === 0 ? (
+            <p className="text-muted-foreground">
+              {departmentFilter === "all" 
+                ? "No tickets yet." 
+                : `No ${getDisplayType(departmentFilter)} tickets found.`}
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {filteredTickets.map((t) => (
+                  <TableRow key={t._id}>
+                    <TableCell>{getDisplayType(t.type)}</TableCell>
+                    <TableCell className="truncate max-w-md">
+                      {t.message}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(t.timestamp).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
