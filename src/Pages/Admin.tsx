@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 
 import { FiDownload, FiEye } from "react-icons/fi";
 import { Trash2 } from "lucide-react";
-
+import PolicySection from "@/components/PolicySection";
 /* ================= Types ================= */
 
 type UserLike = {
@@ -485,187 +485,17 @@ const Admin = () => {
             })}
           </div>
         </TabsContent>
+{/* added by Siva on 30-Dec to call PoliceSection for getting Admin policies */}
+<TabsContent value="policy">
+  <PolicySection
+    category="Admin Policies"
+    title="Admin Policies"
+  />
+ </TabsContent>
 
-        {/* POLICY TAB */}
-        <TabsContent value="policy" className="space-y-4">
-          {loading ? (
-            <p className="text-gray-500">Loading Admin policies...</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {adminPolicies.map((policy, index) => (
-                <Card
-                  key={`${policy.name}-${index}`}
-                  className="p-2 text-xs space-y-0.5 shadow-sm border rounded-md h-full flex flex-col"
-                >
-                  <CardHeader className="pb-2 flex-grow">
-                    <CardTitle>{policy.name}</CardTitle>
-                    <CardDescription>Last updated: {policy.updated}</CardDescription>
+        </Tabs>
 
-                    {policy.description && (
-                      <p className="mt-2 text-[11px] text-gray-600 line-clamp-3">
-                        {policy.description}
-                      </p>
-                    )}
-                  </CardHeader>
-
-                  <CardContent className="flex-shrink-0 pt-0">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setDocToView(`${API}${policy.fileUrl}`);
-                          setShowDocModal(true);
-                        }}
-                        className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
-                        title="View"
-                      >
-                        <FiEye className="w-4 h-4" />
-                      </button>
-
-                      <a
-                        href={`${API}/api/policies/download/${encodeURIComponent(
-                          ADMIN_CATEGORY
-                        )}/${encodeURIComponent(policy.name)}`}
-                        className="text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center"
-                        title="Download"
-                      >
-                        <FiDownload className="w-4 h-4" />
-                      </a>
-
-                      {isAdmin && (
-                        <>
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            className="hidden"
-                            id={`upload-${index}`}
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                await handleUploadPolicyFile(policy.name, file);
-                                e.target.value = "";
-                              }
-                            }}
-                          />
-                          <label
-                            htmlFor={`upload-${index}`}
-                            className={`text-sm px-2 py-1 rounded-md flex items-center cursor-pointer ${
-                              uploadingPolicyKey === `${ADMIN_CATEGORY}::${policy.name}`
-                                ? "bg-green-200 text-green-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                            title="Upload / Replace PDF"
-                          >
-                            Upload
-                          </label>
-
-                          <button
-                            onClick={() => {
-                              setDeleteTarget({ name: policy.name });
-                              setShowDeleteModal(true);
-                            }}
-                            className="text-sm px-2 py-1 bg-red-100 text-red-800 rounded-md flex items-center"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              {isAdmin && (
-                <Card
-                  className="p-4 border-dashed border-2 border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50"
-                  onClick={() => setShowAddModal(true)}
-                >
-                  <span className="text-sm font-medium text-gray-600">+ Add Policy</span>
-                </Card>
-              )}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* PDF Preview */}
-      <Dialog open={showDocModal} onOpenChange={setShowDocModal}>
-        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
-          <DialogHeader className="px-6 pt-6">
-            <DialogTitle>Document Preview</DialogTitle>
-          </DialogHeader>
-
-          {docToView ? (
-            <iframe
-              src={`${docToView}#toolbar=1&navpanes=0&view=fitH`}
-              title="PDF Preview"
-              className="w-full h-[90vh]"
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground px-6 pb-6">No document selected</p>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Policy Modal */}
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add New Admin Policy</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <Input
-              placeholder="Policy name (e.g., Travel Policy)"
-              value={newPolicyName}
-              onChange={(e) => setNewPolicyName(e.target.value)}
-            />
-
-            <Input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => setNewPolicyFile(e.target.files?.[0] || null)}
-            />
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAddModal(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreatePolicy} disabled={savingNewPolicy}>
-                Add Policy
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirm Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Policy</DialogTitle>
-          </DialogHeader>
-
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete <b>{deleteTarget?.name}</b>?
-          </p>
-
-          <div className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowDeleteModal(false);
-                setDeleteTarget(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} disabled={deleting}>
-              Delete
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+ 
     </div>
   );
 };

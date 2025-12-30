@@ -1273,11 +1273,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 <TabsContent value="policy">
   <PolicySection
     category="HR Policies"
-    //title="HR Policies"
+    title="HR Policies"
   />
 </TabsContent>
-
-
 
         <TabsContent value="team" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
