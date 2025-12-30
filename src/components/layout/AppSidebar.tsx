@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Home,
-  FileText,
   Handshake,
   Banknote,
   Computer,
@@ -12,9 +11,7 @@ import {
   Calendar,
   Binoculars,
   HelpCircle,
-  Briefcase,
   ChevronLeft,
-  ChevronRight,
   GraduationCap,
   Building,
   BarChart3,
@@ -29,66 +26,40 @@ type NavItem = {
   title: string;
   href: string;
   icon: React.ElementType;
-  tooltip: string;
-  hover: String;
+  tooltip?: string;
 };
 
-type UserLike = {
-  name?: string;
-  email?: string;
-  role?: "admin" | "user";
-  fullName?: string;
-  type?: string;
-};
-
-export function AppSidebar({ user }: { user?: UserLike }) {
+export function AppSidebar({ role }: { role: "admin" | "user" }) {
   const [collapsed, setCollapsed] = useState(false);
 
-  // ✅ Read user info cached from MSAL + backend role
-  const cachedUser = useMemo<UserLike | null>(() => {
-    try {
-      const raw = localStorage.getItem("user");
-      if (raw && raw !== "undefined") return JSON.parse(raw);
-    } catch {}
-    return null;
-  }, []);
-
-  // ✅ Determine role — prefer explicit `role` from MongoDB
-  const role = user?.role || cachedUser?.role || "user";
+  // ✅ SINGLE SOURCE OF TRUTH
   const isAdmin = role === "admin";
-//   const isMsr = role === "admin";
 
-  // ✅ Sidebar navigation items
+  // ✅ Base navigation (for everyone)
   const mainNavItems: NavItem[] = [
-    {title: "Admin", href: "/admin", icon: Handshake, tooltip: "Admin Dashboard"},
-    { title: "HR", href: "/hr", icon: Users, tooltip: "" },
-
-    { title: "IT", href: "/it", icon: Computer, tooltip: "" },
-    { title: "Finance", href: "/finance", icon: Banknote, tooltip: "" },
-    
-    { title: "Holidays", href: "/holidays", icon: Calendar, tooltip: "" },
-    { title: "Employee Engagement", href: "/engagement", icon: Trophy, tooltip: "" },
-
-    { title: "Learning & Development", href: "/learning", icon: GraduationCap, tooltip: "" },
-
-    { title: "Talent Acquisition", href: "/talent", icon: Target, tooltip: "" },
-    { title: "Time Entry 🚧", href: "/timeentry", icon: Clock, tooltip: "" },   
-    { title: "Notice Board 🚧", href: "/noticeboard", icon: Building, tooltip: "" },
-    { title: "Survey 🚧", href: "/survey", icon: Binoculars, tooltip: "Respond to Surveys and see past survey results" },    
-    
-    { title: "Performance 🚧", href: "/performance", icon: BarChart3, tooltip: "" },
-    { title: "Org Structure", href: "/org", icon: Network, tooltip: "" },
-    { title: "Support", href: "/faqs", icon: HelpCircle, tooltip: "" },
+    { title: "HR", href: "/hr", icon: Users },
+    { title: "IT", href: "/it", icon: Computer },
+    { title: "Finance", href: "/finance", icon: Banknote },
+    { title: "Holidays", href: "/holidays", icon: Calendar },
+    { title: "Employee Engagement", href: "/engagement", icon: Trophy },
+    { title: "Learning & Development", href: "/learning", icon: GraduationCap },
+    { title: "Talent Acquisition", href: "/talent", icon: Target },
+    { title: "Time Entry 🚧", href: "/timeentry", icon: Clock },
+    { title: "Notice Board 🚧", href: "/noticeboard", icon: Building },
+    { title: "Survey 🚧", href: "/survey", icon: Binoculars },
+    { title: "Performance 🚧", href: "/performance", icon: BarChart3 },
+    { title: "Org Structure", href: "/org", icon: Network },
+    { title: "Support", href: "/faqs", icon: HelpCircle },
   ];
 
-  // ✅ Add "Admin Dashboard" only for admin users
+  // ✅ ADMIN ONLY
   if (isAdmin) {
-    mainNavItems.push({
-      title: "Admin Dashboard",
-      href: "/admindashboard",
-      icon: Shield, tooltip: "",
-    });
-  }
+  mainNavItems.push({
+    title: "Admin Dashboard",
+    href: "/admindashboard",
+    icon: Shield,
+  });
+}
 
   return (
     <div
@@ -112,7 +83,7 @@ export function AppSidebar({ user }: { user?: UserLike }) {
           onClick={() => setCollapsed((prev) => !prev)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? <Home size={18} /> : <ChevronLeft size={18} />}
+          <ChevronLeft size={18} />
         </Button>
       </div>
 

@@ -22,7 +22,9 @@ type EmployeeRecord = {
   EmpID?: string;
   EmployeeName?: string;
   Email?: string;
+  role?: string;   // ✅ ADD THIS
 };
+
 
 function getEmployeeImage(empID?: string, name?: string) {
   if (!empID || !name) return "/employee-images/default-avatar.jpg";
@@ -35,7 +37,14 @@ const normalizeName = (s?: string | null) =>
 
 const normalizeEmail = (s?: string | null) => (s ? s.trim().toLowerCase() : "");
 
-export function AppHeader({ user }: { user?: any }) {
+export function AppHeader({
+  user,
+  onRoleResolved,
+}: {
+  user?: any;
+  onRoleResolved?: (role: "admin" | "user") => void;
+}) {
+
   const [showAccountDialog, setShowAccountDialog] = useState(false);
 
   // ✅ Image preview popup
@@ -68,7 +77,14 @@ export function AppHeader({ user }: { user?: any }) {
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
-  const role = mongoUser?.role || "user";
+  const role =
+  employeeRecord?.role?.toLowerCase() === "admin" ? "admin" : "user";
+
+  useEffect(() => {
+  onRoleResolved?.(role);
+}, [role, onRoleResolved]);
+
+
   const jobTitle = mongoUser?.jobTitle || "";
   const createdAt = mongoUser?.createdAt ? new Date(mongoUser.createdAt).toLocaleDateString() : "";
   const initial = displayName.charAt(0).toUpperCase();

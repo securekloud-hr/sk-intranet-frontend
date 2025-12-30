@@ -7,6 +7,9 @@ import { AppHeader } from "./AppHeader";
 export function AppLayout() {
   const [user, setUser] = useState<any>(null);
 
+  // ✅ SINGLE SOURCE OF TRUTH FOR ROLE
+  const [role, setRole] = useState<"admin" | "user">("user");
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("user");
@@ -27,9 +30,13 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <AppSidebar user={user} />
+      {/* ✅ Sidebar uses ROLE, not user */}
+      <AppSidebar role={role} />
+
       <div className="flex flex-col flex-1 overflow-hidden">
-        <AppHeader user={user} />
+        {/* ✅ Header RESOLVES role from employee directory */}
+        <AppHeader user={user} onRoleResolved={setRole} />
+
         <main className="flex-1 overflow-auto p-6 bg-gray-50">
           <div className="container mx-auto fade-in">
             <Outlet />

@@ -31,10 +31,12 @@ import API from "@/config";
 type Ticket = {
   _id: string;
   type: "query" | "ticket" | "payroll";
+  subject?: string;   // ✅ ADD THIS
   message: string;
   status?: string;
   timestamp: string;
 };
+
 
 const FAQs = () => {
   /* ================= DIALOG STATES ================= */
@@ -379,7 +381,7 @@ const FAQs = () => {
           <CardDescription>
             <div className="flex items-center gap-2 mt-2">
               <Label htmlFor="department-filter" className="text-sm font-medium">
-                Filter by Department:
+                Filter by Types:
               </Label>
               <select
                 id="department-filter"
@@ -387,7 +389,7 @@ const FAQs = () => {
                 onChange={(e) => setDepartmentFilter(e.target.value)}
                 className="border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-securekloud-600"
               >
-                <option value="all">All Departments</option>
+                <option value="all">All Types</option>
                 <option value="query">HR</option>
                 <option value="ticket">IT</option>
                 <option value="payroll">Payroll</option>
@@ -407,25 +409,44 @@ const FAQs = () => {
             </p>
           ) : (
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Message</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
+             <TableHeader>
+  <TableRow>
+ 
+   <TableHead>Date</TableHead>
+<TableHead>Type</TableHead>
+<TableHead>Subject</TableHead>
+<TableHead>Message</TableHead>
+<TableHead>Status</TableHead>
+
+    
+  </TableRow>
+</TableHeader>
+
 
               <TableBody>
                 {filteredTickets.map((t) => (
-                  <TableRow key={t._id}>
-                    <TableCell>{getDisplayType(t.type)}</TableCell>
-                    <TableCell className="truncate max-w-md">
-                      {t.message}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(t.timestamp).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
+               <TableRow key={t._id}>
+  {/* ✅ Date FIRST */}
+  <TableCell>
+    {new Date(t.timestamp).toLocaleDateString()}
+  </TableCell>
+
+  <TableCell>{getDisplayType(t.type)}</TableCell>
+
+  <TableCell className="font-medium">
+    {t.subject || "-"}
+  </TableCell>
+
+  <TableCell className="truncate max-w-md">
+    {t.message}
+  </TableCell>
+
+  <TableCell className="capitalize">
+    {t.status}
+  </TableCell>
+</TableRow>
+
+
                 ))}
               </TableBody>
             </Table>
