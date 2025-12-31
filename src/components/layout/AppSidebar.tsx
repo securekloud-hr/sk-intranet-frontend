@@ -40,6 +40,7 @@ export function AppSidebar({
 
   // ✅ Base navigation
   const mainNavItems: NavItem[] = [
+     { title: "Admin", href: "/admin", icon: Users },
     { title: "HR", href: "/hr", icon: Users },
     { title: "IT", href: "/it", icon: Computer },
     { title: "Finance", href: "/finance", icon: Banknote },
