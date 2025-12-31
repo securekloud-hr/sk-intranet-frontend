@@ -8,7 +8,8 @@ export function AppLayout() {
   const [user, setUser] = useState<any>(null);
 
   // ✅ SINGLE SOURCE OF TRUTH FOR ROLE
-  const [role, setRole] = useState<"admin" | "user">("user");
+  const [role, setRole] = useState<"admin" | "manager" | "user">("user");
+
 
   useEffect(() => {
     try {

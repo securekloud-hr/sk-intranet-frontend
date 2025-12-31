@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Home,
-  Handshake,
   Banknote,
   Computer,
   Users,
@@ -12,6 +11,7 @@ import {
   Binoculars,
   HelpCircle,
   ChevronLeft,
+  ChevronRight,
   GraduationCap,
   Building,
   BarChart3,
@@ -26,16 +26,19 @@ type NavItem = {
   title: string;
   href: string;
   icon: React.ElementType;
-  tooltip?: string;
 };
 
-export function AppSidebar({ role }: { role: "admin" | "user" }) {
+export function AppSidebar({
+  role,
+}: {
+  role: "admin" | "manager" | "user";
+}) {
+  // ✅ FIX: collapsed state was missing
   const [collapsed, setCollapsed] = useState(false);
 
-  // ✅ SINGLE SOURCE OF TRUTH
   const isAdmin = role === "admin";
 
-  // ✅ Base navigation (for everyone)
+  // ✅ Base navigation
   const mainNavItems: NavItem[] = [
     { title: "HR", href: "/hr", icon: Users },
     { title: "IT", href: "/it", icon: Computer },
@@ -52,24 +55,24 @@ export function AppSidebar({ role }: { role: "admin" | "user" }) {
     { title: "Support", href: "/faqs", icon: HelpCircle },
   ];
 
-  // ✅ ADMIN ONLY
+  // ✅ Admin Dashboard should appear AFTER Support
   if (isAdmin) {
-  mainNavItems.push({
-    title: "Admin Dashboard",
-    href: "/admindashboard",
-    icon: Shield,
-  });
-}
+    mainNavItems.push({
+      title: "Admin Dashboard",
+      href: "/admindashboard",
+      icon: Shield,
+    });
+  }
 
   return (
     <div
       className={cn(
-        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border",
+        "flex flex-col h-screen bg-sidebar border-r",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+      <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
           <Link to="/" className="flex items-center space-x-2">
             <Home size={20} className="text-white" />
@@ -79,29 +82,25 @@ export function AppSidebar({ role }: { role: "admin" | "user" }) {
         <Button
           variant="ghost"
           size="icon"
-          className="ml-auto text-white"
-          onClick={() => setCollapsed((prev) => !prev)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => setCollapsed(!collapsed)}
         >
-          <ChevronLeft size={18} />
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </Button>
       </div>
 
-      {/* Navigation */}
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid gap-1 px-2">
-          {mainNavItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-sidebar-accent transition-all"
-            >
-              <item.icon className={cn("h-5 w-5", collapsed ? "mx-auto" : "")} />
-              {!collapsed && <span>{item.title}</span>}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      {/* Nav */}
+      <nav className="flex-1 px-2 py-2 space-y-1">
+        {mainNavItems.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href}
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-white hover:bg-sidebar-accent"
+          >
+            <item.icon className="h-5 w-5" />
+            {!collapsed && <span>{item.title}</span>}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }

@@ -77,8 +77,10 @@ export function AppHeader({
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
-  const role =
-  employeeRecord?.role?.toLowerCase() === "admin" ? "admin" : "user";
+ const role = (employeeRecord?.role || "User").toLowerCase() as
+  | "admin"
+  | "manager"
+  | "user";
 
   useEffect(() => {
   onRoleResolved?.(role);

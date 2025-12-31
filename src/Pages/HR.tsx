@@ -1,4 +1,4 @@
-﻿﻿﻿import React, { useState, useEffect } from "react";
+﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
 
 import {
@@ -117,12 +117,28 @@ const team = [
  // 🧩 Employee Directory state
  
 
+
+
+
+
 const HR = () => {
-// 🧩 Employee Directory (fetched from backend)
- const [employeeDirectory, setEmployeeDirectory] = useState<any[]>([]);
-const [isAdmin, setIsAdmin] = useState(false);
-const [submittingForm, setSubmittingForm] = useState<string | null>(null);
-const [submitStatus, setSubmitStatus] = useState("");
+  // ✅ FIXED: Added isAdmin state declaration
+  const [isAdmin, setIsAdmin] = useState(false);
+  // ✅ FIXED: Added role state declaration
+  const [role, setRole] = useState<string>("user");
+  
+  const canSeeHRDashboard = role === "admin" || role === "manager";
+  
+ 
+
+
+
+  // ✅ state that was missing
+  const [employeeDirectory, setEmployeeDirectory] = useState<any[]>([]);
+  const [submittingForm, setSubmittingForm] = useState<string | null>(null);
+  const [submitStatus, setSubmitStatus] = useState("");
+
+
 
 
 
@@ -144,23 +160,25 @@ const [errorEmployees, setErrorEmployees] = useState("");
     const fetchEmployees = async () => {
       try {
         // Get role from localStorage
-        let role = "user";
-        const storedUser = localStorage.getItem("user");
-        if (storedUser && storedUser !== "undefined") {
-          try {
-            const parsed = JSON.parse(storedUser);
-            if (parsed?.role) role = parsed.role;
-          } catch (e) {
-            console.error("Error parsing user from localStorage", e);
-          }
-        }
+       // Get role from localStorage
+let userRole = "user";
+const storedUser = localStorage.getItem("user");
+if (storedUser && storedUser !== "undefined") {
+  try {
+    const parsed = JSON.parse(storedUser);
+    if (parsed?.role) userRole = parsed.role;
+  } catch (e) {
+    console.error("Error parsing user from localStorage", e);
+  }
+}
 
-        // Set admin flag for UI
-        setIsAdmin(role === "admin");
+// Set role and admin flag for UI
+setRole(userRole);
+setIsAdmin(userRole === "admin");
 
         // Fetch with role header
         const res = await fetch(`${API}/api/employeedirectory`, {
-          headers: { "x-user-role": role },
+          headers: { "x-user-role": userRole },
         });
 
         if (!res.ok) throw new Error("Failed to fetch employee data");
@@ -226,18 +244,7 @@ const uniqueDepartments = Array.from(
 
 
 // 👇 add in the same useEffect where you load user / data, or create a new one:
-useEffect(() => {
-  try {
-    const raw = localStorage.getItem("user");
-    if (raw && raw !== "undefined") {
-      const parsed = JSON.parse(raw);
-      // role comes from MongoDB user document: "admin" | "user"
-      setIsAdmin(parsed.role === "admin");
-    }
-  } catch (e) {
-    console.error("Failed to read user from localStorage", e);
-  }
-}, []);
+
 const getEmployeeAvatar = (emp: any) => {
   // ✅ 1) Uploaded profile image (from MongoDB)
   if (emp.ProfileImage) return emp.ProfileImage;
@@ -904,13 +911,16 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
       <Tabs defaultValue="key"  onValueChange={setActiveTab}>
         <TabsList className="grid w-full sm:w-[600px] grid-cols-6">
- <TabsTrigger value="key" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Key Functions</TabsTrigger>
-  <TabsTrigger value="resources" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
-  <TabsTrigger value="team" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
-  <TabsTrigger value="forms" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
-  <TabsTrigger value="policy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
-  <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Dashboard</TabsTrigger>
- </TabsList>
+  <TabsTrigger value="key">Key Functions</TabsTrigger>
+  <TabsTrigger value="resources">Resources</TabsTrigger>
+  <TabsTrigger value="team">HR Team</TabsTrigger>
+  <TabsTrigger value="forms">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy">HR Policies</TabsTrigger>
+
+  {canSeeHRDashboard && (
+    <TabsTrigger value="dashboard">HR Dashboard</TabsTrigger>
+  )}
+</TabsList>
 
 {/* ✅ KEY TAB (THIS WAS MISSING IN YOUR CODE) */}
 <TabsContent value="key" className="mt-6">
@@ -1763,7 +1773,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
       {/* Nomination Form - Associate of the Year */}
       <Dialog open={showAssociateNominationForm} onOpenChange={setShowAssociateNominationForm}>
         
-        
+
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nomination Form - Associate of the Year</DialogTitle>
