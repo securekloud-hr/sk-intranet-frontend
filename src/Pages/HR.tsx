@@ -32,6 +32,14 @@ import SignaturePad from "signature_pad";
 import PolicySection from "@/components/PolicySection";
 
 import API from "@/config";
+import { useOutletContext } from "react-router-dom";
+
+
+
+type OutletContext = {
+  role: "admin" | "manager" | "user";
+};
+
 
 
 
@@ -123,11 +131,12 @@ const team = [
 
 const HR = () => {
   // ✅ FIXED: Added isAdmin state declaration
-  const [isAdmin, setIsAdmin] = useState(false);
-  // ✅ FIXED: Added role state declaration
-  const [role, setRole] = useState<string>("user");
+const { role } = useOutletContext<OutletContext>();
+const isAdmin = role === "admin";
+
+const canSeeHRDashboard = role === "admin" || role === "manager";
+
   
-  const canSeeHRDashboard = role === "admin" || role === "manager";
   
  
 
@@ -160,25 +169,12 @@ const [errorEmployees, setErrorEmployees] = useState("");
     const fetchEmployees = async () => {
       try {
         // Get role from localStorage
-       // Get role from localStorage
-let userRole = "user";
-const storedUser = localStorage.getItem("user");
-if (storedUser && storedUser !== "undefined") {
-  try {
-    const parsed = JSON.parse(storedUser);
-    if (parsed?.role) userRole = parsed.role;
-  } catch (e) {
-    console.error("Error parsing user from localStorage", e);
-  }
-}
-
-// Set role and admin flag for UI
-setRole(userRole);
-setIsAdmin(userRole === "admin");
+ 
 
         // Fetch with role header
         const res = await fetch(`${API}/api/employeedirectory`, {
-          headers: { "x-user-role": userRole },
+          headers: { "x-user-role": role },
+
         });
 
         if (!res.ok) throw new Error("Failed to fetch employee data");

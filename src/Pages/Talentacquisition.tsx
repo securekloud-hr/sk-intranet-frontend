@@ -13,6 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { UserPlus, Award, Building } from "lucide-react";
 import API from "@/config";
+import { useOutletContext } from "react-router-dom";
+
+
+type OutletContext = {
+  role: "admin" | "manager" | "user";
+};
+
 
 type UserLike = {
   name?: string;
@@ -109,6 +116,7 @@ interface ModalProps {
 
 const ViewDescriptionsModal = ({ opportunities }: ModalProps) => {
   const [showModal, setShowModal] = useState(false);
+
 
   if (!opportunities || opportunities.length === 0) return null;
 
@@ -207,9 +215,6 @@ const TalentAcquisition = () => {
     return null;
   }, []);
 
-  const role = cachedUser?.role || "user";
-  const isAdmin = role === "admin";
-
   useEffect(() => {
     fetch(`${API}/api/jobs`)
       .then((res) => res.json())
@@ -244,6 +249,9 @@ const TalentAcquisition = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+  const { role } = useOutletContext<OutletContext>();
+const isAdmin = role === "admin";
+
 
   // referral input handlers
   const handleReferralChange = (e: React.ChangeEvent<HTMLInputElement>) => {

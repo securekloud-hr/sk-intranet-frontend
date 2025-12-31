@@ -40,7 +40,8 @@ export function AppLayout() {
 
         <main className="flex-1 overflow-auto p-6 bg-gray-50">
           <div className="container mx-auto fade-in">
-            <Outlet />
+            <Outlet context={{ role }} />
+
           </div>
         </main>
       </div>

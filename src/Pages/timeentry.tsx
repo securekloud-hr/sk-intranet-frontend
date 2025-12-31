@@ -72,6 +72,22 @@ const getInitials = (name: string) =>
     .slice(0, 2)
     .toUpperCase();
 
+  const getCurrentWeek = () => {
+  const today = new Date();
+  const day = today.getDay();
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  const monday = new Date(today.setDate(diff));
+
+  return Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+};
+
+const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+
 
 /* ----------------------- MODAL COMPONENT ----------------------- */
 
@@ -154,6 +170,18 @@ const TalentAcquisition = () => {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
+  const weekDates = useMemo(() => getCurrentWeek(), []);
+const [weeklyHours, setWeeklyHours] = useState<number[]>(Array(7).fill(0));
+
+const [weekOffset, setWeekOffset] = useState(0);
+
+
+const handleHourChange = (index: number, value: string) => {
+  const updated = [...weeklyHours];
+  updated[index] = Number(value);
+  setWeeklyHours(updated);
+};
+
 
   // referral form state (candidate details)
   const [referral, setReferral] = useState({
@@ -384,21 +412,76 @@ const TalentAcquisition = () => {
                   onChange={handleReferralChange}
                   required
                 />
-                <Input
-                  name="Task"
-                  type="tel"
-                  placeholder="Task:"
-                  value={referral.phone}
+                 <Input
+                  name="Add Module"
+                  type="string"
+                  placeholder="Add Module: "
+                  value={referral.email}
                   onChange={handleReferralChange}
                   required
                 />
                 <Input
-                  name="Week"
-                  placeholder="Time for the Week of:"
-                  value={referral.position}
-                  onChange={handleReferralChange}
-                  required
-                />
+  name="Task"
+  placeholder="Task:"
+  value={referral.phone}
+  onChange={handleReferralChange}
+  required
+/>
+               {/* Compact Weekly Time Entry */}
+<div className="border rounded-md p-2 space-y-2">
+  {/* Week navigation */}
+  <div className="flex items-center justify-between text-xs font-medium">
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setWeekOffset((w) => w - 1)}
+    >
+      ←
+    </Button>
+
+    <span>
+      Time for the Week of{" "}
+      {new Date(
+        weekDates[0].getTime() + weekOffset * 7 * 24 * 60 * 60 * 1000
+      ).toLocaleDateString()}{" "}
+      –{" "}
+      {new Date(
+        weekDates[6].getTime() + weekOffset * 7 * 24 * 60 * 60 * 1000
+      ).toLocaleDateString()}
+    </span>
+
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setWeekOffset((w) => w + 1)}
+    >
+      →
+    </Button>
+  </div>
+
+  {/* Horizontal hours row */}
+  <div className="flex items-center gap-3 overflow-x-auto">
+    {weekDays.map((day, i) => (
+      <div key={day} className="flex flex-col items-center text-xs">
+        <span>{day}</span>
+        <Input
+          type="number"
+          min={0}
+          max={24}
+          value={weeklyHours[i]}
+          onChange={(e) => handleHourChange(i, e.target.value)}
+          className="w-14 h-8 text-center"
+        />
+      </div>
+    ))}
+
+    <div className="ml-3 text-xs font-semibold whitespace-nowrap">
+      Total: {weeklyHours.reduce((a, b) => a + b, 0)}
+    </div>
+  </div>
+</div>
+
+
                 <Button
                   className="w-full"
                   onClick={submitReferral}
