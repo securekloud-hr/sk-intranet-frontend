@@ -144,8 +144,7 @@ const canSeeHRDashboard = role === "admin" || role === "manager";
 
   // ✅ state that was missing
   const [employeeDirectory, setEmployeeDirectory] = useState<any[]>([]);
-  const [submittingForm, setSubmittingForm] = useState<string | null>(null);
-  const [submitStatus, setSubmitStatus] = useState("");
+  
 
 
 
@@ -786,19 +785,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
   };
  const handleUniversalSubmit = (fileName: string) => {
   if (!fileName) return;
-
-  // ⛔ If this form is already submitting, ignore further clicks
-  if (submittingForm === fileName) return;
-
-  // Mark this card as submitting (locks its Submit button)
-  setSubmittingForm(fileName);
-  setSubmitStatus("Submitting...");
-
-  // Open the correct modal (your existing mapping)
   handleSubmit(fileName);
-
-  // ⚠️ Do NOT reset here.
-  // We will reset when the modal is closed or after real submit.
 };
 
 
@@ -806,7 +793,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
   const renderFormTabContent = (tabForms, tabName) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     {tabForms.map((form, index) => {
-      const isSubmitting = submittingForm === form.fileName;
+      
 
       return (
         <Card
@@ -823,11 +810,9 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
             <div className="flex justify-center space-x-2">
               {/* 👁 View */}
               <button
-                onClick={() => handleView(form.fileName)}
-                className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center"
-                title="View"
-                disabled={isSubmitting}
-              >
+  onClick={() => handleView(form.fileName)}
+>
+
                 <FiEye className="w-4 h-4" />
               </button>
 
@@ -835,9 +820,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               <a
                 href={`/files/${form.DWNfileName}`}
                 download
-                className={`text-sm px-2 py-1 bg-gray-100 text-gray-800 rounded-md flex items-center ${
-                  isSubmitting ? "opacity-60 pointer-events-none" : ""
-                }`}
+               
                 title="Download"
               >
                 <FiDownload className="w-4 h-4" />
@@ -847,16 +830,12 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
               {/* ❌ Hide Submit button for Onboarding tab */}
 {tabName !== "onboarding" && (
   <button
-    onClick={() => handleUniversalSubmit(form.fileName)}
-    disabled={isSubmitting}
-    className={`text-sm px-2 py-1 rounded-md ${
-      isSubmitting
-        ? "bg-green-200 text-green-800 cursor-not-allowed"
-        : "bg-green-100 text-green-800"
-    }`}
-  >
-    Submit
-  </button>
+  onClick={() => handleUniversalSubmit(form.fileName)}
+  className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded-md"
+>
+  Submit
+</button>
+
 )}
 
             </div>
@@ -906,12 +885,22 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
       </div>
 
       <Tabs defaultValue="key"  onValueChange={setActiveTab}>
-        <TabsList className="grid w-full sm:w-[600px] grid-cols-6">
-  <TabsTrigger value="key">Key Functions</TabsTrigger>
-  <TabsTrigger value="resources">Resources</TabsTrigger>
-  <TabsTrigger value="team">HR Team</TabsTrigger>
-  <TabsTrigger value="forms">HR Forms</TabsTrigger>
-  <TabsTrigger value="policy">HR Policies</TabsTrigger>
+        <TabsList
+  className={`grid w-full sm:w-[600px] ${
+    canSeeHRDashboard ? "grid-cols-6" : "grid-cols-5"
+  }`}
+>
+
+  <TabsTrigger 
+  value="key" 
+  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+>
+  Key Functions
+</TabsTrigger>
+  <TabsTrigger value="resources" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Resources</TabsTrigger>
+  <TabsTrigger value="team" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Team</TabsTrigger>
+  <TabsTrigger value="forms" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Forms</TabsTrigger>
+  <TabsTrigger value="policy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">HR Policies</TabsTrigger>
 
   {canSeeHRDashboard && (
     <TabsTrigger value="dashboard">HR Dashboard</TabsTrigger>

@@ -379,22 +379,34 @@ const FAQs = () => {
         <CardHeader>
           <CardTitle>Your Submitted Tickets</CardTitle>
           <CardDescription>
-            <div className="flex items-center gap-2 mt-2">
-              <Label htmlFor="department-filter" className="text-sm font-medium">
-                Filter by Types:
-              </Label>
-              <select
-                id="department-filter"
-                value={departmentFilter}
-                onChange={(e) => setDepartmentFilter(e.target.value)}
-                className="border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-securekloud-600"
-              >
-                <option value="all">All Types</option>
-                <option value="query">HR</option>
-                <option value="ticket">IT</option>
-                <option value="payroll">Payroll</option>
-              </select>
-            </div>
+           <div className="flex gap-2 mt-3">
+  {[
+    { label: "All", value: "all" },
+    { label: "HR", value: "query" },
+    { label: "IT", value: "ticket" },
+    { label: "Payroll", value: "payroll" },
+  ].map((tab) => {
+    const isActive = departmentFilter === tab.value;
+
+    return (
+      <button
+        key={tab.value}
+        onClick={() => setDepartmentFilter(tab.value)}
+        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors
+          ${
+            isActive
+              ? "bg-blue-600 text-white"
+              : "text-blue-600 hover:bg-blue-100"
+          }`}
+      >
+        {tab.label}
+      </button>
+    );
+  })}
+</div>
+
+
+
           </CardDescription>
         </CardHeader>
 

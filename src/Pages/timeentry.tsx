@@ -88,6 +88,13 @@ const getInitials = (name: string) =>
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 
+const CLIENT_OPTIONS = ["SecureKloud", "Internal"];
+const PROJECT_OPTIONS = ["DocuGenie", "Readabl"];
+const MODULE_OPTIONS = ["Frontend", "Backend"];
+const TASK_OPTIONS = ["Development", "Testing"];
+
+
+
 
 /* ----------------------- MODAL COMPONENT ----------------------- */
 
@@ -397,36 +404,58 @@ const handleHourChange = (index: number, value: string) => {
                 <CardTitle>Submit a Timsheet</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Input
-                  name="Client"
-                  placeholder="Client:"
-                  value={referral.candidateName}
-                  onChange={handleReferralChange}
-                  required
-                />
-                <Input
-                  name="Project"
-                  type="string"
-                  placeholder="Project: "
-                  value={referral.email}
-                  onChange={handleReferralChange}
-                  required
-                />
-                 <Input
-                  name="Add Module"
-                  type="string"
-                  placeholder="Add Module: "
-                  value={referral.email}
-                  onChange={handleReferralChange}
-                  required
-                />
-                <Input
-  name="Task"
-  placeholder="Task:"
+              <select
+  name="candidateName"
+  value={referral.candidateName}
+  onChange={handleReferralChange}
+  className="w-full border rounded-md p-2 text-sm"
+  required
+>
+  <option value="">Select Client</option>
+  {CLIENT_OPTIONS.map((c) => (
+    <option key={c} value={c}>{c}</option>
+  ))}
+</select>
+
+                <select
+  name="email"
+  value={referral.email}
+  onChange={handleReferralChange}
+  className="w-full border rounded-md p-2 text-sm"
+  required
+>
+  <option value="">Select Project</option>
+  {PROJECT_OPTIONS.map((p) => (
+    <option key={p} value={p}>{p}</option>
+  ))}
+</select>
+
+                 <select
+  name="position"
+  value={referral.position}
+  onChange={handleReferralChange}
+  className="w-full border rounded-md p-2 text-sm"
+  required
+>
+  <option value="">Select Module</option>
+  {MODULE_OPTIONS.map((m) => (
+    <option key={m} value={m}>{m}</option>
+  ))}
+</select>
+
+               <select
+  name="phone"
   value={referral.phone}
   onChange={handleReferralChange}
+  className="w-full border rounded-md p-2 text-sm"
   required
-/>
+>
+  <option value="">Select Task</option>
+  {TASK_OPTIONS.map((t) => (
+    <option key={t} value={t}>{t}</option>
+  ))}
+</select>
+
                {/* Compact Weekly Time Entry */}
 <div className="border rounded-md p-2 space-y-2">
   {/* Week navigation */}
