@@ -42,7 +42,8 @@ export function AppHeader({
   onRoleResolved,
 }: {
   user?: any;
-  onRoleResolved?: (role: "admin" | "user") => void;
+  onRoleResolved?: (role: "admin" | "manager" | "user") => void;
+
 }) {
 
   const [showAccountDialog, setShowAccountDialog] = useState(false);
@@ -105,17 +106,11 @@ export function AppHeader({
 
     const fetchAndMatchEmployee = async () => {
       try {
-        let userRole = "user";
-        const storedUser = localStorage.getItem("user");
-        if (storedUser && storedUser !== "undefined") {
-          try {
-            const parsed = JSON.parse(storedUser);
-            if (parsed?.role) userRole = parsed.role;
-          } catch {}
-        }
+         
 
         const res = await fetch(`${API}/api/employeedirectory`, {
-          headers: { "x-user-role": userRole },
+          headers: { "x-user-role": role },
+
         });
 
         const data: EmployeeRecord[] = await res.json();
@@ -264,7 +259,12 @@ formData.append("avatar", file); // ✅ file LAST
                 <div className="flex flex-col items-start text-left leading-tight">
                   <span className="font-medium">{displayName}</span>
                   <span className="text-sm text-muted-foreground">
-                    {role === "admin" ? "🛡️ Admin" : "👤 User"}
+                    {role === "admin"
+  ? "🛡️ Admin"
+  : role === "manager"
+  ? "👔 Manager"
+  : "👤 User"}
+
                   </span>
                 </div>
               </Button>
