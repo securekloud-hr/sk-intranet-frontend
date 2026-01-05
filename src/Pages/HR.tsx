@@ -807,7 +807,7 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
           </CardHeader>
 
           <CardContent className="flex-shrink-0 pt-0">
-            <div className="flex justify-center space-x-2">
+            <div className="flex items-center justify-center gap-2">
               {/* 👁 View */}
               <button
   onClick={() => handleView(form.fileName)}
