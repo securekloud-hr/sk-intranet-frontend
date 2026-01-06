@@ -748,7 +748,7 @@ else if (fileName === "Gratuity_Declaration_Form.pdf") {
   setShowGratuityForm(true);
 }
 else if (fileName === "Leave_Encashment_Declaration_Form.pdf") {
-  setShowLeaveEncashmentForm(true);
+  setShowLeaveEncashForm(true);
 }
 
 else if (fileName === "Contract_Invoice_Template.pdf") {
@@ -778,8 +778,8 @@ else if (fileName === "Intern_to_Onroll_Template.pdf") {
 else if (fileName === "PIP_Letter_Template_2.pdf") {
   setShowPipForm(true);
 }
-else if (fileName === "Letter_of_Undertaking(2).pdf") {
-  setShowUndertakingForm(true);
+else if (fileName === "Letter_of_Undertaking.pdf") {
+    setShowUndertakingForm(true);
 }
 
   };
@@ -1513,6 +1513,184 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
           </form>
         </DialogContent>
       </Dialog>
+      <Dialog
+  open={showLeaveEncashForm}
+  onOpenChange={setShowLeaveEncashForm}
+>
+  <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>Leave Encashment Declaration Form</DialogTitle>
+      <DialogDescription>
+        Declaration for claiming Leave Encashment Exemption
+      </DialogDescription>
+    </DialogHeader>
+
+    <form className="space-y-4 text-sm leading-relaxed">
+
+      {/* From */}
+      <div>
+        <p className="font-semibold">From</p>
+        <Input
+          placeholder="Employee Name and ID"
+          value={leaveEncashData.employeeName}
+          onChange={(e) =>
+            setLeaveEncashData({ ...leaveEncashData, employeeName: e.target.value })
+          }
+        />
+        <Textarea
+          placeholder="Address"
+          value={leaveEncashData.address}
+          onChange={(e) =>
+            setLeaveEncashData({ ...leaveEncashData, address: e.target.value })
+          }
+        />
+      </div>
+
+      {/* To */}
+      <div>
+        <p className="font-semibold">To</p>
+        <p>Securekloud Technologies Limited</p>
+        <p>5th floor, Bascon Futura SV IT Park,</p>
+        <p>SV 10/1, Venkatnarayana Road,</p>
+        <p>T-Nagar, Chennai – 600 017.</p>
+      </div>
+
+      {/* Declaration Text */}
+      <div className="space-y-2">
+        <p className="font-semibold">
+          Declaration for claiming Leave Encashment Exemption
+        </p>
+
+        <p>
+          I understand that under the provisions of Income Tax Act, the maximum
+          limit of exemption for Leave Encashment as specified under Section
+          10(10AA) of the Income Tax Act has to be reduced by the amount of
+          exemption claimed as Leave Encashment by me in any of my previous
+          employment(s) in any financial year(s).
+        </p>
+
+        <p>
+          In view of the above, I hereby declare that *
+        </p>
+      </div>
+
+      {/* Option A */}
+      <div className="flex items-start gap-2">
+        <input
+          type="radio"
+          name="declarationOption"
+          value="A"
+          checked={leaveEncashData.declarationOption === "A"}
+          onChange={() =>
+            setLeaveEncashData({ ...leaveEncashData, declarationOption: "A" })
+          }
+        />
+        <p>
+          I have not taken Leave Encashment exemption from any of my previous
+          employer up till now, during my entire service tenure.
+        </p>
+      </div>
+
+      {/* Option B */}
+      <div className="flex items-start gap-2">
+        <input
+          type="radio"
+          name="declarationOption"
+          value="B"
+          checked={leaveEncashData.declarationOption === "B"}
+          onChange={() =>
+            setLeaveEncashData({ ...leaveEncashData, declarationOption: "B" })
+          }
+        />
+        <p>
+          I had claimed an aggregate sum of INR
+        </p>
+        <Input
+          className="w-40"
+          placeholder="Amount"
+          disabled={leaveEncashData.declarationOption !== "B"}
+          value={leaveEncashData.exemptionAmount}
+          onChange={(e) =>
+            setLeaveEncashData({
+              ...leaveEncashData,
+              exemptionAmount: e.target.value,
+            })
+          }
+        />
+        <p>
+          as exempt Income in respect of Leave Encashment from my previous
+          employment(s).
+        </p>
+      </div>
+
+      {/* Confirmation */}
+      <p>
+        I confirm that I have reviewed all my prior Form 16(s) and the information
+        provided by me above is accurate.
+      </p>
+
+      <p>
+        In case of any query, assessment or scrutiny from Income Tax Department, I
+        take responsibility to justify the above information as declared to the
+        company and the company should not be held liable for any interest /
+        penalty arising out of such query, assessment or scrutiny should the above
+        information be found inaccurate.
+      </p>
+
+      {/* Footer */}
+      <div className="grid grid-cols-2 gap-4 pt-4">
+        <Input
+          type="date"
+          value={leaveEncashData.date}
+          onChange={(e) =>
+            setLeaveEncashData({ ...leaveEncashData, date: e.target.value })
+          }
+        />
+        <Input
+          placeholder="Place"
+          value={leaveEncashData.place}
+          onChange={(e) =>
+            setLeaveEncashData({ ...leaveEncashData, place: e.target.value })
+          }
+        />
+      </div>
+
+      <div className="space-y-2">
+      <label className="font-semibold">Upload Signature</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              setGratuityData({ ...gratuityData, signature: reader.result as string });
+            reader.readAsDataURL(file);
+          }
+        }}
+        className="border p-2 rounded w-full"
+      />
+      {gratuityData.signature && (
+        <img
+          src={gratuityData.signature}
+          alt="Signature Preview"
+          className="w-32 h-16 border rounded mt-2"
+        />
+      )}
+    </div>
+
+      
+
+      <div className="pt-4">
+        <Button className="bg-green-600 text-white">
+          Submit Declaration
+        </Button>
+      </div>
+    </form>
+  </DialogContent>
+</Dialog>
+
 
       {/* Nomination Form - Star of the Quarter */}
       <Dialog
@@ -3893,10 +4071,30 @@ else if (fileName === "Letter_of_Undertaking(2).pdf") {
 
     {/* Footer */}
     <div className="grid grid-cols-2 gap-4 mt-4">
-      <input type="text" placeholder="Signature of Associate"
-        value={inductionData.signature}
-        onChange={(e) => setInductionData({ ...inductionData, signature: e.target.value })}
-        className="border p-2 rounded" />
+       <div className="space-y-2">
+      <label className="font-semibold">Upload Signature</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              setGratuityData({ ...gratuityData, signature: reader.result as string });
+            reader.readAsDataURL(file);
+          }
+        }}
+        className="border p-2 rounded w-full"
+      />
+      {gratuityData.signature && (
+        <img
+          src={gratuityData.signature}
+          alt="Signature Preview"
+          className="w-32 h-16 border rounded mt-2"
+        />
+      )}
+    </div>
       <input type="date"
         value={inductionData.date}
         onChange={(e) => setInductionData({ ...inductionData, date: e.target.value })}
