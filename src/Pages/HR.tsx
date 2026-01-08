@@ -1,5 +1,14 @@
 ﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+  });
+};
+
 
 import {
   Card,
@@ -125,6 +134,23 @@ const team = [
  // 🧩 Employee Directory state
  
 
+// 🔒 Reusable submit lock (OPTION 2 – same file)
+const useSubmitLock = (delay = 10000) => {
+  const [locked, setLocked] = React.useState(false);
+
+  const lock = () => {
+    if (locked) return false; // prevent double click
+    setLocked(true);
+
+    setTimeout(() => {
+      setLocked(false);
+    }, delay);
+
+    return true;
+  };
+
+  return { locked, lock };
+};
 
 
 
@@ -135,6 +161,9 @@ const { role } = useOutletContext<OutletContext>();
 const isAdmin = role === "admin";
 
 const canSeeHRDashboard = role === "admin" || role === "manager";
+const candidateSubmit = useSubmitLock();
+const authorizationSubmit = useSubmitLock();
+
 
   
   
@@ -144,6 +173,9 @@ const canSeeHRDashboard = role === "admin" || role === "manager";
 
   // ✅ state that was missing
   const [employeeDirectory, setEmployeeDirectory] = useState<any[]>([]);
+
+  const [isSubmittingCandidate, setIsSubmittingCandidate] = useState(false);
+
   
 
 
@@ -536,6 +568,32 @@ const [invoiceData, setInvoiceData] = useState({
   panNumber: "",
   signature: ""
 });
+const submitInvoice = async () => {
+  try {
+    const response = await fetch(`${API}/api/submitNomination`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "Contract Invoice Template",
+        formData: invoiceData,
+        submittedBy: "HR Portal",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Invoice submission failed");
+    }
+
+    alert("Invoice submitted successfully");
+    setShowInvoiceForm(false);
+  } catch (error) {
+    console.error("Invoice submit error:", error);
+    alert("Failed to submit invoice");
+  }
+};
+
 const [showTimesheetForm, setShowTimesheetForm] = useState(false);
 const [timesheetData, setTimesheetData] = useState({
   consultantName: "",
@@ -563,6 +621,35 @@ const [expenseData, setExpenseData] = useState({
   approvalSignature: "",
   approvalDate: ""
 });
+const submitExpenseReimbursement = async () => {
+  // 1️⃣ calculate subtotal
+  const subtotal = expenseData.expenses.reduce(
+    (sum, e) => sum + Number(e.cost || 0),
+    0
+  );
+
+  // 2️⃣ calculate total
+  const total = subtotal - Number(expenseData.cashAdvance || 0);
+
+  // 3️⃣ send everything to backend
+  await fetch(`${API}/api/submitNomination`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "Expense Reimbursement Form",
+      formData: {
+        ...expenseData,
+        subtotal,
+        total,
+      },
+      submittedBy: "HR Portal",
+    }),
+  });
+
+  alert("Expense submitted successfully");
+  setShowExpenseForm(false);
+};
+
 const [showInductionForm, setShowInductionForm] = useState(false);
 const [inductionData, setInductionData] = useState({
   associateName: "",
@@ -833,7 +920,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
   onClick={() => handleUniversalSubmit(form.fileName)}
   className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded-md"
 >
-  Submit
+  Submit1
 </button>
 
 )}
@@ -1451,56 +1538,78 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
                 />
               </div>
             </div>
-      <button
+     <button
   type="button"
   onClick={async () => {
     try {
-    const mappedData = {
-  type: "Team of the Quarter",
-  formData: {
-    project_name: nominationData.project,
-    date_commencement: nominationData.doj, // from input
-    number_of_members: nominationData.roleSince, // from input
-    names_of_members: nominationData.nominationPeriod, // from input
-    nomination_period: nominationData.nominationPeriod,
+      // ✅ Map frontend data to backend format with all necessary fields
+      const mappedData = {
+        type: "Team of the Year",
+        formData: {
+          // Basic team details
+          project_name: teamYearNominationData.project,
+          date_commencement: teamYearNominationData.commencementDate,
+          number_of_members: teamYearNominationData.numberOfMembers,
+          nomination_period: teamYearNominationData.nominationPeriod,
+          names_of_members: teamYearNominationData.memberNames,
+          previous_nomination_details: teamYearNominationData.previousNominations,
 
-    a_deliverable: nominationData.accomplishments?.exceptionalDeliverable,
-    a_utilization: nominationData.accomplishments?.resourceUtilization,
-    a_productivity: nominationData.accomplishments?.resourceProductivity,
-    a_knowledge: nominationData.accomplishments?.teamKnowledge,
-    a_risk: nominationData.accomplishments?.riskManagement,
-    a_customer_sat: nominationData.accomplishments?.customerFeedback,
-    a_team_bonding: nominationData.accomplishments?.teamBonding,
-    a_compliance: nominationData.accomplishments?.processCompliance,
-    a_others: nominationData.accomplishments?.others,
+          // ✅ Nested accomplishments object
+          accomplishments: {
+            deliverable: teamYearNominationData.accomplishments.exceptionalDeliverable,
+            utilization: teamYearNominationData.accomplishments.resourceUtilization,
+            productivity: teamYearNominationData.accomplishments.resourceProductivity,
+            knowledge: teamYearNominationData.accomplishments.teamKnowledge,
+            risk: teamYearNominationData.accomplishments.riskManagement,
+            customer_sat: teamYearNominationData.accomplishments.customerFeedback,
+            team_bonding: teamYearNominationData.accomplishments.teamBonding,
+            compliance: teamYearNominationData.accomplishments.processCompliance,
+            impact: teamYearNominationData.accomplishments.impact,
+            cost_effective: teamYearNominationData.accomplishments.costEffective,
+            contribution: teamYearNominationData.accomplishments.contribution,
+            others: teamYearNominationData.accomplishments.others,
+          },
 
-    nominated_by: nominationData.nominatedBy,
-    nominator_designation: nominationData.nominatedByDesignation,
-    routed_by: nominationData.routedBy,
-    router_designation: nominationData.routedByDesignation,
-  },
-  submittedBy: nominationData.nominatedBy,
-};
+          // ✅ Flattened accomplishments for email template
+          a_deliverable: teamYearNominationData.accomplishments.exceptionalDeliverable,
+          a_utilization: teamYearNominationData.accomplishments.resourceUtilization,
+          a_productivity: teamYearNominationData.accomplishments.resourceProductivity,
+          a_knowledge: teamYearNominationData.accomplishments.teamKnowledge,
+          a_risk: teamYearNominationData.accomplishments.riskManagement,
+          a_customer_sat: teamYearNominationData.accomplishments.customerFeedback,
+          a_team_bonding: teamYearNominationData.accomplishments.teamBonding,
+          a_compliance: teamYearNominationData.accomplishments.processCompliance,
+          a_impact: teamYearNominationData.accomplishments.impact,
+          a_cost_effective: teamYearNominationData.accomplishments.costEffective,
+          a_contribution: teamYearNominationData.accomplishments.contribution,
+          a_others: teamYearNominationData.accomplishments.others,
 
-      console.log("Submitting Team Nomination:", mappedData);
+          // ✅ Nominator details
+          nominated_by: teamYearNominationData.nominatedBy,
+          nominator_designation: teamYearNominationData.nominatedByDesignation,
+          routed_by: teamYearNominationData.routedBy,
+          router_designation: teamYearNominationData.routedByDesignation,
+        },
+        submittedBy: teamYearNominationData.nominatedBy,
+      };
 
-      const response = await fetch(`${API}/api/nomination/submitNomination`, {
+      // 🔹 Send the mapped data to backend
+      const res = await fetch(`${API}/api/nomination/submitNomination`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mappedData),
       });
 
-      const result = await response.json();
-      console.log("Response:", result);
-
-      if (response.ok) {
-        alert("✅ Team Nomination submitted successfully!");
+      const data = await res.json();
+      if (data.success) {
+        alert("✅ Team of the Year Nomination submitted successfully!");
+        setShowTeamYearNominationForm(false);
       } else {
-        alert(`❌ Failed to submit Team Nomination!\n${JSON.stringify(result)}`);
+        alert("❌ Error: " + (data.error || "unknown"));
       }
     } catch (err) {
       console.error("❌ Frontend Error:", err);
-      alert("Submission failed due to frontend error!");
+      alert("Submission failed");
     }
   }}
   className="px-4 py-2 bg-green-600 text-white rounded"
@@ -1866,7 +1975,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
               />
             </div>
 
-            <button
+           <button
   type="button"
   disabled={isSubmittingStarNomination}
   className={`px-4 py-2 rounded text-white ${
@@ -1875,42 +1984,68 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       : "bg-green-600"
   }`}
   onClick={async () => {
-    // prevent double click while already submitting
     if (isSubmittingStarNomination) return;
-
     setIsSubmittingStarNomination(true);
 
     try {
+      // ✅ Map frontend data to match backend expectations
+      const mappedData = {
+        type: "Star of the Quarter",
+        formData: {
+          associate_name: starNominationData.associateName,
+          doj: starNominationData.doj,
+          date_of_joining: starNominationData.doj, // Add this for backend compatibility
+          designation: starNominationData.designation,
+          project: starNominationData.project,
+          project_dept: starNominationData.project, // Add this alias
+          role_since: starNominationData.roleSince,
+          nomination_period: starNominationData.nominationPeriod,
+          
+          // ✅ Map accomplishments properly
+          accomplishments: {
+            exceptional_performance: starNominationData.accomplishments.exceptionalPerformance,
+            process_compliance: starNominationData.accomplishments.processCompliance,
+            initiatives: starNominationData.accomplishments.initiatives,
+            learning: starNominationData.accomplishments.learning,
+            knowledge_sharing: starNominationData.accomplishments.knowledgeSharing,
+            policy_adherence: starNominationData.accomplishments.policyAdherence,
+            client_appreciation: starNominationData.accomplishments.clientAppreciation,
+            potential: starNominationData.accomplishments.potential,
+            participation: starNominationData.accomplishments.participation,
+            others: starNominationData.accomplishments.others,
+          },
+          
+          // ✅ Add these flattened fields for email template
+          a_performance: starNominationData.accomplishments.exceptionalPerformance,
+          a_compliance: starNominationData.accomplishments.processCompliance,
+          a_initiatives: starNominationData.accomplishments.initiatives,
+          a_learning: starNominationData.accomplishments.learning,
+          a_sharing: starNominationData.accomplishments.knowledgeSharing,
+          a_policies: starNominationData.accomplishments.policyAdherence,
+          a_client_appreciation: starNominationData.accomplishments.clientAppreciation,
+          a_potential: starNominationData.accomplishments.potential,
+          a_participation: starNominationData.accomplishments.participation,
+          a_others: starNominationData.accomplishments.others,
+          
+          // ✅ Nominator details
+          nominated_by: starNominationData.nominatedBy,
+          nominated_by_designation: starNominationData.nominatedByDesignation,
+          routed_by: starNominationData.routedBy,
+          routed_by_designation: starNominationData.routedByDesignation,
+        },
+        submittedBy: starNominationData.nominatedBy,
+      };
+
       const res = await fetch(`${API}/api/nomination/submitNomination`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "Star of the Quarter",
-          formData: {
-            associate_name: starNominationData.associateName,
-            doj: starNominationData.doj,
-            designation: starNominationData.designation,
-            project: starNominationData.project,
-            role_since: starNominationData.roleSince,
-            nomination_period: starNominationData.nominationPeriod,
-            nominated_by: starNominationData.nominatedBy,
-            nominated_by_designation:
-              starNominationData.nominatedByDesignation,
-            routed_by: starNominationData.routedBy,
-            routed_by_designation:
-              starNominationData.routedByDesignation,
-            accomplishments: starNominationData.accomplishments,
-          },
-          submittedBy: starNominationData.nominatedBy,
-        }),
+        body: JSON.stringify(mappedData),
       });
 
       const data = await res.json();
 
       if (data.success) {
         alert("Nomination submitted successfully!");
-
-        // close modal and unlock card button
         setShowStarNominationForm(false);
         setSubmittingForm(null);
         setSubmitStatus("");
@@ -1921,7 +2056,6 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       console.error("❌ Frontend Error:", err);
       alert("Submission failed");
     } finally {
-      // if it failed or modal still open, allow retry
       setIsSubmittingStarNomination(false);
     }
   }}
@@ -2222,43 +2356,48 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
                 className="border p-2 rounded w-full" />
             </div>
 
-           <button
+          <button
   type="button"
   onClick={async () => {
     try {
-      // 🔹 Map frontend camelCase data to backend snake_case format
+      console.log("📤 Sending Team Year Data:", teamYearNominationData); // Debug log
+      
       const mappedData = {
         type: "Team of the Year",
         formData: {
-          project_name: teamYearNominationData.projectName,
-          date_commencement: teamYearNominationData.dateCommencement,
-          number_of_members: teamYearNominationData.numberOfMembers,
-          nomination_period: teamYearNominationData.nominationPeriod,
-          names_of_members: teamYearNominationData.namesOfMembers,
-          previous_nomination_details: teamYearNominationData.previousNominationDetails,
+          // ✅ Map from your actual state variable names
+          project_name: teamYearNominationData.project || "",
+          date_commencement: teamYearNominationData.commencementDate || "",
+          number_of_members: teamYearNominationData.numberOfMembers || "",
+          nomination_period: teamYearNominationData.nominationPeriod || "",
+          names_of_members: teamYearNominationData.memberNames || "",
+          previous_nomination_details: teamYearNominationData.previousNominations || "",
 
-          a_deliverable: teamYearNominationData.accomplishments?.deliverable,
-          a_utilization: teamYearNominationData.accomplishments?.utilization,
-          a_productivity: teamYearNominationData.accomplishments?.productivity,
-          a_knowledge: teamYearNominationData.accomplishments?.knowledge,
-          a_risk: teamYearNominationData.accomplishments?.risk,
-          a_customer_sat: teamYearNominationData.accomplishments?.customerSatisfaction,
-          a_team_bonding: teamYearNominationData.accomplishments?.teamBonding,
-          a_compliance: teamYearNominationData.accomplishments?.compliance,
-          a_impact: teamYearNominationData.accomplishments?.impact,
-          a_cost_effective: teamYearNominationData.accomplishments?.costEffective,
-          a_contribution: teamYearNominationData.accomplishments?.contribution,
-          a_others: teamYearNominationData.accomplishments?.others,
+          // ✅ Flattened accomplishments for template
+          a_deliverable: teamYearNominationData.accomplishments?.exceptionalDeliverable || "",
+          a_utilization: teamYearNominationData.accomplishments?.resourceUtilization || "",
+          a_productivity: teamYearNominationData.accomplishments?.resourceProductivity || "",
+          a_knowledge: teamYearNominationData.accomplishments?.teamKnowledge || "",
+          a_risk: teamYearNominationData.accomplishments?.riskManagement || "",
+          a_customer_sat: teamYearNominationData.accomplishments?.customerFeedback || "",
+          a_team_bonding: teamYearNominationData.accomplishments?.teamBonding || "",
+          a_compliance: teamYearNominationData.accomplishments?.processCompliance || "",
+          a_impact: teamYearNominationData.accomplishments?.impact || "",
+          a_cost_effective: teamYearNominationData.accomplishments?.costEffective || "",
+          a_contribution: teamYearNominationData.accomplishments?.contribution || "",
+          a_others: teamYearNominationData.accomplishments?.others || "",
 
-          nominated_by: teamYearNominationData.nominatedBy,
-          nominator_designation: teamYearNominationData.nominatedByDesignation,
-          routed_by: teamYearNominationData.routedBy,
-          router_designation: teamYearNominationData.routedByDesignation,
+          // ✅ Nominator details
+          nominated_by: teamYearNominationData.nominatedBy || "",
+          nominator_designation: teamYearNominationData.nominatedByDesignation || "",
+          routed_by: teamYearNominationData.routedBy || "",
+          router_designation: teamYearNominationData.routedByDesignation || "",
         },
-        submittedBy: teamYearNominationData.nominatedBy,
+        submittedBy: teamYearNominationData.nominatedBy || "Unknown",
       };
 
-      // 🔹 Send the mapped data to backend
+      console.log("📤 Mapped Data Being Sent:", mappedData); // Debug log
+
       const res = await fetch(`${API}/api/nomination/submitNomination`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2266,6 +2405,8 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       });
 
       const data = await res.json();
+      console.log("📥 Backend Response:", data); // Debug log
+      
       if (data.success) {
         alert("✅ Team of the Year Nomination submitted successfully!");
         setShowTeamYearNominationForm(false);
@@ -2274,7 +2415,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       }
     } catch (err) {
       console.error("❌ Frontend Error:", err);
-      alert("Submission failed");
+      alert("Submission failed: " + err.message);
     }
   }}
   className="px-4 py-2 bg-green-600 text-white rounded"
@@ -2410,37 +2551,53 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
 
       {/* Submit */}
       <div className="flex justify-end space-x-2">
-        <button
-          type="button"
-          onClick={async () => {
-            try {
-              const res = await fetch(`${API}/api/nomination/submitNomination`,
-                
-               {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  type: "Candidate Information Form - BGV",
-                  formData: candidateInfoData,
-                  submittedBy: candidateInfoData.candidateName,
-                }),
-              });
-              const data = await res.json();
-              if (data.success) {
-                alert("Candidate Info submitted successfully!");
-                setShowCandidateInfoForm(false);
-              } else {
-                alert("Error: " + (data.error || "unknown"));
-              }
-            } catch (err) {
-              console.error("❌ Frontend Error:", err);
-              alert("Submission failed");
-            }
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded"
-        >
-          Submit Form
-        </button>
+       <button
+  type="button"
+  disabled={isSubmittingCandidate}
+  onClick={async () => {
+    // ⛔ prevent double click
+    if (isSubmittingCandidate) return;
+
+    setIsSubmittingCandidate(true);
+
+    try {
+      const res = await fetch(`${API}/api/nomination/submitNomination`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "Candidate Information Form - BGV",
+          formData: candidateInfoData,
+          submittedBy: candidateInfoData.candidateName,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Candidate Info submitted successfully!");
+        setShowCandidateInfoForm(false);
+      } else {
+        alert("Error: " + (data.error || "unknown"));
+      }
+    } catch (err) {
+      console.error("❌ Frontend Error:", err);
+      alert("Submission failed");
+    } finally {
+      // ⏱️ enable button again after 10 seconds
+      setTimeout(() => {
+        setIsSubmittingCandidate(false);
+      }, 10000);
+    }
+  }}
+  className={`px-4 py-2 rounded text-white ${
+    isSubmittingCandidate
+      ? "bg-green-300 cursor-not-allowed"
+      : "bg-green-600"
+  }`}
+>
+  {isSubmittingCandidate ? "Submitting..." : "Submit Form x"}
+</button>
+
         <button
           type="button"
           onClick={() => setShowCandidateInfoForm(false)}
@@ -2518,34 +2675,45 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       {/* Submit + Cancel */}
       <div className="flex justify-end space-x-2">
         <button
-          type="button"
-          onClick={async () => {
-            try {
-              const res = await fetch(`${API}/api/nomination/submitNomination`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  type: "Letter of Authorization - BGV",
-                  formData: authorizationData,
-                  submittedBy: authorizationData.name,
-                }),
-              });
-              const data = await res.json();
-              if (data.success) {
-                alert("Authorization form submitted successfully!");
-                setShowAuthorizationForm(false);
-              } else {
-                alert("Error: " + (data.error || "unknown"));
-              }
-            } catch (err) {
-              console.error("❌ Frontend Error:", err);
-              alert("Submission failed");
-            }
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded"
-        >
-          Submit Form
-        </button>
+  type="button"
+  disabled={authorizationSubmit.locked}
+  onClick={async () => {
+    // ⛔ block double submit
+    if (!authorizationSubmit.lock()) return;
+
+    try {
+      const res = await fetch(`${API}/api/nomination/submitNomination`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "Letter of Authorization - BGV",
+          formData: authorizationData,
+          submittedBy: authorizationData.name,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Authorization form submitted successfully!");
+        setShowAuthorizationForm(false);
+      } else {
+        alert("Error: " + (data.error || "unknown"));
+      }
+    } catch (err) {
+      console.error("❌ Frontend Error:", err);
+      alert("Submission failed");
+    }
+  }}
+  className={`px-4 py-2 rounded text-white ${
+    authorizationSubmit.locked
+      ? "bg-green-300 cursor-not-allowed"
+      : "bg-green-600"
+  }`}
+>
+  {authorizationSubmit.locked ? "Submitting..." : "Submit Form 1"}
+</button>
+
         <button
           type="button"
           onClick={() => setShowAuthorizationForm(false)}
@@ -3288,17 +3456,25 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
 
     <div className="mt-4">
       <label className="block mb-2">Signature of Associate</label>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) =>
-          setUndertakingData({
-            ...undertakingData,
-            signature: e.target.files?.[0]?.name || "",
-          })
-        }
-        className="border p-2 rounded w-full"
-      />
+     <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUndertakingData({
+        ...undertakingData,
+        signature: reader.result, // ✅ BASE64 IMAGE
+      });
+    };
+    reader.readAsDataURL(file);
+  }}
+  className="border p-2 rounded w-full"
+/>
+
     </div>
 
     {/* Submit + Cancel */}
@@ -3353,15 +3529,14 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
 
     {/* Invoice Details */}
     <div className="grid grid-cols-2 gap-4">
-      <input
-        type="text"
-        placeholder="Invoice Number"
-        value={invoiceData.invoiceNumber}
-        onChange={(e) =>
-          setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })
-        }
-        className="border p-2 rounded"
-      />
+     <Input
+  placeholder="Invoice Number"
+  value={invoiceData.invoiceNumber}
+  onChange={(e) =>
+    setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })
+  }
+/>
+
       <input
         type="date"
         value={invoiceData.invoiceDate}
@@ -3502,14 +3677,12 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
         }
         className="border p-2 rounded"
       />
-      <input
-        type="text"
+     <Input
         placeholder="IFSC Code"
         value={invoiceData.ifscCode}
         onChange={(e) =>
           setInvoiceData({ ...invoiceData, ifscCode: e.target.value })
         }
-        className="border p-2 rounded"
       />
       <input
         type="text"
@@ -3537,12 +3710,18 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       <input
         type="file"
         accept="image/*"
-        onChange={(e) =>
-          setInvoiceData({
-            ...invoiceData,
-            signature: e.target.files?.[0]?.name || "",
-          })
-        }
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              setInvoiceData({
+                ...invoiceData,
+                signature: reader.result as string,
+              });
+            reader.readAsDataURL(file);
+          }
+        }}
         className="border p-2 rounded w-full"
       />
     </div>
@@ -3553,174 +3732,73 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
 
     {/* Submit + Cancel */}
     <div className="flex justify-end space-x-2 mt-4">
-      <button
-        type="button"
-        onClick={async () => {
-          try {
-            const res = await fetch(
-              `${API}/api/nomination/submitNomination`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  type: "Contract Invoice Template",
-                  formData: invoiceData,
-                  submittedBy: invoiceData.consultantName,
-                }),
-              }
-            );
-            const data = await res.json();
-            if (data.success) {
-              alert("Invoice submitted successfully!");
-              setShowInvoiceForm(false);
-            } else {
-              alert("Error: " + (data.error || "unknown"));
-            }
-          } catch (err) {
-            console.error("❌ Invoice Submit Error:", err);
-            alert("Submission failed");
-          }
-        }}
-        className="px-4 py-2 bg-green-600 text-white rounded"
-      >
-        Submit
-      </button>
+     // Find this section in HR.tsx (around line 845):
+<button
+  type="button"
+  onClick={async () => {
+    try {
+      console.log("📤 Invoice Data:", invoiceData); // Debug log
+
+      const mappedData = {
+        type: "Contract Invoice Template",
+        formData: {
+          invoice_number: invoiceData.invoiceNumber || "",
+          invoice_date: invoiceData.invoiceDate || "",
+          consultant_name: invoiceData.consultantName || "",
+          consultant_address: invoiceData.consultantAddress || "",
+          consultant_mobile: invoiceData.consultantMobile || "",
+          
+          // Services array
+          services: invoiceData.services || [],
+          
+          // Calculate totals
+          total_amount: invoiceData.services.reduce((sum, s) => sum + s.amount, 0),
+          
+          // Bank details
+          bank_name: invoiceData.bankName || "",
+          bank_branch: invoiceData.bankBranch || "",
+          ifsc_code: invoiceData.ifscCode || "",
+          account_number: invoiceData.accountNumber || "",
+          pan_number: invoiceData.panNumber || "",
+          
+          // Signature (base64 string)
+          signature: invoiceData.signature || "",
+        },
+        submittedBy: invoiceData.consultantName || "Unknown",
+      };
+
+      console.log("📤 Mapped Invoice Data:", mappedData); // Debug log
+
+      const res = await fetch(
+        `${API}/api/nomination/submitNomination`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mappedData),
+        }
+      );
+      const data = await res.json();
+      
+      console.log("📥 Backend Response:", data); // Debug log
+      
+      if (data.success) {
+        alert("Invoice submitted successfully!");
+        setShowInvoiceForm(false);
+      } else {
+        alert("Error: " + (data.error || "unknown"));
+      }
+    } catch (err) {
+      console.error("❌ Invoice Submit Error:", err);
+      alert("Submission failed: " + err.message);
+    }
+  }}
+  className="px-4 py-2 bg-green-600 text-white rounded"
+>
+  Submit
+</button>
       <button
         type="button"
         onClick={() => setShowInvoiceForm(false)}
-        className="px-4 py-2 border rounded"
-      >
-        Cancel
-      </button>
-    </div>
-  </DialogContent>
-</Dialog>
-<Dialog open={showTimesheetForm} onOpenChange={setShowTimesheetForm}>
-  <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-    <DialogHeader>
-      <DialogTitle>Contract Timesheet Template</DialogTitle>
-    </DialogHeader>
-
-    {/* Consultant Name */}
-    <input
-      type="text"
-      placeholder="Consultant Name"
-      value={timesheetData.consultantName}
-      onChange={(e) =>
-        setTimesheetData({ ...timesheetData, consultantName: e.target.value })
-      }
-      className="border p-2 rounded w-full mb-4"
-    />
-
-    {/* Timesheet Table */}
-    <div>
-      <p className="font-semibold mb-2">Timesheet Entries</p>
-      {timesheetData.entries.map((entry, index) => (
-        <div key={index} className="grid grid-cols-3 gap-2 mb-2">
-          <input
-            type="date"
-            value={entry.date}
-            onChange={(e) => {
-              const entries = [...timesheetData.entries];
-              entries[index].date = e.target.value;
-              setTimesheetData({ ...timesheetData, entries });
-            }}
-            className="border p-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Module"
-            value={entry.module}
-            onChange={(e) => {
-              const entries = [...timesheetData.entries];
-              entries[index].module = e.target.value;
-              setTimesheetData({ ...timesheetData, entries });
-            }}
-            className="border p-2 rounded"
-          />
-          <input
-            type="number"
-            placeholder="Hours Worked"
-            value={entry.hours}
-            onChange={(e) => {
-              const entries = [...timesheetData.entries];
-              entries[index].hours = Number(e.target.value);
-              setTimesheetData({ ...timesheetData, entries });
-            }}
-            className="border p-2 rounded"
-          />
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() =>
-          setTimesheetData({
-            ...timesheetData,
-            entries: [
-              ...timesheetData.entries,
-              { date: "", module: "", hours: 0 },
-            ],
-          })
-        }
-        className="px-2 py-1 bg-blue-600 text-white rounded"
-      >
-        + Add Row
-      </button>
-    </div>
-
-    {/* Total Hours */}
-    <p className="mt-4 font-semibold">
-      Total Hours:{" "}
-      {timesheetData.entries.reduce((sum, e) => sum + e.hours, 0)}
-    </p>
-
-    {/* Description */}
-    <textarea
-      placeholder="Description of modules and activity"
-      value={timesheetData.description}
-      onChange={(e) =>
-        setTimesheetData({ ...timesheetData, description: e.target.value })
-      }
-      className="border p-2 rounded w-full mt-4"
-    />
-
-    {/* Submit + Cancel */}
-    <div className="flex justify-end space-x-2 mt-4">
-      <button
-        type="button"
-        onClick={async () => {
-          try {
-            const res = await fetch(
-              `${API}/api/nomination/submitNomination`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  type: "Contract Timesheet Template",
-                  formData: timesheetData,
-                  submittedBy: timesheetData.consultantName,
-                }),
-              }
-            );
-            const data = await res.json();
-            if (data.success) {
-              alert("Timesheet submitted successfully!");
-              setShowTimesheetForm(false);
-            } else {
-              alert("Error: " + (data.error || "unknown"));
-            }
-          } catch (err) {
-            console.error("❌ Timesheet Submit Error:", err);
-            alert("Submission failed");
-          }
-        }}
-        className="px-4 py-2 bg-green-600 text-white rounded"
-      >
-        Submit
-      </button>
-      <button
-        type="button"
-        onClick={() => setShowTimesheetForm(false)}
         className="px-4 py-2 border rounded"
       >
         Cancel
@@ -3740,40 +3818,52 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
         type="text"
         placeholder="Employee Name"
         value={expenseData.employeeName}
-        onChange={(e) => setExpenseData({ ...expenseData, employeeName: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, employeeName: e.target.value })
+        }
         className="border p-2 rounded"
       />
       <input
         type="text"
         placeholder="EMP ID"
         value={expenseData.empId}
-        onChange={(e) => setExpenseData({ ...expenseData, empId: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, empId: e.target.value })
+        }
         className="border p-2 rounded"
       />
       <input
         type="text"
         placeholder="Manager Name"
         value={expenseData.managerName}
-        onChange={(e) => setExpenseData({ ...expenseData, managerName: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, managerName: e.target.value })
+        }
         className="border p-2 rounded"
       />
       <input
         type="text"
         placeholder="Department"
         value={expenseData.department}
-        onChange={(e) => setExpenseData({ ...expenseData, department: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, department: e.target.value })
+        }
         className="border p-2 rounded"
       />
       <input
         type="date"
         value={expenseData.fromDate}
-        onChange={(e) => setExpenseData({ ...expenseData, fromDate: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, fromDate: e.target.value })
+        }
         className="border p-2 rounded"
       />
       <input
         type="date"
         value={expenseData.toDate}
-        onChange={(e) => setExpenseData({ ...expenseData, toDate: e.target.value })}
+        onChange={(e) =>
+          setExpenseData({ ...expenseData, toDate: e.target.value })
+        }
         className="border p-2 rounded"
       />
     </div>
@@ -3782,13 +3872,16 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
       type="text"
       placeholder="Business Purpose / Project"
       value={expenseData.businessPurpose}
-      onChange={(e) => setExpenseData({ ...expenseData, businessPurpose: e.target.value })}
+      onChange={(e) =>
+        setExpenseData({ ...expenseData, businessPurpose: e.target.value })
+      }
       className="border p-2 rounded w-full mb-4"
     />
 
-    {/* Expenses Table */}
+    {/* Itemized Expenses */}
     <div>
       <p className="font-semibold mb-2">Itemized Expenses</p>
+
       {expenseData.expenses.map((exp, index) => (
         <div key={index} className="grid grid-cols-4 gap-2 mb-2">
           <input
@@ -3836,12 +3929,16 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
           />
         </div>
       ))}
+
       <button
         type="button"
         onClick={() =>
           setExpenseData({
             ...expenseData,
-            expenses: [...expenseData.expenses, { date: "", description: "", category: "", cost: 0 }],
+            expenses: [
+              ...expenseData.expenses,
+              { date: "", description: "", category: "", cost: 0 },
+            ],
           })
         }
         className="px-2 py-1 bg-blue-600 text-white rounded"
@@ -3851,16 +3948,33 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     </div>
 
     {/* Totals */}
-    <p className="mt-4">Subtotal: ₹{expenseData.expenses.reduce((sum, e) => sum + e.cost, 0)}</p>
+    <p className="mt-4">
+      Subtotal: ₹
+      {expenseData.expenses.reduce(
+        (sum, e) => sum + Number(e.cost || 0),
+        0
+      )}
+    </p>
+
     <input
       type="number"
       placeholder="Less Cash Advance"
       value={expenseData.cashAdvance}
-      onChange={(e) => setExpenseData({ ...expenseData, cashAdvance: Number(e.target.value) })}
+      onChange={(e) =>
+        setExpenseData({
+          ...expenseData,
+          cashAdvance: Number(e.target.value),
+        })
+      }
       className="border p-2 rounded mt-2"
     />
+
     <p className="mt-2 font-semibold">
-      Total: ₹{expenseData.expenses.reduce((sum, e) => sum + e.cost, 0) - expenseData.cashAdvance}
+      Total: ₹
+      {expenseData.expenses.reduce(
+        (sum, e) => sum + Number(e.cost || 0),
+        0
+      ) - Number(expenseData.cashAdvance || 0)}
     </p>
 
     {/* Receipts */}
@@ -3870,7 +3984,10 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
         type="file"
         multiple
         onChange={(e) =>
-          setExpenseData({ ...expenseData, receipts: Array.from(e.target.files || []) })
+          setExpenseData({
+            ...expenseData,
+            receipts: Array.from(e.target.files || []),
+          })
         }
         className="border p-2 rounded w-full"
       />
@@ -3883,32 +4000,59 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) =>
-            setExpenseData({ ...expenseData, employeeSignature: e.target.files?.[0]?.name || "" })
-          }
+        onChange={async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const base64 = await fileToBase64(file);
+  setExpenseData({
+    ...expenseData,
+    employeeSignature: base64,
+  });
+}}
+
           className="border p-2 rounded w-full"
         />
         <input
           type="date"
           value={expenseData.employeeDate}
-          onChange={(e) => setExpenseData({ ...expenseData, employeeDate: e.target.value })}
+          onChange={(e) =>
+            setExpenseData({
+              ...expenseData,
+              employeeDate: e.target.value,
+            })
+          }
           className="border p-2 rounded mt-2 w-full"
         />
       </div>
+
       <div>
         <label className="block mb-2">Approval Signature</label>
         <input
           type="file"
           accept="image/*"
-          onChange={(e) =>
-            setExpenseData({ ...expenseData, approvalSignature: e.target.files?.[0]?.name || "" })
-          }
+          onChange={async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const base64 = await fileToBase64(file);
+  setExpenseData({
+    ...expenseData,
+    approvalSignature: base64,
+  });
+}}
+
           className="border p-2 rounded w-full"
         />
         <input
           type="date"
           value={expenseData.approvalDate}
-          onChange={(e) => setExpenseData({ ...expenseData, approvalDate: e.target.value })}
+          onChange={(e) =>
+            setExpenseData({
+              ...expenseData,
+              approvalDate: e.target.value,
+            })
+          }
           className="border p-2 rounded mt-2 w-full"
         />
       </div>
@@ -3918,33 +4062,60 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     <div className="flex justify-end space-x-2 mt-4">
       <button
         type="button"
+        className="px-4 py-2 bg-green-600 text-white rounded"
         onClick={async () => {
           try {
+            const subtotal = expenseData.expenses.reduce(
+              (sum, e) => sum + Number(e.cost || 0),
+              0
+            );
+            const total = subtotal - Number(expenseData.cashAdvance || 0);
+
+            const mappedFormData = {
+              employee_name: expenseData.employeeName,
+              emp_id: expenseData.empId,
+              manager_name: expenseData.managerName,
+              department: expenseData.department,
+              from_date: expenseData.fromDate,
+              to_date: expenseData.toDate,
+              business_purpose: expenseData.businessPurpose,
+              expenses: expenseData.expenses,
+              subtotal,
+              cash_advance: expenseData.cashAdvance,
+              total,
+              employee_signature: expenseData.employeeSignature,
+              employee_date: expenseData.employeeDate,
+              approval_signature: expenseData.approvalSignature,
+              approval_date: expenseData.approvalDate,
+            };
+
             const res = await fetch(`${API}/api/nomination/submitNomination`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 type: "Expense Reimbursement Form",
-                formData: expenseData,
+                formData: mappedFormData,
                 submittedBy: expenseData.employeeName,
               }),
             });
+
             const data = await res.json();
+
             if (data.success) {
-              alert("Expense Reimbursement submitted successfully!");
+              alert("✅ Expense Reimbursement submitted successfully!");
               setShowExpenseForm(false);
             } else {
-              alert("Error: " + (data.error || "unknown"));
+              alert("❌ Error: " + (data.error || "unknown"));
             }
           } catch (err) {
             console.error("❌ Expense Submit Error:", err);
-            alert("Submission failed");
+            alert("❌ Submission failed");
           }
         }}
-        className="px-4 py-2 bg-green-600 text-white rounded"
       >
         Submit
       </button>
+
       <button
         type="button"
         onClick={() => setShowExpenseForm(false)}
@@ -3955,6 +4126,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     </div>
   </DialogContent>
 </Dialog>
+
 <Dialog open={showInductionForm} onOpenChange={setShowInductionForm}>
   <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
     <DialogHeader>
@@ -4081,19 +4253,21 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
           if (file) {
             const reader = new FileReader();
             reader.onloadend = () =>
-              setGratuityData({ ...gratuityData, signature: reader.result as string });
+              setInductionData({ ...inductionData, signature: reader.result as string });
+
             reader.readAsDataURL(file);
           }
         }}
         className="border p-2 rounded w-full"
       />
-      {gratuityData.signature && (
-        <img
-          src={gratuityData.signature}
-          alt="Signature Preview"
-          className="w-32 h-16 border rounded mt-2"
-        />
-      )}
+    {inductionData.signature && (
+  <img
+    src={inductionData.signature}
+    alt="Signature"
+    className="w-32 h-16 border rounded mt-2"
+  />
+)}
+
     </div>
       <input type="date"
         value={inductionData.date}
@@ -4105,29 +4279,67 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     <div className="flex justify-end space-x-2 mt-4">
       <button
         type="button"
-        onClick={async () => {
-          try {
-            const res = await fetch(`${API}/api/nomination/submitNomination`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                type: "Induction Feedback Form",
-                formData: inductionData,
-                submittedBy: inductionData.associateName,
-              }),
-            });
-            const data = await res.json();
-            if (data.success) {
-              alert("Induction Feedback submitted successfully!");
-              setShowInductionForm(false);
-            } else {
-              alert("Error: " + (data.error || "unknown"));
-            }
-          } catch (err) {
-            console.error("❌ Induction Feedback Submit Error:", err);
-            alert("Submission failed");
-          }
-        }}
+       onClick={async () => {
+  try {
+    // ✅ STEP 1: Convert arrays into named fields
+    const formattedData = {
+      associateName: inductionData.associateName,
+      employeeNumber: inductionData.employeeNumber,
+      designation: inductionData.designation,
+      department: inductionData.department,
+      trainers: inductionData.trainers,
+      trainingDate: inductionData.trainingDate,
+
+      // ✅ Responses (IMPORTANT)
+      onboardingSmooth: inductionData.responses[0],
+      programmeDuration: inductionData.responses[1],
+      programmeManaged: inductionData.responses[2],
+      policiesExplained: inductionData.responses[3],
+      businessUnderstanding: inductionData.responses[4],
+      introducedToManager: inductionData.responses[5],
+
+      // ✅ Ratings
+      coverage: inductionData.ratings[0],
+      duration: inductionData.ratings[1],
+      speaker: inductionData.ratings[2],
+      businessOrientation: inductionData.ratings[3],
+      hrOrientation: inductionData.ratings[4],
+      itOrientation: inductionData.ratings[5],
+
+      // ✅ Text fields
+      suggestions: inductionData.suggestions,
+      overallFeedback: inductionData.overall,
+      comments: inductionData.comments,
+
+      // ✅ Signature & date
+      signature: inductionData.signature,
+      date: inductionData.date,
+    };
+
+    // ✅ STEP 2: Send formattedData (NOT inductionData)
+    const res = await fetch(`${API}/api/nomination/submitNomination`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "Induction Feedback Form",
+        formData: formattedData,
+        submittedBy: inductionData.associateName,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("Induction Feedback submitted successfully!");
+      setShowInductionForm(false);
+    } else {
+      alert("Error: " + (data.error || "unknown"));
+    }
+  } catch (err) {
+    console.error("Submit Error:", err);
+    alert("Submission failed");
+  }
+}}
+
         className="px-4 py-2 bg-green-600 text-white rounded"
       >
         Submit
@@ -4254,16 +4466,51 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     </div>
 
     {/* Footer */}
-    <div className="grid grid-cols-2 gap-4 mt-4">
-      <input type="text" placeholder="Signature"
-        value={internOnrollData.signature}
-        onChange={(e) => setInternOnrollData({ ...internOnrollData, signature: e.target.value })}
-        className="border p-2 rounded" />
-      <input type="date"
-        value={internOnrollData.date}
-        onChange={(e) => setInternOnrollData({ ...internOnrollData, date: e.target.value })}
-        className="border p-2 rounded" />
-    </div>
+   {/* Footer */}
+<div className="grid grid-cols-2 gap-4 mt-4">
+  {/* Signature Upload */}
+  <div className="space-y-2">
+    <label className="font-semibold">Upload Signature</label>
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setInternOnrollData({
+            ...internOnrollData,
+            signature: reader.result as string, // BASE64 IMAGE
+          });
+        };
+        reader.readAsDataURL(file);
+      }}
+      className="border p-2 rounded w-full"
+    />
+
+    {internOnrollData.signature && (
+      <img
+        src={internOnrollData.signature}
+        alt="Signature Preview"
+        className="w-40 h-20 border rounded"
+      />
+    )}
+  </div>
+
+  {/* Date */}
+  <input
+    type="date"
+    value={internOnrollData.date}
+    onChange={(e) =>
+      setInternOnrollData({ ...internOnrollData, date: e.target.value })
+    }
+    className="border p-2 rounded h-fit"
+  />
+</div>
+
 
     {/* Submit + Cancel */}
     <div className="flex justify-end space-x-2 mt-4">

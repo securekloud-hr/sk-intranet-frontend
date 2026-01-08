@@ -199,7 +199,16 @@ formData.append("avatar", file); // ✅ file LAST
         return;
       }
 
-      const newObj = { empId: String(employeeRecord.EmpID), avatarUrl: data.avatarUrl };
+     const bustedUrl = `${data.avatarUrl}?t=${Date.now()}`;
+
+const newObj = {
+  empId: String(employeeRecord.EmpID),
+  avatarUrl: bustedUrl,
+};
+
+localStorage.setItem("profile-avatar", JSON.stringify(newObj));
+setStoredAvatar(newObj);
+
       localStorage.setItem("profile-avatar", JSON.stringify(newObj));
       setStoredAvatar(newObj);
 
