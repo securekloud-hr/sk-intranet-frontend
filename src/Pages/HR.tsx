@@ -1463,6 +1463,8 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
         </TabsContent>
       </Tabs>
 
+
+
       <Dialog
   open={showNominationForm}
   onOpenChange={(open) => {
@@ -1473,241 +1475,304 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     }
   }}
 >
-  
-  
+  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>Nomination Form - Team of the Quarter</DialogTitle>
+      <DialogDescription>
+        <div>Version No: 1.0</div>
+        <div>Version Date: 14-Jan-21</div>
+        <div>Please fill in the details below</div>
+      </DialogDescription>
+    </DialogHeader>
 
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Nomination Form - Team of the Quarter</DialogTitle>
-            <DialogDescription>
-              <div>Version No: 1.0</div>
-              <div>Version Date: 14-Jan-21</div>
-              <div>Please fill in the details below</div>
-            </DialogDescription>
-          </DialogHeader>
+    <form className="space-y-4 p-4">
+      {/* Team Details */}
+      <h3 className="font-bold">TEAM DETAILS</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium">Name of the Project</label>
+          <input
+            value={teamYearNominationData.project}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                project: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Date of Commencement</label>
+          <input
+            type="date"
+            value={teamYearNominationData.commencementDate}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                commencementDate: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Number of Members</label>
+          <input
+            type="text"
+            value={teamYearNominationData.numberOfMembers}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                numberOfMembers: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Names of Members</label>
+          <input
+            type="text"
+            value={teamYearNominationData.memberNames}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                memberNames: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Nomination Period</label>
+          <input
+            type="text"
+            value={teamYearNominationData.nominationPeriod}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                nominationPeriod: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+      </div>
 
-          <form className="space-y-4 p-4">
-            {/* Team Details */}
-            <h3 className="font-bold">TEAM DETAILS</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium">Name of the Project</label>
-                <input
-                  type="text"
-                  value={nominationData.project}
-                  onChange={(e) => setNominationData({ ...nominationData, project: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Date of Commencement</label>
-                <input
-                  type="date"
-                  value={nominationData.doj}
-                  onChange={(e) => setNominationData({ ...nominationData, doj: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Number of Members</label>
-                <input
-                  type="text"
-                  value={nominationData.roleSince}
-                  onChange={(e) => setNominationData({ ...nominationData, roleSince: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Names of Members</label>
-                <input
-                  type="text"
-                  value={nominationData.nominationPeriod}
-                  onChange={(e) => setNominationData({ ...nominationData, nominationPeriod: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-            </div>
+      {/* Criteria Table */}
+      <h3 className="font-bold">CRITERIA AND ACCOMPLISHMENTS</h3>
+      <div className="max-h-60 overflow-y-auto border rounded">
+        <table className="w-full border-collapse">
+          <thead className="sticky top-0 bg-blue-600 text-white">
+            <tr>
+              <th className="p-2">SL. NO.</th>
+              <th className="p-2">CRITERIA</th>
+              <th className="p-2">ACCOMPLISHMENT</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { sl: "01", criteria: "Consistently Exceptional Deliverable", key: "exceptionalDeliverable" },
+              { sl: "02", criteria: "Utilization of Resources", key: "resourceUtilization" },
+              { sl: "03", criteria: "Productivity of Resources", key: "resourceProductivity" },
+              { sl: "04", criteria: "Knowledge within the team", key: "teamKnowledge" },
+              { sl: "05", criteria: "Risk Management", key: "riskManagement" },
+              { sl: "06", criteria: "Customer Satisfaction Report / Feedback", key: "customerFeedback" },
+              { sl: "07", criteria: "Team Bonding / Motivation", key: "teamBonding" },
+              { sl: "08", criteria: "Process Compliance / Quality of Work", key: "processCompliance" },
+              { sl: "09", criteria: "Others, if any", key: "others" },
+            ].map((item) => (
+              <tr key={item.sl} className="border-t">
+                <td className="p-2">{item.sl}</td>
+                <td className="p-2">{item.criteria}</td>
+                <td className="p-2">
+                  <textarea
+                    className="w-full border p-2 rounded"
+                    value={teamYearNominationData.accomplishments[item.key] || ""}
+                    onChange={(e) =>
+                      setTeamYearNominationData({
+                        ...teamYearNominationData,
+                        accomplishments: {
+                          ...teamYearNominationData.accomplishments,
+                          [item.key]: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-            {/* Criteria Table */}
-            <h3 className="font-bold">CRITERIA AND ACCOMPLISHMENTS</h3>
-            <div className="max-h-60 overflow-y-auto border rounded">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-blue-600 text-white">
-                  <tr>
-                    <th className="p-2">SL. NO.</th>
-                    <th className="p-2">CRITERIA</th>
-                    <th className="p-2">ACCOMPLISHMENT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { sl: "01", criteria: "Consistently Exceptional Deliverable", key: "exceptionalDeliverable" },
-                    { sl: "02", criteria: "Utilization of Resources", key: "resourceUtilization" },
-                    { sl: "03", criteria: "Productivity of Resources", key: "resourceProductivity" },
-                    { sl: "04", criteria: "Knowledge within the team", key: "teamKnowledge" },
-                    { sl: "05", criteria: "Risk Management", key: "riskManagement" },
-                    { sl: "06", criteria: "Customer Satisfaction Report / Feedback", key: "customerFeedback" },
-                    { sl: "07", criteria: "Team Bonding / Motivation", key: "teamBonding" },
-                    { sl: "08", criteria: "Process Compliance / Quality of Work", key: "processCompliance" },
-                    { sl: "09", criteria: "Others, if any", key: "others" },
-                  ].map((item) => (
-                    <tr key={item.sl} className="border-t">
-                      <td className="p-2">{item.sl}</td>
-                      <td className="p-2">{item.criteria}</td>
-                      <td className="p-2">
-                        <textarea
-                          className="w-full border p-2 rounded"
-                          value={nominationData.accomplishments[item.key] || ""}
-                          onChange={(e) =>
-                            setNominationData({
-                              ...nominationData,
-                              accomplishments: {
-                                ...nominationData.accomplishments,
-                                [item.key]: e.target.value,
-                              },
-                            })
-                          }
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      {/* Nomination Footer */}
+      <h3 className="font-bold">NOMINATION DETAILS</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium">Nominated By</label>
+          <input
+            type="text"
+            value={teamYearNominationData.nominatedBy}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                nominatedBy: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Designation</label>
+          <input
+            type="text"
+            value={teamYearNominationData.nominatedByDesignation}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                nominatedByDesignation: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Routed By</label>
+          <input
+            type="text"
+            value={teamYearNominationData.routedBy}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                routedBy: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Designation</label>
+          <input
+            type="text"
+            value={teamYearNominationData.routedByDesignation}
+            onChange={(e) =>
+              setTeamYearNominationData({
+                ...teamYearNominationData,
+                routedByDesignation: e.target.value,
+              })
+            }
+            className="border p-2 rounded w-full"
+          />
+        </div>
+      </div>
 
-            {/* Nomination Footer */}
-            <h3 className="font-bold">NOMINATION DETAILS</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium">Nominated By</label>
-                <input
-                  type="text"
-                  value={nominationData.nominatedBy}
-                  onChange={(e) => setNominationData({ ...nominationData, nominatedBy: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Designation</label>
-                <input
-                  type="text"
-                  value={nominationData.nominatedByDesignation}
-                  onChange={(e) => setNominationData({ ...nominationData, nominatedByDesignation: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Routed By</label>
-                <input
-                  type="text"
-                  value={nominationData.routedBy}
-                  onChange={(e) => setNominationData({ ...nominationData, routedBy: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Designation</label>
-                <input
-                  type="text"
-                  value={nominationData.routedByDesignation}
-                  onChange={(e) => setNominationData({ ...nominationData, routedByDesignation: e.target.value })}
-                  className="border p-2 rounded w-full"
-                />
-              </div>
-            </div>
-    <button
-  type="button"
-  disabled={teamYearSubmit.locked}
-  onClick={async () => {
-    // ⛔ Prevent double click
-    if (!teamYearSubmit.start()) return;
+      {/* Your existing submit button code stays exactly the same */}
+      <button
+        type="button"
+        disabled={teamYearSubmit.locked}
+        onClick={async () => {
+          if (!teamYearSubmit.start()) return;
 
-    try {
-      // ✅ Map frontend data to backend format with all necessary fields
-      const mappedData = {
-        type: "Team of the Year",
-        formData: {
-          project_name: teamYearNominationData.project,
-          date_commencement: teamYearNominationData.commencementDate,
-          number_of_members: teamYearNominationData.numberOfMembers,
-          nomination_period: teamYearNominationData.nominationPeriod,
-          names_of_members: teamYearNominationData.memberNames,
-          previous_nomination_details: teamYearNominationData.previousNominations,
+          try {
+            const mappedData = {
+              type: "Team of the Quarter",
+              formData: {
+                project_name: teamYearNominationData.project,
+                date_commencement: teamYearNominationData.commencementDate,
+                number_of_members: teamYearNominationData.numberOfMembers,
+                nomination_period: teamYearNominationData.nominationPeriod,
+                names_of_members: teamYearNominationData.memberNames,
+                previous_nomination_details: teamYearNominationData.previousNominations,
 
-          accomplishments: {
-            deliverable: teamYearNominationData.accomplishments.exceptionalDeliverable,
-            utilization: teamYearNominationData.accomplishments.resourceUtilization,
-            productivity: teamYearNominationData.accomplishments.resourceProductivity,
-            knowledge: teamYearNominationData.accomplishments.teamKnowledge,
-            risk: teamYearNominationData.accomplishments.riskManagement,
-            customer_sat: teamYearNominationData.accomplishments.customerFeedback,
-            team_bonding: teamYearNominationData.accomplishments.teamBonding,
-            compliance: teamYearNominationData.accomplishments.processCompliance,
-            impact: teamYearNominationData.accomplishments.impact,
-            cost_effective: teamYearNominationData.accomplishments.costEffective,
-            contribution: teamYearNominationData.accomplishments.contribution,
-            others: teamYearNominationData.accomplishments.others,
-          },
+                accomplishments: {
+                  consistently_exceptional_deliverable:
+                    teamYearNominationData.accomplishments.exceptionalDeliverable,
+                  utilization_of_resources:
+                    teamYearNominationData.accomplishments.resourceUtilization,
+                  productivity_of_resources:
+                    teamYearNominationData.accomplishments.resourceProductivity,
+                  knowledge_within_team:
+                    teamYearNominationData.accomplishments.teamKnowledge,
+                  risk_management:
+                    teamYearNominationData.accomplishments.riskManagement,
+                  customer_satisfaction:
+                    teamYearNominationData.accomplishments.customerFeedback,
+                  team_bonding:
+                    teamYearNominationData.accomplishments.teamBonding,
+                  process_compliance:
+                    teamYearNominationData.accomplishments.processCompliance,
+                  impact_on_project:
+                    teamYearNominationData.accomplishments.impact,
+                  cost_effective_initiatives:
+                    teamYearNominationData.accomplishments.costEffective,
+                  contribution_to_targets:
+                    teamYearNominationData.accomplishments.contribution,
+                  others:
+                    teamYearNominationData.accomplishments.others,
+                },
 
-          // Flattened fields
-          a_deliverable: teamYearNominationData.accomplishments.exceptionalDeliverable,
-          a_utilization: teamYearNominationData.accomplishments.resourceUtilization,
-          a_productivity: teamYearNominationData.accomplishments.resourceProductivity,
-          a_knowledge: teamYearNominationData.accomplishments.teamKnowledge,
-          a_risk: teamYearNominationData.accomplishments.riskManagement,
-          a_customer_sat: teamYearNominationData.accomplishments.customerFeedback,
-          a_team_bonding: teamYearNominationData.accomplishments.teamBonding,
-          a_compliance: teamYearNominationData.accomplishments.processCompliance,
-          a_impact: teamYearNominationData.accomplishments.impact,
-          a_cost_effective: teamYearNominationData.accomplishments.costEffective,
-          a_contribution: teamYearNominationData.accomplishments.contribution,
-          a_others: teamYearNominationData.accomplishments.others,
+                a_deliverable: teamYearNominationData.accomplishments.exceptionalDeliverable,
+                a_utilization: teamYearNominationData.accomplishments.resourceUtilization,
+                a_productivity: teamYearNominationData.accomplishments.resourceProductivity,
+                a_knowledge: teamYearNominationData.accomplishments.teamKnowledge,
+                a_risk: teamYearNominationData.accomplishments.riskManagement,
+                a_customer_sat: teamYearNominationData.accomplishments.customerFeedback,
+                a_team_bonding: teamYearNominationData.accomplishments.teamBonding,
+                a_compliance: teamYearNominationData.accomplishments.processCompliance,
+                a_impact: teamYearNominationData.accomplishments.impact,
+                a_cost_effective: teamYearNominationData.accomplishments.costEffective,
+                a_contribution: teamYearNominationData.accomplishments.contribution,
+                a_others: teamYearNominationData.accomplishments.others,
 
-          nominated_by: teamYearNominationData.nominatedBy,
-          nominator_designation: teamYearNominationData.nominatedByDesignation,
-          routed_by: teamYearNominationData.routedBy,
-          router_designation: teamYearNominationData.routedByDesignation,
-        },
-        submittedBy: teamYearNominationData.nominatedBy,
-      };
+                nominated_by: teamYearNominationData.nominatedBy,
+                nominator_designation: teamYearNominationData.nominatedByDesignation,
+                routed_by: teamYearNominationData.routedBy,
+                router_designation: teamYearNominationData.routedByDesignation,
+              },
+              submittedBy: teamYearNominationData.nominatedBy,
+            };
 
-      const res = await fetch(`${API}/api/nomination/submitNomination`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mappedData),
-      });
+            const res = await fetch(`${API}/api/nomination/submitNomination`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(mappedData),
+            });
 
-      const data = await res.json();
+            const data = await res.json();
 
-      if (data.success) {
-        alert("✅ Team of the Year Nomination submitted successfully!");
-        setShowTeamYearNominationForm(false);
-      } else {
-        alert("❌ Error: " + (data.error || "unknown"));
-      }
-    } catch (err) {
-      console.error("❌ Frontend Error:", err);
-      alert("Submission failed");
-    } finally {
-      // 🔓 Always unlock after API finishes
-      teamYearSubmit.stop();
-    }
-  }}
-  className={`px-4 py-2 rounded text-white ${
-    teamYearSubmit.locked
-      ? "bg-green-300 cursor-not-allowed"
-      : "bg-green-600"
-  }`}
->
-  {teamYearSubmit.locked ? "Submitting..." : "Submit Nomination "}
-</button>
+            if (data.success) {
+              alert("✅ Team of the Quarter Nomination submitted successfully!");
+              setShowNominationForm(false);
+            } else {
+              alert("❌ Error: " + (data.error || "unknown"));
+            }
+          } catch (err) {
+            console.error("❌ Frontend Error:", err);
+            alert("Submission failed");
+          } finally {
+            teamYearSubmit.stop();
+          }
+        }}
+        className={`px-4 py-2 rounded text-white ${
+          teamYearSubmit.locked
+            ? "bg-green-300 cursor-not-allowed"
+            : "bg-green-600"
+        }`}
+      >
+        {teamYearSubmit.locked ? "Submitting..." : "Submit Nomination"}
+      </button>
+    </form>
+  </DialogContent>
+</Dialog>
 
 
 
-           
-          </form>
-        </DialogContent>
-      </Dialog>
+
+
+
+
       <Dialog
   open={showLeaveEncashForm}
   onOpenChange={setShowLeaveEncashForm}
@@ -2336,7 +2401,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
     }
   }}
 >
-  {starNominationSubmit.locked ? "Submitting..." : "Submit Nomination "}
+  {starNominationSubmit.locked ? "Submitting..." : "Submit Nomination  "}
 </button>
 
 
