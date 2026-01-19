@@ -1,5 +1,11 @@
 ﻿﻿import React, { useState, useEffect } from "react";
 import CollapsibleSkillLine from "./CollapsibleSkillLine";
+import HRFunctions from "./HRFunctions";
+
+
+
+
+
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1071,7 +1077,7 @@ else if (fileName === "Letter_of_Undertaking.pdf") {
   )}
 </TabsList>
 
-
+ <HRFunctions />
 
 {/*}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
