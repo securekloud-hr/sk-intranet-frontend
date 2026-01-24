@@ -32,6 +32,8 @@ import MyCertifications from "./Pages/MyCertifications";
 import AdminDashboard from "./Pages/AdminDashboard";
 import MyCourses from "./Pages/MyCourses";
 import Finance from "./Pages/Finance";
+import Sales from "./Pages/Sales";
+
 
 const queryClient = new QueryClient();
 
@@ -73,6 +75,8 @@ export default function App() {
                 <Route path="/my-certifications" element={<MyCertifications />} />
                 <Route path="/admindashboard" element={<AdminDashboard />} />
                 <Route path="/finance" element={<Finance />} />
+                <Route path="/sales" element={<Sales />} />
+
               </Route>
             </Route>
 

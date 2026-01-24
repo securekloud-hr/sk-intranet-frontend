@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { TrendingUp } from "lucide-react";
+
 
 type NavItem = {
   title: string;
@@ -54,6 +56,8 @@ export function AppSidebar({
     { title: "Performance 🚧", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },
     { title: "Support", href: "/faqs", icon: HelpCircle },
+    { title: "Sales", href: "/sales", icon: TrendingUp },
+
   ];
 
   // ✅ Admin Dashboard should appear AFTER Support
