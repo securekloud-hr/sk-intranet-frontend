@@ -42,7 +42,8 @@ export function AppHeader({
   onRoleResolved,
 }: {
   user?: any;
- onRoleResolved?: (role: "admin" | "manager" | "user" | "isr") => void;
+ onRoleResolved?: (role: "admin" | "manager" | "user" | "isr" | "sm") => void;
+
 
 
 }) {
@@ -97,11 +98,13 @@ export function AppHeader({
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
- const role = (employeeRecord?.role || "user").toLowerCase() as
+const role = (employeeRecord?.role || "user").toLowerCase() as
   | "admin"
   | "manager"
   | "user"
-  | "isr";
+  | "isr"
+  | "sm";
+
 
 
   useEffect(() => {
