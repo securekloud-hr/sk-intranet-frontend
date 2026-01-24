@@ -18,31 +18,30 @@ import {
   Network,
   Shield,
   Clock,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { TrendingUp } from "lucide-react";
 
-
+/* ================= TYPES ================= */
 type NavItem = {
   title: string;
   href: string;
   icon: React.ElementType;
 };
 
-export function AppSidebar({
-  role,
-}: {
-  role: "admin" | "manager" | "user";
-}) {
-  // ✅ FIX: collapsed state was missing
+type UserRole = "admin" | "manager" | "user" | "isr";
+
+/* ================= SIDEBAR ================= */
+export function AppSidebar({ role }: { role: UserRole }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const isAdmin = role === "admin";
+  const isISR = role === "isr";
 
-  // ✅ Base navigation
+  /* ================= BASE NAV ================= */
   const mainNavItems: NavItem[] = [
-     { title: "Admin", href: "/admin", icon: Users },
+    { title: "Admin", href: "/admin", icon: Users },
     { title: "HR", href: "/hr", icon: Users },
     { title: "IT", href: "/it", icon: Computer },
     { title: "Finance", href: "/finance", icon: Banknote },
@@ -56,11 +55,18 @@ export function AppSidebar({
     { title: "Performance 🚧", href: "/performance", icon: BarChart3 },
     { title: "Org Structure", href: "/org", icon: Network },
     { title: "Support", href: "/faqs", icon: HelpCircle },
-    { title: "Sales", href: "/sales", icon: TrendingUp },
-
   ];
 
-  // ✅ Admin Dashboard should appear AFTER Support
+  /* ================= ISR ONLY ================= */
+  if (isISR) {
+    mainNavItems.push({
+      title: "Sales",
+      href: "/sales",
+      icon: TrendingUp,
+    });
+  }
+
+  /* ================= ADMIN ONLY ================= */
   if (isAdmin) {
     mainNavItems.push({
       title: "Admin Dashboard",
@@ -76,7 +82,7 @@ export function AppSidebar({
         collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* Header */}
+      {/* ================= HEADER ================= */}
       <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
           <Link to="/" className="flex items-center space-x-2">
@@ -84,6 +90,7 @@ export function AppSidebar({
             <span className="text-xl font-bold text-white">Home</span>
           </Link>
         )}
+
         <Button
           variant="ghost"
           size="icon"
@@ -93,7 +100,7 @@ export function AppSidebar({
         </Button>
       </div>
 
-      {/* Nav */}
+      {/* ================= NAV ================= */}
       <nav className="flex-1 px-2 py-2 space-y-1">
         {mainNavItems.map((item) => (
           <Link

@@ -42,7 +42,8 @@ export function AppHeader({
   onRoleResolved,
 }: {
   user?: any;
-  onRoleResolved?: (role: "admin" | "manager" | "user") => void;
+ onRoleResolved?: (role: "admin" | "manager" | "user" | "isr") => void;
+
 
 }) {
 
@@ -53,6 +54,24 @@ export function AppHeader({
   const [previewSrc, setPreviewSrc] = useState<string>("");
 
   const [employeeRecord, setEmployeeRecord] = useState<EmployeeRecord | null>(null);
+  useEffect(() => {
+  if (
+    employeeRecord?.EmpID &&
+    employeeRecord?.EmployeeName
+  ) {
+    const loggedEmployee = {
+      empId: employeeRecord.EmpID,
+      employeeName: employeeRecord.EmployeeName,
+      role: (employeeRecord.role || "isr").toLowerCase(),
+    };
+
+    localStorage.setItem(
+      "loggedEmployee",
+      JSON.stringify(loggedEmployee)
+    );
+  }
+}, [employeeRecord]);
+
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -78,10 +97,12 @@ export function AppHeader({
   }, [user]);
 
   const displayName = mongoUser?.name || "User";
- const role = (employeeRecord?.role || "User").toLowerCase() as
+ const role = (employeeRecord?.role || "user").toLowerCase() as
   | "admin"
   | "manager"
-  | "user";
+  | "user"
+  | "isr";
+
 
   useEffect(() => {
   onRoleResolved?.(role);
@@ -268,10 +289,12 @@ setStoredAvatar(newObj);
                 <div className="flex flex-col items-start text-left leading-tight">
                   <span className="font-medium">{displayName}</span>
                   <span className="text-sm text-muted-foreground">
-                    {role === "admin"
+                   {role === "admin"
   ? "🛡️ Admin"
   : role === "manager"
   ? "👔 Manager"
+  : role === "isr"
+  ? "📈 ISR"
   : "👤 User"}
 
                   </span>
@@ -351,7 +374,19 @@ setStoredAvatar(newObj);
               </div>
 
               <div className="border-t pt-3 space-y-2">
-                <InfoRow label="Role" value={role === "admin" ? "Admin" : "User"} />
+                <InfoRow
+  label="Role"
+  value={
+    role === "admin"
+      ? "Admin"
+      : role === "manager"
+      ? "Manager"
+      : role === "isr"
+      ? "ISR"
+      : "User"
+  }
+/>
+
                 <InfoRow label="Job Title" value={jobTitle} />
                 <InfoRow label="Joined On" value={createdAt} />
               </div>
