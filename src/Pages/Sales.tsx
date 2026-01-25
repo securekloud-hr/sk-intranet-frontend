@@ -99,6 +99,30 @@ const Sales = () => {
     formData.followUpMeeting +
     formData.qualifiedMeeting;
 
+
+  const normalizeDate = (d: string | Date) => {
+  const date = new Date(d);
+  date.setHours(0, 0, 0, 0);
+  return date.toISOString().split("T")[0];
+};
+
+  
+
+    const resetFormForDate = (date: string) => {
+  setFormData({
+    date,
+    callsMade: 0,
+    netNewMeeting: 0,
+    followUpMeeting: 0,
+    qualifiedMeeting: 0,
+    emailsOutgoing: 0,
+    whatsappMessage: 0,
+    proposals: 0,
+    dealWon: 0,
+  });
+};
+
+
   /* ================= LOAD ================= */
   useEffect(() => {
     fetchSales();
@@ -132,45 +156,38 @@ const Sales = () => {
   if (!loggedEmployee) return;
 
   const record = salesData.find(
-    (s) =>
-      s.empId === loggedEmployee.empId &&
-      s.date.split("T")[0] === formData.date
-  );
+  (s) =>
+    s.empId === loggedEmployee.empId &&
+    normalizeDate(s.date) === normalizeDate(formData.date)
+);
 
-  // ✅ NO DATA → RESET FORM
-  if (!record) {
-    setFormData({
-      date: formData.date,
-      callsMade: 0,
-      netNewMeeting: 0,
-      followUpMeeting: 0,
-      qualifiedMeeting: 0,
-      emailsOutgoing: 0,
-      whatsappMessage: 0,
-      proposals: 0,
-      dealWon: 0,
-    });
-    setLastLoadedDate(null);
+
+  // 🟢 CASE 1: Data exists → autofill ONCE
+  if (record) {
+    if (lastLoadedDate !== formData.date) {
+      setFormData({
+        date: formData.date,
+        callsMade: record.callsMade,
+        netNewMeeting: record.netNewMeeting,
+        followUpMeeting: record.followUpMeeting,
+        qualifiedMeeting: record.qualifiedMeeting,
+        emailsOutgoing: record.emailsOutgoing,
+        whatsappMessage: record.whatsappMessage,
+        proposals: record.proposals,
+        dealWon: record.dealWon,
+      });
+      setLastLoadedDate(formData.date);
+    }
     return;
   }
 
-  // ✅ DATA EXISTS → AUTOFILL ONLY ONCE
-  if (lastLoadedDate === formData.date) return;
+  // 🟡 CASE 2: No data → reset ONLY when date changes
+  if (lastLoadedDate !== formData.date) {
+    resetFormForDate(formData.date);
+    setLastLoadedDate(formData.date);
+  }
+}, [formData.date, salesData, loggedEmployee, lastLoadedDate]);
 
-  setFormData({
-    date: formData.date,
-    callsMade: record.callsMade,
-    netNewMeeting: record.netNewMeeting,
-    followUpMeeting: record.followUpMeeting,
-    qualifiedMeeting: record.qualifiedMeeting,
-    emailsOutgoing: record.emailsOutgoing,
-    whatsappMessage: record.whatsappMessage,
-    proposals: record.proposals,
-    dealWon: record.dealWon,
-  });
-
-  setLastLoadedDate(formData.date);
-}, [formData.date, salesData, loggedEmployee]);
 
 
   /* ================= HANDLERS ================= */
@@ -192,10 +209,22 @@ const handleSubmit = async () => {
   if (saving || !loggedEmployee) return;
 
   const existing = salesData.find(
-    (s) =>
-      s.empId === loggedEmployee.empId &&
-      s.date.split("T")[0] === formData.date
-  );
+  (s) =>
+    s.empId === loggedEmployee.empId &&
+    normalizeDate(s.date) === normalizeDate(formData.date)
+);
+
+  // 🚨 CONFIRM OVERWRITE
+  if (existing) {
+    const confirmOverwrite = window.confirm(
+      `Sales data already exists for ${formData.date}.
+Do you want to overwrite it?`
+    );
+
+    if (!confirmOverwrite) {
+      return; // ❌ user clicked NO
+    }
+  }
 
   const payload = {
     ...formData,
@@ -214,7 +243,6 @@ const handleSubmit = async () => {
 
     const res = await fetch(`${API}/api/sales`, {
       method: "POST",
-
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
@@ -229,7 +257,12 @@ const handleSubmit = async () => {
     if (!res.ok) throw new Error("Save failed");
 
     await fetchSales();
-    alert("✅ Saved successfully");
+
+    alert(
+      existing
+        ? "✅ Sales data updated successfully"
+        : "✅ Sales data saved successfully"
+    );
   } catch (err) {
     console.error(err);
     alert("❌ Failed to save");
@@ -237,7 +270,6 @@ const handleSubmit = async () => {
     setSaving(false);
   }
 };
-
 
   /* ================= MONTH & WEEK OPTIONS ================= */
   // Month options derived from salesData (unique year-month). Sorted newest -> oldest
