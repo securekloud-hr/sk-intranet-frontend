@@ -538,19 +538,55 @@ const aggregatedTotal = useMemo(() => {
 
   /* ================= UI ================= */
   return (
-    <div className="space-y-10 p-6 max-w-7xl">
+    <div className="p-6 max-w-7xl space-y-6">
+
       <h1 className="text-3xl font-bold">Sales Daily Tracker</h1>
 
-      <Label>Date</Label>
-     <Input
-  type="date"
-  value={formData.date}
-  onChange={(e) => {
-    setLastLoadedDate(null); // 🔓 allow new autofill
-    handleChange("date", e.target.value);
-  }}
-  className="w-64"
-/>
+   <div className="flex items-center gap-3">
+  <Label className="text-sm mb-0">Date</Label>
+
+  {/* ⬅ Previous day */}
+  <Button
+    variant="outline"
+    size="icon"
+    className="h-9 w-9"
+    onClick={() => {
+      const d = new Date(formData.date);
+      d.setDate(d.getDate() - 1);
+      setLastLoadedDate(null);
+      handleChange("date", d.toISOString().split("T")[0]);
+    }}
+  >
+    ←
+  </Button>
+
+  {/* 📅 Date picker */}
+  <Input
+    type="date"
+    value={formData.date}
+    onChange={(e) => {
+      setLastLoadedDate(null);
+      handleChange("date", e.target.value);
+    }}
+    className="w-40 h-9"
+  />
+
+  {/* ➡ Next day */}
+  <Button
+    variant="outline"
+    size="icon"
+    className="h-9 w-9"
+    onClick={() => {
+      const d = new Date(formData.date);
+      d.setDate(d.getDate() + 1);
+      setLastLoadedDate(null);
+      handleChange("date", d.toISOString().split("T")[0]);
+    }}
+  >
+    →
+  </Button>
+</div>
+
 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
