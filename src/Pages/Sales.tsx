@@ -428,6 +428,77 @@ const totalMeetings = useMemo(() => {
 }, [filteredSales]);
 
 
+
+const aggregatedSales = useMemo(() => {
+  // DAILY → no aggregation
+  if (filter === "daily") return filteredSales;
+
+  const map = new Map<string, SalesEntry>();
+
+  filteredSales.forEach((item) => {
+    let key = "";
+    let displayDate = item.date;
+
+    // MONTHLY grouping
+    if (filter === "monthly") {
+      const d = new Date(item.date);
+      key = `${item.empId}-${d.getFullYear()}-${d.getMonth()}`;
+      displayDate = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+    }
+
+    // WEEKLY grouping
+    if (filter === "weekly") {
+      const d = new Date(item.date);
+      const start = new Date(d);
+      start.setDate(d.getDate() - d.getDay());
+      start.setHours(0, 0, 0, 0);
+      key = `${item.empId}-${start.toISOString()}`;
+      displayDate = start.toISOString();
+    }
+
+    if (!map.has(key)) {
+      map.set(key, {
+        ...item,
+        date: displayDate,
+        callsMade: 0,
+        netNewMeeting: 0,
+        followUpMeeting: 0,
+        qualifiedMeeting: 0,
+        meetingsDone: 0,
+        emailsOutgoing: 0,
+        whatsappMessage: 0,
+        proposals: 0,
+        dealWon: 0,
+      });
+    }
+
+    const agg = map.get(key)!;
+
+    agg.callsMade += item.callsMade;
+    agg.netNewMeeting += item.netNewMeeting;
+    agg.followUpMeeting += item.followUpMeeting;
+    agg.qualifiedMeeting += item.qualifiedMeeting;
+    agg.meetingsDone += item.meetingsDone;
+    agg.emailsOutgoing += item.emailsOutgoing;
+    agg.whatsappMessage += item.whatsappMessage;
+    agg.proposals += item.proposals;
+    agg.dealWon += item.dealWon;
+
+    // latest updatedAt
+    if (
+      item.updatedAt &&
+      (!agg.updatedAt ||
+        new Date(item.updatedAt) > new Date(agg.updatedAt))
+    ) {
+      agg.updatedAt = item.updatedAt;
+    }
+  });
+
+  return Array.from(map.values());
+}, [filteredSales, filter]);
+
+
+
   /* ================= UI ================= */
   return (
     <div className="space-y-10 p-6 max-w-7xl">
@@ -611,9 +682,24 @@ const totalMeetings = useMemo(() => {
 
 
            <TableBody>
-  {filteredSales.map((s) => (
+  {aggregatedSales.map((s) => (
+
     <TableRow key={s._id || `${s.empId}-${s.date}`}>
-      <TableCell>{new Date(s.date).toLocaleDateString()}</TableCell>
+<TableCell>
+  {filter === "monthly"
+    ? new Date(s.date).toLocaleString("default", {
+        month: "short",
+        year: "numeric",
+      })
+    : filter === "weekly"
+    ? (() => {
+        const start = new Date(s.date);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+      })()
+    : new Date(s.date).toLocaleDateString()}
+</TableCell>
       <TableCell>{s.employeeName}</TableCell>
 
       <TableCell>{s.callsMade}</TableCell>
