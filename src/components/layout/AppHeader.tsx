@@ -292,13 +292,16 @@ setStoredAvatar(newObj);
                 <div className="flex flex-col items-start text-left leading-tight">
                   <span className="font-medium">{displayName}</span>
                   <span className="text-sm text-muted-foreground">
-                   {role === "admin"
+{role === "admin"
   ? "🛡️ Admin"
   : role === "manager"
   ? "👔 Manager"
+  : role === "sm"
+  ? "📊 SM"
   : role === "isr"
   ? "📈 ISR"
   : "👤 User"}
+
 
                   </span>
                 </div>

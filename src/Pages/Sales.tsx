@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+ import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -263,52 +263,72 @@ const Sales = () => {
 
   /* ================= FILTER LOGIC (UPDATED) ================= */
   const filteredSales = useMemo(() => {
-    return salesData.filter((entry) => {
-      if (selectedISR !== "all" && entry.empId !== selectedISR) return false;
+  return salesData.filter((entry) => {
 
-      const d = new Date(entry.date);
-      d.setHours(0, 0, 0, 0);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    // 🔐 ROLE-BASED VISIBILITY
+    if (loggedEmployee?.role?.toLowerCase() === "isr") {
+      // ISR sees ONLY their own submitted data
+      if (entry.empId !== loggedEmployee.empId) return false;
+    }
 
-      // DAILY → only today
-      // DAILY → show all dates
-if (filter === "daily") {
-  return true;
-}
+    // 👔 SM can see all data (no restriction)
 
+    // 🔽 ISR dropdown filter (SM only)
+    if (selectedISR !== "all" && entry.empId !== selectedISR) return false;
 
-      // WEEKLY → use selectedWeek (Sunday start) if set; otherwise current week
-      if (filter === "weekly") {
-        let start: Date;
-        if (selectedWeek) {
-          start = new Date(selectedWeek);
-          start.setHours(0, 0, 0, 0);
-        } else {
-          start = new Date(today);
-          start.setDate(today.getDate() - today.getDay());
-          start.setHours(0, 0, 0, 0);
-        }
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        return d >= start && d <= end;
-      }
+    const d = new Date(entry.date);
+    d.setHours(0, 0, 0, 0);
 
-      // MONTHLY → use selectedMonth if set, otherwise show all months
-      if (filter === "monthly") {
-        if (!selectedMonth) return true;
-        const [y, m] = selectedMonth.split("-");
-        const year = Number(y);
-        const monthIndex = Number(m);
-        return d.getFullYear() === year && d.getMonth() === monthIndex;
-      }
-
+    // DAILY → show all dates
+    if (filter === "daily") {
       return true;
-    });
-  }, [salesData, filter, selectedISR, selectedMonth, selectedWeek]);
+    }
 
-  const totalMeetings = filteredSales.reduce((sum, item) => sum + item.meetingsDone, 0);
+    // WEEKLY
+    if (filter === "weekly") {
+      let start: Date;
+
+      if (selectedWeek) {
+        start = new Date(selectedWeek);
+      } else {
+        start = new Date();
+        start.setDate(start.getDate() - start.getDay());
+      }
+
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+
+      return d >= start && d <= end;
+    }
+
+    // MONTHLY
+    if (filter === "monthly") {
+      if (!selectedMonth) return true;
+      const [y, m] = selectedMonth.split("-");
+      return d.getFullYear() === Number(y) && d.getMonth() === Number(m);
+    }
+
+    return true;
+  });
+}, [
+  salesData,
+  filter,
+  selectedISR,
+  selectedMonth,
+  selectedWeek,
+  loggedEmployee,
+]);
+
+const totalMeetings = useMemo(() => {
+  return filteredSales.reduce(
+    (sum, item) => sum + (item.meetingsDone || 0),
+    0
+  );
+}, [filteredSales]);
+
 
   /* ================= UI ================= */
   return (
@@ -352,21 +372,24 @@ if (filter === "daily") {
           <CardTitle>Sales Activity</CardTitle>
 
           <CardDescription className="flex gap-4 items-center flex-wrap">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">ISR</span>
-              <select
-                className="border rounded px-2 py-1"
-                value={selectedISR}
-                onChange={(e) => setSelectedISR(e.target.value)}
-              >
-                <option value="all">All</option>
-                {isrs.map((i) => (
-                  <option key={i.EmpID} value={i.EmpID}>
-                    {i.EmployeeName}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {loggedEmployee?.role?.toLowerCase() === "sm" && (
+  <div className="flex items-center gap-2">
+    <span className="font-medium">ISR</span>
+    <select
+      className="border rounded px-2 py-1"
+      value={selectedISR}
+      onChange={(e) => setSelectedISR(e.target.value)}
+    >
+      <option value="all">All</option>
+      {isrs.map((i) => (
+        <option key={i.EmpID} value={i.EmpID}>
+          {i.EmployeeName}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
 
             {(["daily", "weekly", "monthly"] as FilterType[]).map((t) => (
               <button
@@ -474,4 +497,4 @@ const Row = ({ label, value, onChange }: any) => (
       <Input type="number" min={0} value={value} onChange={(e) => onChange(e.target.value)} />
     </td>
   </tr>
-);
+); 

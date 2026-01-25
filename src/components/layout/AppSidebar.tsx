@@ -30,14 +30,16 @@ type NavItem = {
   icon: React.ElementType;
 };
 
-type UserRole = "admin" | "manager" | "user" | "isr";
+type UserRole = "admin" | "manager" | "user" | "isr" | "sm";
+
 
 /* ================= SIDEBAR ================= */
 export function AppSidebar({ role }: { role: UserRole }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const isAdmin = role === "admin";
-  const isISR = role === "isr";
+  const isISR = role === "isr" || role === "sm";
+
 
   /* ================= BASE NAV ================= */
   const mainNavItems: NavItem[] = [
