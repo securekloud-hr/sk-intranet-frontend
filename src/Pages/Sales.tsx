@@ -87,6 +87,11 @@ const Sales = () => {
   const [selectedMonth, setSelectedMonth] = useState(""); // format: "YYYY-M" where M is monthIndex
   const [selectedWeek, setSelectedWeek] = useState(""); // ISO start-of-week string
 
+  const [lastLoadedDate, setLastLoadedDate] = useState<string | null>(null);
+
+  const [isReadOnly, setIsReadOnly] = useState(false);
+
+
   /* ================= CALC ================= */
   const meetingsDone =
     formData.callsMade +
@@ -122,62 +127,100 @@ const Sales = () => {
     }
   };
 
+ useEffect(() => {
+  if (!loggedEmployee) return;
+
+  const record = salesData.find(
+    (s) =>
+      s.empId === loggedEmployee.empId &&
+      s.date.split("T")[0] === formData.date
+  );
+
+  if (!record) return;
+
+  // ⛔ IMPORTANT: autofill ONLY ONCE per date
+  if (lastLoadedDate === formData.date) return;
+
+  setFormData({
+    date: formData.date,
+    callsMade: record.callsMade,
+    netNewMeeting: record.netNewMeeting,
+    followUpMeeting: record.followUpMeeting,
+    qualifiedMeeting: record.qualifiedMeeting,
+    emailsOutgoing: record.emailsOutgoing,
+    whatsappMessage: record.whatsappMessage,
+    proposals: record.proposals,
+    dealWon: record.dealWon,
+  });
+
+  setLastLoadedDate(formData.date);
+}, [formData.date, salesData, loggedEmployee]);
+
   /* ================= HANDLERS ================= */
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: field === "date" ? value : Number(value),
-    }));
-  };
+ const handleChange = (field: string, value: string) => {
+  setFormData((prev) => ({
+    ...prev,
+    [field]:
+      field === "date"
+        ? value
+        : value === ""
+        ? ""
+        : Number(value),
+  }));
+};
+
 
   /* ================= SAVE ================= */
-  const handleSubmit = async () => {
-    if (saving) return;
-    if (!loggedEmployee) {
-      alert("User not logged in");
-      return;
-    }
+const handleSubmit = async () => {
+  if (saving || !loggedEmployee) return;
 
-    try {
-      setSaving(true);
+  const existing = salesData.find(
+    (s) =>
+      s.empId === loggedEmployee.empId &&
+      s.date.split("T")[0] === formData.date
+  );
 
-      const payload = {
+  const payload = {
+    ...formData,
+    callsMade: Number(formData.callsMade || 0),
+    netNewMeeting: Number(formData.netNewMeeting || 0),
+    followUpMeeting: Number(formData.followUpMeeting || 0),
+    qualifiedMeeting: Number(formData.qualifiedMeeting || 0),
+    emailsOutgoing: Number(formData.emailsOutgoing || 0),
+    whatsappMessage: Number(formData.whatsappMessage || 0),
+    proposals: Number(formData.proposals || 0),
+    dealWon: Number(formData.dealWon || 0),
+  };
+
+  try {
+    setSaving(true);
+
+    const res = await fetch(`${API}/api/sales`, {
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
         empId: loggedEmployee.empId,
         employeeName: loggedEmployee.employeeName,
         role: loggedEmployee.role,
-        ...formData,
+        ...payload,
         meetingsDone,
-      };
+      }),
+    });
 
-      const res = await fetch(`${API}/api/sales`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+    if (!res.ok) throw new Error("Save failed");
 
-      if (!res.ok) throw new Error("Save failed");
+    await fetchSales();
+    alert("✅ Saved successfully");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to save");
+  } finally {
+    setSaving(false);
+  }
+};
 
-      await fetchSales();
-
-      setFormData({
-        date: todayISO,
-        callsMade: 0,
-        netNewMeeting: 0,
-        followUpMeeting: 0,
-        qualifiedMeeting: 0,
-        emailsOutgoing: 0,
-        whatsappMessage: 0,
-        proposals: 0,
-        dealWon: 0,
-      });
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to save");
-    } finally {
-      setSaving(false);
-    }
-  };
 
   /* ================= MONTH & WEEK OPTIONS ================= */
   // Month options derived from salesData (unique year-month). Sorted newest -> oldest
@@ -336,19 +379,46 @@ const totalMeetings = useMemo(() => {
       <h1 className="text-3xl font-bold">Sales Daily Tracker</h1>
 
       <Label>Date</Label>
-      <Input
-        type="date"
-        value={formData.date}
-        onChange={(e) => handleChange("date", e.target.value)}
-        className="w-64"
-      />
+     <Input
+  type="date"
+  value={formData.date}
+  onChange={(e) => {
+    setLastLoadedDate(null); // 🔓 allow new autofill
+    handleChange("date", e.target.value);
+  }}
+  className="w-64"
+/>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <TableBox title="Meetings & Calls">
-          <Row label="Calls made" value={formData.callsMade} onChange={(v) => handleChange("callsMade", v)} />
-          <Row label="Net new meeting" value={formData.netNewMeeting} onChange={(v) => handleChange("netNewMeeting", v)} />
-          <Row label="Follow-up meeting" value={formData.followUpMeeting} onChange={(v) => handleChange("followUpMeeting", v)} />
-          <Row label="Qualified meeting" value={formData.qualifiedMeeting} onChange={(v) => handleChange("qualifiedMeeting", v)} />
+         <Row
+  label="Calls made"
+  value={formData.callsMade}
+ 
+  onChange={(v) => handleChange("callsMade", v)}
+/>
+
+<Row
+  label="Net new meeting"
+  value={formData.netNewMeeting}
+ 
+  onChange={(v) => handleChange("netNewMeeting", v)}
+/>
+
+<Row
+  label="Follow-up meeting"
+  value={formData.followUpMeeting}
+ 
+  onChange={(v) => handleChange("followUpMeeting", v)}
+/>
+
+<Row
+  label="Qualified meeting"
+  value={formData.qualifiedMeeting}
+
+  onChange={(v) => handleChange("qualifiedMeeting", v)}
+/>
           <tr className="bg-muted font-semibold">
             <td className="border px-4 py-2">Meetings done</td>
             <td className="border px-4 py-2">{meetingsDone}</td>
@@ -356,16 +426,43 @@ const totalMeetings = useMemo(() => {
         </TableBox>
 
         <TableBox title="Outreach & Result">
-          <Row label="Emails outgoing" value={formData.emailsOutgoing} onChange={(v) => handleChange("emailsOutgoing", v)} />
-          <Row label="WhatsApp message" value={formData.whatsappMessage} onChange={(v) => handleChange("whatsappMessage", v)} />
-          <Row label="Proposals" value={formData.proposals} onChange={(v) => handleChange("proposals", v)} />
-          <Row label="Deal won" value={formData.dealWon} onChange={(v) => handleChange("dealWon", v)} />
+          
+<Row
+  label="Emails outgoing"
+  value={formData.emailsOutgoing}
+  
+  onChange={(v) => handleChange("emailsOutgoing", v)}
+/>
+
+<Row
+  label="WhatsApp message"
+  value={formData.whatsappMessage}
+ 
+  onChange={(v) => handleChange("whatsappMessage", v)}
+/>
+
+<Row
+  label="Proposals"
+  value={formData.proposals}
+  
+  onChange={(v) => handleChange("proposals", v)}
+/>
+
+<Row
+  label="Deal won"
+  value={formData.dealWon}
+  
+  onChange={(v) => handleChange("dealWon", v)}
+/>
         </TableBox>
       </div>
 
       <Button disabled={saving} onClick={handleSubmit}>
-        {saving ? "Saving..." : "Save Sales Data"}
-      </Button>
+
+  {isReadOnly ? "Already Submitted" : saving ? "Saving..." : "Save Sales Data"}
+</Button>
+
+
 
       <Card>
         <CardHeader>
@@ -494,7 +591,13 @@ const Row = ({ label, value, onChange }: any) => (
   <tr>
     <td className="border px-4 py-2">{label}</td>
     <td className="border px-4 py-2">
-      <Input type="number" min={0} value={value} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        type="number"
+        min={0}
+        value={value === "" ? "" : value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </td>
   </tr>
-); 
+);
+
