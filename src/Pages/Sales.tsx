@@ -499,6 +499,43 @@ const aggregatedSales = useMemo(() => {
 
 
 
+const aggregatedTotal = useMemo(() => {
+  // Decide which data to total
+  const source =
+    filter === "daily" ? filteredSales : aggregatedSales;
+
+  if (!source.length) return null;
+
+  return source.reduce(
+    (acc, item) => {
+      acc.callsMade += item.callsMade;
+      acc.netNewMeeting += item.netNewMeeting;
+      acc.followUpMeeting += item.followUpMeeting;
+      acc.qualifiedMeeting += item.qualifiedMeeting;
+      acc.meetingsDone += item.meetingsDone;
+      acc.emailsOutgoing += item.emailsOutgoing;
+      acc.whatsappMessage += item.whatsappMessage;
+      acc.proposals += item.proposals;
+      acc.dealWon += item.dealWon;
+      return acc;
+    },
+    {
+      callsMade: 0,
+      netNewMeeting: 0,
+      followUpMeeting: 0,
+      qualifiedMeeting: 0,
+      meetingsDone: 0,
+      emailsOutgoing: 0,
+      whatsappMessage: 0,
+      proposals: 0,
+      dealWon: 0,
+    }
+  );
+}, [filteredSales, aggregatedSales, filter]);
+
+
+
+
   /* ================= UI ================= */
   return (
     <div className="space-y-10 p-6 max-w-7xl">
@@ -681,45 +718,60 @@ const aggregatedSales = useMemo(() => {
 </TableHeader>
 
 
-           <TableBody>
+          <TableBody>
   {aggregatedSales.map((s) => (
-
     <TableRow key={s._id || `${s.empId}-${s.date}`}>
-<TableCell>
-  {filter === "monthly"
-    ? new Date(s.date).toLocaleString("default", {
-        month: "short",
-        year: "numeric",
-      })
-    : filter === "weekly"
-    ? (() => {
-        const start = new Date(s.date);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
-      })()
-    : new Date(s.date).toLocaleDateString()}
-</TableCell>
-      <TableCell>{s.employeeName}</TableCell>
+      <TableCell>
+        {filter === "monthly"
+          ? new Date(s.date).toLocaleString("default", {
+              month: "short",
+              year: "numeric",
+            })
+          : filter === "weekly"
+          ? (() => {
+              const start = new Date(s.date);
+              const end = new Date(start);
+              end.setDate(start.getDate() + 6);
+              return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+            })()
+          : new Date(s.date).toLocaleDateString()}
+      </TableCell>
 
+      <TableCell>{s.employeeName}</TableCell>
       <TableCell>{s.callsMade}</TableCell>
       <TableCell>{s.netNewMeeting}</TableCell>
       <TableCell>{s.followUpMeeting}</TableCell>
       <TableCell>{s.qualifiedMeeting}</TableCell>
       <TableCell>{s.meetingsDone}</TableCell>
-
       <TableCell>{s.emailsOutgoing}</TableCell>
       <TableCell>{s.whatsappMessage}</TableCell>
       <TableCell>{s.proposals}</TableCell>
       <TableCell>{s.dealWon}</TableCell>
       <TableCell>
-  {s.updatedAt
-    ? new Date(s.updatedAt).toLocaleString()
-    : "-"}
-</TableCell>
-
+        {s.updatedAt ? new Date(s.updatedAt).toLocaleString() : "-"}
+      </TableCell>
     </TableRow>
   ))}
+
+  {/* ✅ TOTAL ROW */}
+  {aggregatedTotal && (
+    <TableRow className="font-semibold bg-muted">
+      <TableCell>Total</TableCell>
+      <TableCell />
+
+      <TableCell>{aggregatedTotal.callsMade}</TableCell>
+      <TableCell>{aggregatedTotal.netNewMeeting}</TableCell>
+      <TableCell>{aggregatedTotal.followUpMeeting}</TableCell>
+      <TableCell>{aggregatedTotal.qualifiedMeeting}</TableCell>
+      <TableCell>{aggregatedTotal.meetingsDone}</TableCell>
+
+      <TableCell>{aggregatedTotal.emailsOutgoing}</TableCell>
+      <TableCell>{aggregatedTotal.whatsappMessage}</TableCell>
+      <TableCell>{aggregatedTotal.proposals}</TableCell>
+      <TableCell>{aggregatedTotal.dealWon}</TableCell>
+      <TableCell>-</TableCell>
+    </TableRow>
+  )}
 </TableBody>
 
           </Table>
@@ -754,4 +806,3 @@ const Row = ({ label, value, onChange }: any) => (
     </td>
   </tr>
 );
-
