@@ -127,7 +127,8 @@ const Sales = () => {
     }
   };
 
- useEffect(() => {
+
+  useEffect(() => {
   if (!loggedEmployee) return;
 
   const record = salesData.find(
@@ -136,9 +137,24 @@ const Sales = () => {
       s.date.split("T")[0] === formData.date
   );
 
-  if (!record) return;
+  // ✅ NO DATA → RESET FORM
+  if (!record) {
+    setFormData({
+      date: formData.date,
+      callsMade: 0,
+      netNewMeeting: 0,
+      followUpMeeting: 0,
+      qualifiedMeeting: 0,
+      emailsOutgoing: 0,
+      whatsappMessage: 0,
+      proposals: 0,
+      dealWon: 0,
+    });
+    setLastLoadedDate(null);
+    return;
+  }
 
-  // ⛔ IMPORTANT: autofill ONLY ONCE per date
+  // ✅ DATA EXISTS → AUTOFILL ONLY ONCE
   if (lastLoadedDate === formData.date) return;
 
   setFormData({
@@ -155,6 +171,7 @@ const Sales = () => {
 
   setLastLoadedDate(formData.date);
 }, [formData.date, salesData, loggedEmployee]);
+
 
   /* ================= HANDLERS ================= */
  const handleChange = (field: string, value: string) => {
