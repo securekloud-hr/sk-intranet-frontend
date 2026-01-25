@@ -26,16 +26,22 @@ type SalesEntry = {
   employeeName: string;
   role: string;
   date: string;
+
   callsMade: number;
   netNewMeeting: number;
   followUpMeeting: number;
   qualifiedMeeting: number;
   meetingsDone: number;
+
   emailsOutgoing: number;
   whatsappMessage: number;
   proposals: number;
   dealWon: number;
+
+  createdAt?: string;
+  updatedAt?: string;
 };
+
 
 type Employee = {
   EmpID: string;
@@ -583,40 +589,53 @@ const totalMeetings = useMemo(() => {
 
         <CardContent>
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>ISR</TableHead>
-                <TableHead>Calls</TableHead>
-                <TableHead>Meetings</TableHead>
-                <TableHead>Emails</TableHead>
-                <TableHead>WhatsApp</TableHead>
-                <TableHead>Proposals</TableHead>
-                <TableHead>Deals</TableHead>
-              </TableRow>
-            </TableHeader>
+          <TableHeader>
+  <TableRow>
+    <TableHead>Date</TableHead>
+    <TableHead>ISR</TableHead>
 
-            <TableBody>
-              {filteredSales.map((s) => (
-                <TableRow key={s._id || `${s.empId}-${s.date}`}>
-                  <TableCell>{new Date(s.date).toLocaleDateString()}</TableCell>
-                  <TableCell>{s.employeeName}</TableCell>
-                  <TableCell>{s.callsMade}</TableCell>
-                  <TableCell>{s.meetingsDone}</TableCell>
-                  <TableCell>{s.emailsOutgoing}</TableCell>
-                  <TableCell>{s.whatsappMessage}</TableCell>
-                  <TableCell>{s.proposals}</TableCell>
-                  <TableCell>{s.dealWon}</TableCell>
-                </TableRow>
-              ))}
+    <TableHead>Calls</TableHead>
+    <TableHead>Net New</TableHead>
+    <TableHead>Follow-up</TableHead>
+    <TableHead>Qualified</TableHead>
+    <TableHead>Meetings Done</TableHead>
 
-              <TableRow className="font-semibold bg-muted">
-                <TableCell>Total</TableCell>
-                <TableCell />
-                <TableCell />
-                <TableCell>{totalMeetings}</TableCell>
-              </TableRow>
-            </TableBody>
+    <TableHead>Emails</TableHead>
+    <TableHead>WhatsApp</TableHead>
+    <TableHead>Proposals</TableHead>
+    <TableHead>Deal Won</TableHead>
+    <TableHead>Updated At</TableHead>
+
+  </TableRow>
+</TableHeader>
+
+
+           <TableBody>
+  {filteredSales.map((s) => (
+    <TableRow key={s._id || `${s.empId}-${s.date}`}>
+      <TableCell>{new Date(s.date).toLocaleDateString()}</TableCell>
+      <TableCell>{s.employeeName}</TableCell>
+
+      <TableCell>{s.callsMade}</TableCell>
+      <TableCell>{s.netNewMeeting}</TableCell>
+      <TableCell>{s.followUpMeeting}</TableCell>
+      <TableCell>{s.qualifiedMeeting}</TableCell>
+      <TableCell>{s.meetingsDone}</TableCell>
+
+      <TableCell>{s.emailsOutgoing}</TableCell>
+      <TableCell>{s.whatsappMessage}</TableCell>
+      <TableCell>{s.proposals}</TableCell>
+      <TableCell>{s.dealWon}</TableCell>
+      <TableCell>
+  {s.updatedAt
+    ? new Date(s.updatedAt).toLocaleString()
+    : "-"}
+</TableCell>
+
+    </TableRow>
+  ))}
+</TableBody>
+
           </Table>
         </CardContent>
       </Card>
