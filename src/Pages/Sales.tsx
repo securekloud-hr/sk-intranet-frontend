@@ -538,11 +538,11 @@ const aggregatedTotal = useMemo(() => {
 
   /* ================= UI ================= */
   return (
-    <div className="p-6 max-w-7xl space-y-6">
+    <div className="p-6 max-w-7xl space-y-3">
 
       <h1 className="text-3xl font-bold">Sales Daily Tracker</h1>
 
-   <div className="flex items-center gap-3">
+   <div className="flex items-center gap-1">
   <Label className="text-sm mb-0">Date</Label>
 
   {/* ⬅ Previous day */}
@@ -589,7 +589,7 @@ const aggregatedTotal = useMemo(() => {
 
 
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <TableBox title="Meetings & Calls">
          <Row
   label="Calls made"
@@ -618,10 +618,7 @@ const aggregatedTotal = useMemo(() => {
 
   onChange={(v) => handleChange("qualifiedMeeting", v)}
 />
-          <tr className="bg-muted font-semibold">
-            <td className="border px-4 py-2">Meetings done</td>
-            <td className="border px-4 py-2">{meetingsDone}</td>
-          </tr>
+
         </TableBox>
 
         <TableBox title="Outreach & Result">
@@ -667,7 +664,7 @@ const aggregatedTotal = useMemo(() => {
         <CardHeader>
           <CardTitle>Sales Activity</CardTitle>
 
-          <CardDescription className="flex gap-4 items-center flex-wrap">
+          <CardDescription className="flex gap-2 items-center flex-wrap">
             {loggedEmployee?.role?.toLowerCase() === "sm" && (
   <div className="flex items-center gap-2">
     <span className="font-medium">ISR</span>
@@ -800,7 +797,6 @@ const aggregatedTotal = useMemo(() => {
       <TableCell>{aggregatedTotal.followUpMeeting}</TableCell>
       <TableCell>{aggregatedTotal.qualifiedMeeting}</TableCell>
       <TableCell>{aggregatedTotal.meetingsDone}</TableCell>
-
       <TableCell>{aggregatedTotal.emailsOutgoing}</TableCell>
       <TableCell>{aggregatedTotal.whatsappMessage}</TableCell>
       <TableCell>{aggregatedTotal.proposals}</TableCell>

@@ -47,16 +47,6 @@ export function AppSidebar({ role }: { role: UserRole }) {
     { title: "HR", href: "/hr", icon: Users },
     { title: "IT", href: "/it", icon: Computer },
     { title: "Finance", href: "/finance", icon: Banknote },
-    { title: "Holidays", href: "/holidays", icon: Calendar },
-    { title: "Employee Engagement", href: "/engagement", icon: Trophy },
-    { title: "Learning & Development", href: "/learning", icon: GraduationCap },
-    { title: "Talent Acquisition", href: "/talent", icon: Target },
-    { title: "Time Entry 🚧", href: "/timeentry", icon: Clock },
-    { title: "Notice Board 🚧", href: "/noticeboard", icon: Building },
-    { title: "Survey 🚧", href: "/survey", icon: Binoculars },
-    { title: "Performance 🚧", href: "/performance", icon: BarChart3 },
-    { title: "Org Structure", href: "/org", icon: Network },
-    { title: "Support", href: "/faqs", icon: HelpCircle },
   ];
 
   /* ================= ISR ONLY ================= */
@@ -67,6 +57,19 @@ export function AppSidebar({ role }: { role: UserRole }) {
       icon: TrendingUp,
     });
   }
+
+    mainNavItems.push(
+    { title: "Holidays", href: "/holidays", icon: Calendar },
+    { title: "Employee Engagement", href: "/engagement", icon: Trophy },
+    { title: "Learning & Development", href: "/learning", icon: GraduationCap },
+    { title: "Talent Acquisition", href: "/talent", icon: Target },
+    { title: "Time Entry 🚧", href: "/timeentry", icon: Clock },
+    { title: "Notice Board 🚧", href: "/noticeboard", icon: Building },
+    { title: "Survey 🚧", href: "/survey", icon: Binoculars },
+    { title: "Performance 🚧", href: "/performance", icon: BarChart3 },
+    { title: "Org Structure", href: "/org", icon: Network },
+    { title: "Support", href: "/faqs", icon: HelpCircle },
+    );
 
   /* ================= ADMIN ONLY ================= */
   if (isAdmin) {

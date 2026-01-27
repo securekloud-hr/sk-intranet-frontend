@@ -56,7 +56,8 @@ export default function App() {
                 <Route path="/home" element={<Index />} />
                 <Route path="/admin" element={<Admin />} />                              
                 <Route path="/it" element={<IT />} />
-                <Route path="/hr" element={<HR />} />                
+                <Route path="/hr" element={<HR />} /> 
+                <Route path="/sales" element={<Sales />} />                               
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/holidays" element={<Holidays />} />
                 <Route path="/faqs" element={<FAQs />} />
@@ -75,7 +76,7 @@ export default function App() {
                 <Route path="/my-certifications" element={<MyCertifications />} />
                 <Route path="/admindashboard" element={<AdminDashboard />} />
                 <Route path="/finance" element={<Finance />} />
-                <Route path="/sales" element={<Sales />} />
+
 
               </Route>
             </Route>
