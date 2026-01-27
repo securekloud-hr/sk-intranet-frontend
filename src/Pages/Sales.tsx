@@ -538,7 +538,7 @@ const aggregatedTotal = useMemo(() => {
 
   /* ================= UI ================= */
   return (
-    <div className="p-6 max-w-7xl space-y-3">
+    <div className="p-3 max-w-4xl space-y-3">
 
       <h1 className="text-3xl font-bold">Sales Daily Tracker</h1>
 
@@ -589,26 +589,26 @@ const aggregatedTotal = useMemo(() => {
 
 
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <TableBox title="Meetings & Calls">
-         <Row
+<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+<TableBox title="Meetings & Calls">
+  <Row
   label="Calls made"
   value={formData.callsMade}
- 
+
   onChange={(v) => handleChange("callsMade", v)}
 />
 
 <Row
   label="Net new meeting"
   value={formData.netNewMeeting}
- 
+
   onChange={(v) => handleChange("netNewMeeting", v)}
 />
 
 <Row
   label="Follow-up meeting"
   value={formData.followUpMeeting}
- 
+
   onChange={(v) => handleChange("followUpMeeting", v)}
 />
 
@@ -619,9 +619,9 @@ const aggregatedTotal = useMemo(() => {
   onChange={(v) => handleChange("qualifiedMeeting", v)}
 />
 
-        </TableBox>
+</TableBox>
 
-        <TableBox title="Outreach & Result">
+<TableBox title="Outreach & Result">
           
 <Row
   label="Emails outgoing"
@@ -818,7 +818,7 @@ export default Sales;
 /* ================= HELPERS ================= */
 const TableBox = ({ title, children }: any) => (
   <div className="border rounded-lg overflow-hidden">
-    <h2 className="font-semibold px-4 py-2 bg-muted">{title}</h2>
+    <h2 className="font-semibold px-12 py-2 bg-muted">{title}</h2>
     <table className="w-full border-collapse">
       <tbody>{children}</tbody>
     </table>
@@ -827,8 +827,8 @@ const TableBox = ({ title, children }: any) => (
 
 const Row = ({ label, value, onChange }: any) => (
   <tr>
-    <td className="border px-4 py-2">{label}</td>
-    <td className="border px-4 py-2">
+    <td className="border px-4 py-1">{label}</td>
+    <td className="border px-4 py-1">
       <Input
         type="number"
         min={0}
