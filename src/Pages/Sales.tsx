@@ -43,6 +43,20 @@ type SalesEntry = {
 };
 
 
+type TopPerformer = {
+  _id: string;
+  employeeName: string;
+  calls: number;
+  emails: number;
+  netNew: number;
+  followUp: number;
+  qualified: number;
+  proposals: number;
+  deals: number;
+};
+
+
+
 type Employee = {
   EmpID: string;
   EmployeeName: string;
@@ -96,6 +110,10 @@ const Sales = () => {
   const [lastLoadedDate, setLastLoadedDate] = useState<string | null>(null);
 
   const [isReadOnly, setIsReadOnly] = useState(false);
+  const [top5, setTop5] = useState<TopPerformer[]>([]);
+  const [target, setTarget] = useState<any>(null);
+
+
 
 
   /* ================= CALC ================= */
@@ -133,6 +151,8 @@ const Sales = () => {
   useEffect(() => {
     fetchSales();
     fetchISRs();
+    fetchTop5();
+    fetchTarget();
   }, []);
 
   const fetchSales = async () => {
@@ -276,6 +296,49 @@ Do you want to overwrite it?`
     setSaving(false);
   }
 };
+
+const fetchTop5 = async () => {
+  try {
+    const res = await fetch(`${API}/api/sales/top5`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    setTop5(result.data || []);
+  } catch (err) {
+    console.error("❌ Failed to load Top 5", err);
+  }
+};
+
+const fetchTarget = async () => {
+  try {
+    const res = await fetch(`${API}/api/target`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    setTarget(result.data);
+  } catch (err) {
+    console.error("❌ Failed to load target", err);
+  }
+};
+
+
+
+const pivotRows = useMemo(() => {
+  if (!top5.length || !target) return [];
+
+  return [
+    { metric: "Calls", target: target.calls, values: top5.map(i => i.calls) },
+    { metric: "Emails", target: target.emails, values: top5.map(i => i.emails) },
+    { metric: "Net New Meetings", target: target.net_new_meetings, values: top5.map(i => i.netNew) },
+    { metric: "Follow-up Meetings", target: target.followup_meetings, values: top5.map(i => i.followUp) },
+    { metric: "Qualified Meetings", target: target.qualified_meetings, values: top5.map(i => i.qualified) },
+    { metric: "Proposals Shared", target: target.proposals_shared, values: top5.map(i => i.proposals) },
+    { metric: "Deals Won", target: target.deals_won, values: top5.map(i => i.deals) },
+  ];
+}, [top5, target]);
+
+
+
 
   /* ================= MONTH & WEEK OPTIONS ================= */
   // Month options derived from salesData (unique year-month). Sorted newest -> oldest
@@ -538,7 +601,9 @@ const aggregatedTotal = useMemo(() => {
 
   /* ================= UI ================= */
   return (
-    <div className="p-3 max-w-4xl space-y-3">
+    <div className="p-3 max-w-7xl space-y-3">
+
+
 
       <h1 className="text-3xl font-bold">Sales Daily Tracker</h1>
 
@@ -651,12 +716,77 @@ const aggregatedTotal = useMemo(() => {
   onChange={(v) => handleChange("dealWon", v)}
 />
         </TableBox>
+<Card className="h-full max-h-[320px] overflow-hidden">
+
+
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base">
+      Top 5 Performers (Overall)
+    </CardTitle>
+    <CardDescription className="text-xs">
+      Aggregated from all sales data
+    </CardDescription>
+  </CardHeader>
+
+ <CardContent className="p-0 flex flex-col h-full">
+
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Metric</TableHead>
+          <TableHead>Target</TableHead>
+
+          {top5.map((isr) => (
+            <TableHead key={isr._id}>
+              {isr.employeeName}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+
+      <TableBody>
+        {pivotRows.map((row) => (
+          <TableRow key={row.metric}>
+            <TableCell className="font-medium">
+              {row.metric}
+            </TableCell>
+
+            {/* Target column (future use) */}
+            <TableCell className="text-center font-semibold">
+        {row.target}
+      </TableCell>
+
+            {row.values.map((val, i) => (
+              <TableCell key={i}>{val}</TableCell>
+            ))}
+          </TableRow>
+        ))}
+
+        {!pivotRows.length && (
+          <TableRow>
+            <TableCell
+              colSpan={top5.length + 2}
+              className="text-center text-muted-foreground"
+            >
+              No data
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </CardContent>
+</Card>
+
+
       </div>
 
       <Button disabled={saving} onClick={handleSubmit}>
 
   {isReadOnly ? "Already Submitted" : saving ? "Saving..." : "Save Sales Data"}
 </Button>
+
+
+
 
 
 
